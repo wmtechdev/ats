@@ -18,58 +18,54 @@ class AdminJobCreateScreen extends StatelessWidget {
     final hospitalController = TextEditingController();
     final requirementsController = TextEditingController();
 
-    return Scaffold(
-      backgroundColor: AppColors.lightBackground,
-      appBar: AppAppBar(title: AppTexts.createJob),
-      body: SingleChildScrollView(
-        padding: AppSpacing.padding(context),
-        child: Column(
-          children: [
-            AppTextField(
-              controller: titleController,
-              labelText: AppTexts.jobTitle,
-              prefixIcon: Iconsax.briefcase,
-            ),
-            AppSpacing.vertical(context, 0.02),
-            AppTextField(
-              controller: descriptionController,
-              labelText: AppTexts.description,
-              prefixIcon: Iconsax.document_text,
-              maxLines: 5,
-            ),
-            AppSpacing.vertical(context, 0.02),
-            AppTextField(
-              controller: hospitalController,
-              labelText: AppTexts.hospitalName,
-              prefixIcon: Iconsax.hospital,
-            ),
-            AppSpacing.vertical(context, 0.02),
-            AppTextField(
-              controller: requirementsController,
-              labelText: AppTexts.requirementsCommaSeparated,
-              prefixIcon: Iconsax.tick_circle,
-            ),
-            AppSpacing.vertical(context, 0.03),
-            Obx(() => AppButton(
-                  text: AppTexts.createJob,
-                  icon: Iconsax.add,
-                  onPressed: () {
-                    final requirements = requirementsController.text
-                        .split(',')
-                        .map((e) => e.trim())
-                        .where((e) => e.isNotEmpty)
-                        .toList();
-                    controller.createJob(
-                      title: titleController.text,
-                      description: descriptionController.text,
-                      hospitalName: hospitalController.text,
-                      requirements: requirements,
-                    );
-                  },
-                  isLoading: controller.isLoading.value,
-                )),
-          ],
-        ),
+    return AdminMainLayout(
+      title: AppTexts.createJob,
+      child: Column(
+        children: [
+          AppTextField(
+            controller: titleController,
+            labelText: AppTexts.jobTitle,
+            prefixIcon: Iconsax.briefcase,
+          ),
+          AppSpacing.vertical(context, 0.02),
+          AppTextField(
+            controller: descriptionController,
+            labelText: AppTexts.description,
+            prefixIcon: Iconsax.document_text,
+            maxLines: 5,
+          ),
+          AppSpacing.vertical(context, 0.02),
+          AppTextField(
+            controller: hospitalController,
+            labelText: AppTexts.hospitalName,
+            prefixIcon: Iconsax.hospital,
+          ),
+          AppSpacing.vertical(context, 0.02),
+          AppTextField(
+            controller: requirementsController,
+            labelText: AppTexts.requirementsCommaSeparated,
+            prefixIcon: Iconsax.tick_circle,
+          ),
+          AppSpacing.vertical(context, 0.03),
+          Obx(() => AppButton(
+                text: AppTexts.createJob,
+                icon: Iconsax.add,
+                onPressed: () {
+                  final requirements = requirementsController.text
+                      .split(',')
+                      .map((e) => e.trim())
+                      .where((e) => e.isNotEmpty)
+                      .toList();
+                  controller.createJob(
+                    title: titleController.text,
+                    description: descriptionController.text,
+                    hospitalName: hospitalController.text,
+                    requirements: requirements,
+                  );
+                },
+                isLoading: controller.isLoading.value,
+              )),
+        ],
       ),
     );
   }

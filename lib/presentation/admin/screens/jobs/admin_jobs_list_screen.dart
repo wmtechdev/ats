@@ -16,60 +16,63 @@ class AdminJobsListScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final controller = Get.find<AdminJobsController>();
 
-    return Scaffold(
-      backgroundColor: AppColors.lightBackground,
-      appBar: AppAppBar(
-        title: AppTexts.jobs,
-        actions: [
-          IconButton(
-            icon: Icon(
-              Iconsax.add,
-              size: AppResponsive.iconSize(context),
-              color: AppColors.primary,
-            ),
-            onPressed: () => Get.toNamed(AppConstants.routeAdminJobCreate),
+    return AdminMainLayout(
+      title: AppTexts.jobs,
+      actions: [
+        IconButton(
+          icon: Icon(
+            Iconsax.add,
+            size: AppResponsive.iconSize(context),
+            color: AppColors.primary,
           ),
-        ],
-      ),
-      body: Obx(() => controller.jobs.isEmpty
+          onPressed: () => Get.toNamed(AppConstants.routeAdminJobCreate),
+        ),
+      ],
+      child: Obx(() => controller.jobs.isEmpty
           ? AppEmptyState(
               message: AppTexts.noJobsAvailable,
               icon: Iconsax.briefcase,
             )
           : ListView.builder(
-              padding: AppSpacing.padding(context),
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
               itemCount: controller.jobs.length,
               itemBuilder: (context, index) {
                 final job = controller.jobs[index];
-                return AppListCard(
-                  title: job.title,
-                  subtitle: job.hospitalName,
-                  icon: Iconsax.briefcase,
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      IconButton(
-                        icon: Icon(
-                          Iconsax.edit,
-                          size: AppResponsive.iconSize(context),
-                          color: AppColors.information,
-                        ),
-                        onPressed: () {
-                          controller.selectJob(job);
-                          Get.toNamed(AppConstants.routeAdminJobEdit);
-                        },
-                      ),
-                      IconButton(
-                        icon: Icon(
-                          Iconsax.trash,
-                          size: AppResponsive.iconSize(context),
-                          color: AppColors.error,
-                        ),
-                        onPressed: () => controller.deleteJob(job.jobId),
-                      ),
-                    ],
+                return Padding(
+                  padding: EdgeInsets.only(
+                    bottom: AppResponsive(context).scaleSize(0.015),
                   ),
-                  onTap: null,
+                  child: AppListCard(
+                    title: job.title,
+                    subtitle: job.hospitalName,
+                    icon: Iconsax.briefcase,
+                    trailing: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        IconButton(
+                          icon: Icon(
+                            Iconsax.edit,
+                            size: AppResponsive.iconSize(context),
+                            color: AppColors.information,
+                          ),
+                          onPressed: () {
+                            controller.selectJob(job);
+                            Get.toNamed(AppConstants.routeAdminJobEdit);
+                          },
+                        ),
+                        IconButton(
+                          icon: Icon(
+                            Iconsax.trash,
+                            size: AppResponsive.iconSize(context),
+                            color: AppColors.error,
+                          ),
+                          onPressed: () => controller.deleteJob(job.jobId),
+                        ),
+                      ],
+                    ),
+                    onTap: null,
+                  ),
                 );
               },
             )),

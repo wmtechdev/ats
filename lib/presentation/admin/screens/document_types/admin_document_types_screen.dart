@@ -16,46 +16,49 @@ class AdminDocumentTypesScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final controller = Get.find<AdminDocumentsController>();
 
-    return Scaffold(
-      backgroundColor: AppColors.lightBackground,
-      appBar: AppAppBar(
-        title: AppTexts.documentTypes,
-        actions: [
-          IconButton(
-            icon: Icon(
-              Iconsax.add,
-              size: AppResponsive.iconSize(context),
-              color: AppColors.primary,
-            ),
-            onPressed: () {
-              _showCreateDialog(context, controller);
-            },
+    return AdminMainLayout(
+      title: AppTexts.documentTypes,
+      actions: [
+        IconButton(
+          icon: Icon(
+            Iconsax.add,
+            size: AppResponsive.iconSize(context),
+            color: AppColors.primary,
           ),
-        ],
-      ),
-      body: Obx(() => controller.documentTypes.isEmpty
+          onPressed: () {
+            _showCreateDialog(context, controller);
+          },
+        ),
+      ],
+      child: Obx(() => controller.documentTypes.isEmpty
           ? AppEmptyState(
               message: AppTexts.noDocumentTypesAvailable,
               icon: Iconsax.document_text,
             )
           : ListView.builder(
-              padding: AppSpacing.padding(context),
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
               itemCount: controller.documentTypes.length,
               itemBuilder: (context, index) {
                 final docType = controller.documentTypes[index];
-                return AppListCard(
-                  title: docType.name,
-                  subtitle: docType.description,
-                  icon: Iconsax.document_text,
-                  trailing: IconButton(
-                    icon: Icon(
-                      Iconsax.trash,
-                      size: AppResponsive.iconSize(context),
-                      color: AppColors.error,
-                    ),
-                    onPressed: () => controller.deleteDocumentType(docType.docTypeId),
+                return Padding(
+                  padding: EdgeInsets.only(
+                    bottom: AppResponsive(context).scaleSize(0.015),
                   ),
-                  onTap: null,
+                  child: AppListCard(
+                    title: docType.name,
+                    subtitle: docType.description,
+                    icon: Iconsax.document_text,
+                    trailing: IconButton(
+                      icon: Icon(
+                        Iconsax.trash,
+                        size: AppResponsive.iconSize(context),
+                        color: AppColors.error,
+                      ),
+                      onPressed: () => controller.deleteDocumentType(docType.docTypeId),
+                    ),
+                    onTap: null,
+                  ),
                 );
               },
             )),

@@ -18,3 +18,10 @@ export 'auth/app_auth_logo.dart';
 export 'auth/app_auth_title.dart';
 export 'auth/app_auth_form_content.dart';
 export 'auth/app_auth_container.dart';
+
+// Admin widgets (used in admin panel)
+export 'admin/admin_navigation_item.dart';
+export 'admin/admin_profile_section.dart';
+export 'admin/admin_sidebar.dart';
+export 'admin/admin_drawer.dart';
+export 'admin/admin_main_layout.dart';

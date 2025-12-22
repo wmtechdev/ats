@@ -17,10 +17,9 @@ class AdminJobEditScreen extends StatelessWidget {
     final descriptionController = TextEditingController();
     final hospitalController = TextEditingController();
 
-    return Scaffold(
-      backgroundColor: AppColors.lightBackground,
-      appBar: AppAppBar(title: AppTexts.editJob),
-      body: Obx(() {
+    return AdminMainLayout(
+      title: AppTexts.editJob,
+      child: Obx(() {
         final job = controller.selectedJob.value;
         if (job == null) {
           return AppEmptyState(
@@ -33,44 +32,41 @@ class AdminJobEditScreen extends StatelessWidget {
         descriptionController.text = job.description;
         hospitalController.text = job.hospitalName;
 
-        return SingleChildScrollView(
-          padding: AppSpacing.padding(context),
-          child: Column(
-            children: [
-              AppTextField(
-                controller: titleController,
-                labelText: AppTexts.jobTitle,
-                prefixIcon: Iconsax.briefcase,
-              ),
-              AppSpacing.vertical(context, 0.02),
-              AppTextField(
-                controller: descriptionController,
-                labelText: AppTexts.description,
-                prefixIcon: Iconsax.document_text,
-                maxLines: 5,
-              ),
-              AppSpacing.vertical(context, 0.02),
-              AppTextField(
-                controller: hospitalController,
-                labelText: AppTexts.hospitalName,
-                prefixIcon: Iconsax.hospital,
-              ),
-              AppSpacing.vertical(context, 0.03),
-              Obx(() => AppButton(
-                    text: AppTexts.updateJob,
-                    icon: Iconsax.edit,
-                    onPressed: () {
-                      controller.updateJob(
-                        jobId: job.jobId,
-                        title: titleController.text,
-                        description: descriptionController.text,
-                        hospitalName: hospitalController.text,
-                      );
-                    },
-                    isLoading: controller.isLoading.value,
-                  )),
-            ],
-          ),
+        return Column(
+          children: [
+            AppTextField(
+              controller: titleController,
+              labelText: AppTexts.jobTitle,
+              prefixIcon: Iconsax.briefcase,
+            ),
+            AppSpacing.vertical(context, 0.02),
+            AppTextField(
+              controller: descriptionController,
+              labelText: AppTexts.description,
+              prefixIcon: Iconsax.document_text,
+              maxLines: 5,
+            ),
+            AppSpacing.vertical(context, 0.02),
+            AppTextField(
+              controller: hospitalController,
+              labelText: AppTexts.hospitalName,
+              prefixIcon: Iconsax.hospital,
+            ),
+            AppSpacing.vertical(context, 0.03),
+            Obx(() => AppButton(
+                  text: AppTexts.updateJob,
+                  icon: Iconsax.edit,
+                  onPressed: () {
+                    controller.updateJob(
+                      jobId: job.jobId,
+                      title: titleController.text,
+                      description: descriptionController.text,
+                      hospitalName: hospitalController.text,
+                    );
+                  },
+                  isLoading: controller.isLoading.value,
+                )),
+          ],
         );
       }),
     );

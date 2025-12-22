@@ -16,32 +16,37 @@ class AdminCandidatesListScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final controller = Get.find<AdminCandidatesController>();
 
-    return Scaffold(
-      backgroundColor: AppColors.lightBackground,
-      appBar: AppAppBar(title: AppTexts.candidates),
-      body: Obx(() => controller.candidates.isEmpty
+    return AdminMainLayout(
+      title: AppTexts.candidates,
+      child: Obx(() => controller.candidates.isEmpty
           ? AppEmptyState(
               message: AppTexts.noCandidatesAvailable,
               icon: Iconsax.profile_circle,
             )
           : ListView.builder(
-              padding: AppSpacing.padding(context),
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
               itemCount: controller.candidates.length,
               itemBuilder: (context, index) {
                 final candidate = controller.candidates[index];
-                return AppListCard(
-                  title: candidate.email,
-                  subtitle: '${AppTexts.role}: ${candidate.role}',
-                  icon: Iconsax.profile_circle,
-                  trailing: Icon(
-                    Iconsax.arrow_right_3,
-                    size: AppResponsive.iconSize(context),
-                    color: AppColors.primary,
+                return Padding(
+                  padding: EdgeInsets.only(
+                    bottom: AppResponsive(context).scaleSize(0.015),
                   ),
-                  onTap: () {
-                    controller.selectCandidate(candidate);
-                    Get.toNamed(AppConstants.routeAdminCandidateDetails);
-                  },
+                  child: AppListCard(
+                    title: candidate.email,
+                    subtitle: '${AppTexts.role}: ${candidate.role}',
+                    icon: Iconsax.profile_circle,
+                    trailing: Icon(
+                      Iconsax.arrow_right_3,
+                      size: AppResponsive.iconSize(context),
+                      color: AppColors.primary,
+                    ),
+                    onTap: () {
+                      controller.selectCandidate(candidate);
+                      Get.toNamed(AppConstants.routeAdminCandidateDetails);
+                    },
+                  ),
                 );
               },
             )),
