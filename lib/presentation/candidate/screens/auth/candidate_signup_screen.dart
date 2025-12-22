@@ -1,12 +1,12 @@
+import 'package:ats/core/utils/app_colors/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:ats/presentation/candidate/controllers/auth_controller.dart';
 import 'package:ats/core/constants/app_constants.dart';
 import 'package:ats/core/utils/app_texts/app_texts.dart';
-import 'package:ats/core/utils/app_styles/app_text_styles.dart';
 import 'package:ats/core/utils/app_spacing/app_spacing.dart';
-import 'package:ats/core/utils/app_colors/app_colors.dart';
+import 'package:ats/core/utils/app_navigation/app_navigation.dart';
 import 'package:ats/core/widgets/app_widgets.dart';
 
 class CandidateSignUpScreen extends StatelessWidget {
@@ -15,77 +15,106 @@ class CandidateSignUpScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.find<AuthController>();
-    final emailController = TextEditingController();
-    final passwordController = TextEditingController();
-    final firstNameController = TextEditingController();
-    final lastNameController = TextEditingController();
 
-    return Scaffold(
-      backgroundColor: AppColors.lightBackground,
-      appBar: AppAppBar(title: AppTexts.signUp),
-      body: Center(
-        child: SingleChildScrollView(
-          padding: AppSpacing.padding(context),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                AppTexts.signUp,
-                style: AppTextStyles.headline(context),
-              ),
-              AppSpacing.vertical(context, 0.04),
-              AppTextField(
-                controller: firstNameController,
-                labelText: AppTexts.firstName,
-                prefixIcon: Iconsax.user,
-              ),
-              AppSpacing.vertical(context, 0.02),
-              AppTextField(
-                controller: lastNameController,
-                labelText: AppTexts.lastName,
-                prefixIcon: Iconsax.user,
-              ),
-              AppSpacing.vertical(context, 0.02),
-              AppTextField(
-                controller: emailController,
-                labelText: AppTexts.email,
-                prefixIcon: Iconsax.sms,
-              ),
-              AppSpacing.vertical(context, 0.02),
-              AppTextField(
-                controller: passwordController,
-                labelText: AppTexts.password,
-                prefixIcon: Iconsax.lock,
-                obscureText: true,
-              ),
-              AppSpacing.vertical(context, 0.03),
-              Obx(() => AppButton(
-                    text: AppTexts.signUp,
-                    onPressed: () {
-                      controller.signUp(
-                        email: emailController.text,
-                        password: passwordController.text,
-                        firstName: firstNameController.text,
-                        lastName: lastNameController.text,
-                      );
-                    },
-                    isLoading: controller.isLoading.value,
-                  )),
-              AppSpacing.vertical(context, 0.02),
-              AppTextButton(
-                text: AppTexts.alreadyHaveAccount,
-                onPressed: () {
-                  Get.toNamed(AppConstants.routeLogin);
-                },
-              ),
-              Obx(() => AppErrorMessage(
-                    message: controller.errorMessage.value,
-                  )),
-            ],
-          ),
+    return AppAuthLayout(
+      title: AppTexts.candidateSignUp,
+      isLoginSelected: false,
+      onLoginTap: () {
+        AppNavigation.toNamedWithFade(AppConstants.routeLogin);
+      },
+      onSignUpTap: () {
+        // Already on signup screen
+      },
+      formFields: [
+        AppTextField(
+          controller: controller.firstNameController,
+          labelText: AppTexts.firstName,
+          prefixIcon: Iconsax.user,
+          onChanged: (_) {
+            if (controller.firstNameError.value != null) {
+              controller.validateFirstName(controller.firstNameController.text);
+            }
+          },
+        ),
+        Obx(
+          () => controller.firstNameError.value != null
+              ? AppErrorMessage(
+                  message: controller.firstNameError.value!,
+                  icon: Iconsax.info_circle,
+                  messageColor: AppColors.white,
+                )
+              : const SizedBox.shrink(),
+        ),
+        AppSpacing.vertical(context, 0.02),
+        AppTextField(
+          controller: controller.lastNameController,
+          labelText: AppTexts.lastName,
+          prefixIcon: Iconsax.user,
+          onChanged: (_) {
+            if (controller.lastNameError.value != null) {
+              controller.validateLastName(controller.lastNameController.text);
+            }
+          },
+        ),
+        Obx(
+          () => controller.lastNameError.value != null
+              ? AppErrorMessage(
+                  message: controller.lastNameError.value!,
+                  icon: Iconsax.info_circle,
+                  messageColor: AppColors.white,
+                )
+              : const SizedBox.shrink(),
+        ),
+        AppSpacing.vertical(context, 0.02),
+        AppTextField(
+          controller: controller.emailController,
+          labelText: AppTexts.email,
+          prefixIcon: Iconsax.sms,
+          keyboardType: TextInputType.emailAddress,
+          onChanged: (_) {
+            if (controller.emailError.value != null) {
+              controller.validateEmail(controller.emailController.text);
+            }
+          },
+        ),
+        Obx(
+          () => controller.emailError.value != null
+              ? AppErrorMessage(
+                  message: controller.emailError.value!,
+                  icon: Iconsax.info_circle,
+                  messageColor: AppColors.white,
+                )
+              : const SizedBox.shrink(),
+        ),
+        AppSpacing.vertical(context, 0.02),
+        AppTextField(
+          controller: controller.passwordController,
+          labelText: AppTexts.password,
+          prefixIcon: Iconsax.lock,
+          obscureText: true,
+          onChanged: (_) {
+            if (controller.passwordError.value != null) {
+              controller.validatePassword(controller.passwordController.text);
+            }
+          },
+        ),
+        Obx(
+          () => controller.passwordError.value != null
+              ? AppErrorMessage(
+                  message: controller.passwordError.value!,
+                  icon: Iconsax.info_circle,
+                  messageColor: AppColors.white,
+                )
+              : const SizedBox.shrink(),
+        ),
+      ],
+      actionButton: Obx(
+        () => AppButton(
+          text: AppTexts.signUp,
+          onPressed: controller.signUp,
+          isLoading: controller.isLoading.value,
         ),
       ),
     );
   }
 }
-

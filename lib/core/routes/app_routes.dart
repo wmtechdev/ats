@@ -4,7 +4,6 @@ import 'package:ats/core/middleware/auth_middleware.dart';
 import 'package:ats/presentation/candidate/bindings/candidate_bindings.dart';
 import 'package:ats/presentation/candidate/screens/auth/candidate_login_screen.dart';
 import 'package:ats/presentation/candidate/screens/auth/candidate_signup_screen.dart';
-import 'package:ats/presentation/candidate/screens/auth/candidate_forgot_password_screen.dart';
 import 'package:ats/presentation/candidate/screens/dashboard/candidate_dashboard_screen.dart';
 import 'package:ats/presentation/candidate/screens/profile/candidate_profile_screen.dart';
 import 'package:ats/presentation/candidate/screens/jobs/jobs_list_screen.dart';
@@ -14,7 +13,6 @@ import 'package:ats/presentation/candidate/screens/documents/my_documents_screen
 import 'package:ats/presentation/admin/bindings/admin_bindings.dart';
 import 'package:ats/presentation/admin/screens/auth/admin_login_screen.dart';
 import 'package:ats/presentation/admin/screens/auth/admin_signup_screen.dart';
-import 'package:ats/presentation/admin/screens/auth/admin_forgot_password_screen.dart';
 import 'package:ats/presentation/admin/screens/dashboard/admin_dashboard_screen.dart';
 import 'package:ats/presentation/admin/screens/jobs/admin_jobs_list_screen.dart';
 import 'package:ats/presentation/admin/screens/jobs/admin_job_create_screen.dart';
@@ -41,13 +39,6 @@ class AppRoutes {
       binding: CandidateBindings(),
       middlewares: [AuthMiddleware()],
     ),
-    GetPage(
-      name: AppConstants.routeForgotPassword,
-      page: () => const CandidateForgotPasswordScreen(),
-      binding: CandidateBindings(),
-      middlewares: [AuthMiddleware()],
-    ),
-
     // Admin Auth Routes
     GetPage(
       name: AppConstants.routeAdminLogin,
@@ -61,13 +52,6 @@ class AppRoutes {
       binding: AdminBindings(),
       middlewares: [AuthMiddleware()],
     ),
-    GetPage(
-      name: AppConstants.routeAdminForgotPassword,
-      page: () => const AdminForgotPasswordScreen(),
-      binding: AdminBindings(),
-      middlewares: [AuthMiddleware()],
-    ),
-
     // Candidate Routes
     GetPage(
       name: AppConstants.routeCandidateDashboard,

@@ -24,10 +24,8 @@ class AuthMiddleware extends GetMiddleware {
         // Not authenticated, allow access to auth routes only
         if (route != AppConstants.routeLogin && 
             route != AppConstants.routeSignUp &&
-            route != AppConstants.routeForgotPassword &&
             route != AppConstants.routeAdminLogin &&
-            route != AppConstants.routeAdminSignUp &&
-            route != AppConstants.routeAdminForgotPassword) {
+            route != AppConstants.routeAdminSignUp) {
           return const RouteSettings(name: AppConstants.routeLogin);
         }
       } else {
@@ -36,8 +34,7 @@ class AuthMiddleware extends GetMiddleware {
         
         // Candidate auth routes
         if (route == AppConstants.routeLogin || 
-            route == AppConstants.routeSignUp ||
-            route == AppConstants.routeForgotPassword) {
+            route == AppConstants.routeSignUp) {
           if (userRole == AppConstants.roleAdmin) {
             return const RouteSettings(name: AppConstants.routeAdminDashboard);
           } else {
@@ -47,8 +44,7 @@ class AuthMiddleware extends GetMiddleware {
         
         // Admin auth routes
         if (route == AppConstants.routeAdminLogin || 
-            route == AppConstants.routeAdminSignUp ||
-            route == AppConstants.routeAdminForgotPassword) {
+            route == AppConstants.routeAdminSignUp) {
           if (userRole == AppConstants.roleAdmin) {
             return const RouteSettings(name: AppConstants.routeAdminDashboard);
           } else {

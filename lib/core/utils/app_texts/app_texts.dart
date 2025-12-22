@@ -7,17 +7,16 @@ class AppTexts {
   // Auth
   static const String login = "Login";
   static const String signUp = "Sign Up";
-  static const String forgotPassword = "Forgot Password";
-  static const String resetPassword = "Reset Password";
+  static const String candidateLogin = "Candidate Login";
+  static const String candidateSignUp = "Candidate Sign Up";
+  static const String adminLogin = "Admin Login";
+  static const String adminSignUp = "Admin Sign Up";
   static const String email = "Email";
   static const String password = "Password";
   static const String firstName = "First Name";
   static const String lastName = "Last Name";
   static const String dontHaveAccount = "Don't have an account? Sign Up";
   static const String alreadyHaveAccount = "Already have an account? Login";
-  static const String backToLogin = "Back to Login";
-  static const String sendResetEmail = "Send Reset Email";
-  static const String passwordResetEmailSent = "Password reset email sent";
 
   // Dashboard
   static const String dashboard = "Dashboard";
@@ -92,6 +91,16 @@ class AppTexts {
   // Admins
   static const String manageAdmins = "Manage Admins";
   static const String manageAdminsToBeImplemented = "Manage Admins - To be implemented";
+
+  // Validation
+  static const String emailRequired = "Email is required";
+  static const String emailInvalid = "Please enter a valid email address";
+  static const String passwordRequired = "Password is required";
+  static const String passwordMinLength = "Password must be at least 6 characters";
+  static const String firstNameRequired = "First name is required";
+  static const String firstNameMinLength = "First name must be at least 2 characters";
+  static const String lastNameRequired = "Last name is required";
+  static const String lastNameMinLength = "Last name must be at least 2 characters";
 
   // Common
   static const String cancel = "Cancel";

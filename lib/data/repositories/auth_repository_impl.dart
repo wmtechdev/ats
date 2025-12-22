@@ -130,18 +130,6 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<Either<Failure, void>> sendPasswordResetEmail(String email) async {
-    try {
-      await authDataSource.sendPasswordResetEmail(email);
-      return const Right(null);
-    } on AuthException catch (e) {
-      return Left(AuthFailure(e.message));
-    } catch (e) {
-      return Left(AuthFailure('Failed to send password reset email: $e'));
-    }
-  }
-
-  @override
   Stream<UserEntity?> get authStateChanges {
     return authDataSource.authStateChanges.asyncMap((firebaseUser) async {
       if (firebaseUser == null) return null;

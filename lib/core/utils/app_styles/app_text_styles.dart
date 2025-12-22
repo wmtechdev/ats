@@ -16,6 +16,7 @@ class AppTextStyles {
     return TextStyle(
       fontSize: fontSize,
       fontFamily: AppFonts.primaryFont,
+      fontWeight: FontWeight.w700,
       color: Theme.of(context).textTheme.bodyLarge?.color,
     );
   }
@@ -33,6 +34,7 @@ class AppTextStyles {
     return TextStyle(
       fontSize: fontSize,
       fontFamily: AppFonts.primaryFont,
+      fontWeight: FontWeight.w500,
       color: Theme.of(context).textTheme.bodyLarge?.color,
     );
   }
@@ -50,6 +52,7 @@ class AppTextStyles {
     return TextStyle(
       fontSize: fontSize,
       fontFamily: AppFonts.secondaryFont,
+      fontWeight: FontWeight.w400,
       color: Theme.of(context).textTheme.bodyLarge?.color,
     );
   }
@@ -67,6 +70,7 @@ class AppTextStyles {
     return TextStyle(
       fontSize: fontSize,
       fontFamily: AppFonts.secondaryFont,
+      fontWeight: FontWeight.w400,
       color: Theme.of(context).hintColor,
     );
   }
@@ -84,6 +88,7 @@ class AppTextStyles {
     return TextStyle(
       fontSize: fontSize,
       fontFamily: AppFonts.secondaryFont,
+      fontWeight: FontWeight.w400,
       color: Colors.white,
     );
   }

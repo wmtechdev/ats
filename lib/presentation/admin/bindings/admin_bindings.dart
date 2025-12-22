@@ -9,7 +9,7 @@ import 'package:ats/data/repositories/job_repository_impl.dart';
 import 'package:ats/data/repositories/document_repository_impl.dart';
 import 'package:ats/data/repositories/application_repository_impl.dart';
 import 'package:ats/data/repositories/admin_repository_impl.dart';
-import 'package:ats/domain/repositories/auth_repository.dart';
+// import 'package:ats/domain/repositories/auth_repository.dart';
 import 'package:ats/domain/repositories/job_repository.dart';
 import 'package:ats/domain/repositories/document_repository.dart';
 import 'package:ats/domain/repositories/application_repository.dart';
@@ -28,8 +28,8 @@ class AdminBindings extends Bindings {
     final firestoreDataSource = FirestoreDataSourceImpl(FirebaseFirestore.instance);
     final storageDataSource = FirebaseStorageDataSourceImpl(FirebaseStorage.instance);
 
-    // Get globally registered AuthRepository
-    final authRepo = Get.find<AuthRepository>();
+    // Get globally registered AuthRepository (commented out until Firebase access)
+    // final authRepo = Get.find<AuthRepository>();
 
     // Repositories
     final jobRepo = JobRepositoryImpl(firestoreDataSource);
@@ -50,7 +50,9 @@ class AdminBindings extends Bindings {
     Get.lazyPut<AdminRepository>(() => adminRepo);
 
     // Controllers
-    Get.lazyPut(() => AdminAuthController(authRepo));
+    // Temporary: No AuthRepository needed until Firebase access
+    Get.lazyPut(() => AdminAuthController());
+    // Get.lazyPut(() => AdminAuthController(authRepo));
     Get.lazyPut(() => AdminDashboardController(applicationRepo, jobRepo));
     Get.lazyPut(() => AdminJobsController(jobRepo));
     Get.lazyPut(() => AdminCandidatesController(adminRepo, applicationRepo, documentRepo));
