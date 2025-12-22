@@ -4,24 +4,46 @@ import 'package:iconsax/iconsax.dart';
 import 'package:ats/presentation/admin/controllers/admin_jobs_controller.dart';
 import 'package:ats/core/utils/app_texts/app_texts.dart';
 import 'package:ats/core/utils/app_spacing/app_spacing.dart';
-import 'package:ats/core/utils/app_colors/app_colors.dart';
 import 'package:ats/core/widgets/app_widgets.dart';
 
-class AdminJobCreateScreen extends StatelessWidget {
+class AdminJobCreateScreen extends StatefulWidget {
   const AdminJobCreateScreen({super.key});
+
+  @override
+  State<AdminJobCreateScreen> createState() => _AdminJobCreateScreenState();
+}
+
+class _AdminJobCreateScreenState extends State<AdminJobCreateScreen> {
+  late final TextEditingController titleController;
+  late final TextEditingController descriptionController;
+  late final TextEditingController hospitalController;
+  late final TextEditingController requirementsController;
+
+  @override
+  void initState() {
+    super.initState();
+    titleController = TextEditingController();
+    descriptionController = TextEditingController();
+    hospitalController = TextEditingController();
+    requirementsController = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    titleController.dispose();
+    descriptionController.dispose();
+    hospitalController.dispose();
+    requirementsController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     final controller = Get.find<AdminJobsController>();
-    final titleController = TextEditingController();
-    final descriptionController = TextEditingController();
-    final hospitalController = TextEditingController();
-    final requirementsController = TextEditingController();
 
-    return Scaffold(
-      backgroundColor: AppColors.lightBackground,
-      appBar: AppAppBar(title: AppTexts.createJob),
-      body: SingleChildScrollView(
+    return AppAdminLayout(
+      title: AppTexts.createJob,
+      child: SingleChildScrollView(
         padding: AppSpacing.padding(context),
         child: Column(
           children: [

@@ -18,3 +18,12 @@ export 'auth/app_auth_logo.dart';
 export 'auth/app_auth_title.dart';
 export 'auth/app_auth_form_content.dart';
 export 'auth/app_auth_container.dart';
+
+// Common layout widgets (used in admin and candidate screens)
+export 'common/app_side_layout.dart';
+export 'common/app_navigation_item.dart';
+export 'common/app_navigation_item_model.dart';
+export 'common/app_user_profile_section.dart';
+
+// Admin widgets (used in admin screens)
+export 'admin/app_admin_layout.dart';

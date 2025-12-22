@@ -152,7 +152,21 @@ class AdminAuthController extends GetxController {
 
   Future<void> signOut() async {
     // Temporary: Direct navigation (no Firebase)
-    Get.offAllNamed(AppConstants.routeAdminLogin);
+    // Clear controllers safely before navigation to prevent disposal errors
+    try {
+      emailController.clear();
+      passwordController.clear();
+      firstNameController.clear();
+      lastNameController.clear();
+    } catch (e) {
+      // Controllers might already be disposed, ignore
+    }
+    
+    // Use post-frame callback to ensure current widget build cycle completes
+    // before navigating and disposing controllers
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Get.offAllNamed(AppConstants.routeAdminLogin);
+    });
     
     // Commented out until Firebase access
     // isLoading.value = true;

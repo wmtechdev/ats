@@ -10,7 +10,10 @@ class AdminDashboardController extends GetxController {
   AdminDashboardController(this.applicationRepository, this.jobRepository);
 
   final isLoading = false.obs;
+  final totalApplicationsCount = 0.obs;
   final pendingApplicationsCount = 0.obs;
+  final approvedApplicationsCount = 0.obs;
+  final rejectedApplicationsCount = 0.obs;
   final openJobsCount = 0.obs;
 
   @override
@@ -20,11 +23,30 @@ class AdminDashboardController extends GetxController {
   }
 
   void loadStats() {
+    // Load all applications count (total applied)
+    applicationRepository.streamApplications().listen((apps) {
+      totalApplicationsCount.value = apps.length;
+    });
+
     // Load pending applications count
     applicationRepository
         .streamApplications(status: AppConstants.applicationStatusPending)
         .listen((apps) {
       pendingApplicationsCount.value = apps.length;
+    });
+
+    // Load approved applications count
+    applicationRepository
+        .streamApplications(status: AppConstants.applicationStatusApproved)
+        .listen((apps) {
+      approvedApplicationsCount.value = apps.length;
+    });
+
+    // Load rejected/denied applications count
+    applicationRepository
+        .streamApplications(status: AppConstants.applicationStatusDenied)
+        .listen((apps) {
+      rejectedApplicationsCount.value = apps.length;
     });
 
     // Load open jobs count

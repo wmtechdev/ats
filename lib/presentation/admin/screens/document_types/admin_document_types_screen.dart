@@ -16,24 +16,21 @@ class AdminDocumentTypesScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final controller = Get.find<AdminDocumentsController>();
 
-    return Scaffold(
-      backgroundColor: AppColors.lightBackground,
-      appBar: AppAppBar(
-        title: AppTexts.documentTypes,
-        actions: [
-          IconButton(
-            icon: Icon(
-              Iconsax.add,
-              size: AppResponsive.iconSize(context),
-              color: AppColors.primary,
-            ),
-            onPressed: () {
-              _showCreateDialog(context, controller);
-            },
+    return AppAdminLayout(
+      title: AppTexts.documentTypes,
+      actions: [
+        IconButton(
+          icon: Icon(
+            Iconsax.add,
+            size: AppResponsive.iconSize(context),
+            color: AppColors.primary,
           ),
-        ],
-      ),
-      body: Obx(() => controller.documentTypes.isEmpty
+          onPressed: () {
+            _showCreateDialog(context, controller);
+          },
+        ),
+      ],
+      child: Obx(() => controller.documentTypes.isEmpty
           ? AppEmptyState(
               message: AppTexts.noDocumentTypesAvailable,
               icon: Iconsax.document_text,

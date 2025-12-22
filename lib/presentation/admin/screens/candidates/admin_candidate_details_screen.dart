@@ -17,10 +17,9 @@ class AdminCandidateDetailsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final controller = Get.find<AdminCandidatesController>();
 
-    return Scaffold(
-      backgroundColor: AppColors.lightBackground,
-      appBar: AppAppBar(title: AppTexts.candidateDetails),
-      body: Obx(() {
+    return AppAdminLayout(
+      title: AppTexts.candidateDetails,
+      child: Obx(() {
         final candidate = controller.selectedCandidate.value;
         if (candidate == null) {
           return AppEmptyState(

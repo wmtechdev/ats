@@ -16,22 +16,19 @@ class AdminJobsListScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final controller = Get.find<AdminJobsController>();
 
-    return Scaffold(
-      backgroundColor: AppColors.lightBackground,
-      appBar: AppAppBar(
-        title: AppTexts.jobs,
-        actions: [
-          IconButton(
-            icon: Icon(
-              Iconsax.add,
-              size: AppResponsive.iconSize(context),
-              color: AppColors.primary,
-            ),
-            onPressed: () => Get.toNamed(AppConstants.routeAdminJobCreate),
+    return AppAdminLayout(
+      title: AppTexts.jobs,
+      actions: [
+        IconButton(
+          icon: Icon(
+            Iconsax.add,
+            size: AppResponsive.iconSize(context),
+            color: AppColors.primary,
           ),
-        ],
-      ),
-      body: Obx(() => controller.jobs.isEmpty
+          onPressed: () => Get.toNamed(AppConstants.routeAdminJobCreate),
+        ),
+      ],
+      child: Obx(() => controller.jobs.isEmpty
           ? AppEmptyState(
               message: AppTexts.noJobsAvailable,
               icon: Iconsax.briefcase,

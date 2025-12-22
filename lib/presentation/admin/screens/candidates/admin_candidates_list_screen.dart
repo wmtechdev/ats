@@ -16,10 +16,9 @@ class AdminCandidatesListScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final controller = Get.find<AdminCandidatesController>();
 
-    return Scaffold(
-      backgroundColor: AppColors.lightBackground,
-      appBar: AppAppBar(title: AppTexts.candidates),
-      body: Obx(() => controller.candidates.isEmpty
+    return AppAdminLayout(
+      title: AppTexts.candidates,
+      child: Obx(() => controller.candidates.isEmpty
           ? AppEmptyState(
               message: AppTexts.noCandidatesAvailable,
               icon: Iconsax.profile_circle,

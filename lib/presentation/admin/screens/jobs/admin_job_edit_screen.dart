@@ -4,23 +4,43 @@ import 'package:iconsax/iconsax.dart';
 import 'package:ats/presentation/admin/controllers/admin_jobs_controller.dart';
 import 'package:ats/core/utils/app_texts/app_texts.dart';
 import 'package:ats/core/utils/app_spacing/app_spacing.dart';
-import 'package:ats/core/utils/app_colors/app_colors.dart';
 import 'package:ats/core/widgets/app_widgets.dart';
 
-class AdminJobEditScreen extends StatelessWidget {
+class AdminJobEditScreen extends StatefulWidget {
   const AdminJobEditScreen({super.key});
+
+  @override
+  State<AdminJobEditScreen> createState() => _AdminJobEditScreenState();
+}
+
+class _AdminJobEditScreenState extends State<AdminJobEditScreen> {
+  late final TextEditingController titleController;
+  late final TextEditingController descriptionController;
+  late final TextEditingController hospitalController;
+
+  @override
+  void initState() {
+    super.initState();
+    titleController = TextEditingController();
+    descriptionController = TextEditingController();
+    hospitalController = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    titleController.dispose();
+    descriptionController.dispose();
+    hospitalController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     final controller = Get.find<AdminJobsController>();
-    final titleController = TextEditingController();
-    final descriptionController = TextEditingController();
-    final hospitalController = TextEditingController();
 
-    return Scaffold(
-      backgroundColor: AppColors.lightBackground,
-      appBar: AppAppBar(title: AppTexts.editJob),
-      body: Obx(() {
+    return AppAdminLayout(
+      title: AppTexts.editJob,
+      child: Obx(() {
         final job = controller.selectedJob.value;
         if (job == null) {
           return AppEmptyState(

@@ -65,6 +65,9 @@ class AppTexts {
   static const String underReview = "Under Review";
   static const String approved = "Approved";
   static const String denied = "Denied";
+  static const String totalApplications = "Total Applications";
+  static const String approvedApplications = "Approved Applications";
+  static const String rejectedApplications = "Rejected Applications";
 
   // Documents
   static const String upload = "Upload";
@@ -91,6 +94,9 @@ class AppTexts {
   // Admins
   static const String manageAdmins = "Manage Admins";
   static const String manageAdminsToBeImplemented = "Manage Admins - To be implemented";
+  static const String administrator = "Administrator";
+  static const String admin = "Admin";
+  static const String logout = "Logout";
 
   // Validation
   static const String emailRequired = "Email is required";

@@ -27,12 +27,27 @@ class AuthController extends GetxController {
   final firstNameController = TextEditingController();
   final lastNameController = TextEditingController();
 
+  void _clearControllers() {
+    try {
+      emailController.clear();
+      passwordController.clear();
+      firstNameController.clear();
+      lastNameController.clear();
+    } catch (e) {
+      // Controllers might already be disposed, ignore
+    }
+  }
+
   @override
   void onClose() {
-    emailController.dispose();
-    passwordController.dispose();
-    firstNameController.dispose();
-    lastNameController.dispose();
+    try {
+      emailController.dispose();
+      passwordController.dispose();
+      firstNameController.dispose();
+      lastNameController.dispose();
+    } catch (e) {
+      // Controllers already disposed, ignore
+    }
     super.onClose();
   }
 
@@ -141,7 +156,12 @@ class AuthController extends GetxController {
       },
       (_) {
         isLoading.value = false;
-        Get.offAllNamed(AppConstants.routeLogin);
+        // Clear controllers before navigation
+        _clearControllers();
+        // Use post-frame callback to ensure current widget build cycle completes
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          Get.offAllNamed(AppConstants.routeLogin);
+        });
       },
     );
   }
