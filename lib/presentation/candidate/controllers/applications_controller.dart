@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:get/get.dart';
 import 'package:ats/core/constants/app_constants.dart';
-import 'package:ats/domain/repositories/auth_repository.dart';
+import 'package:ats/domain/repositories/candidate_auth_repository.dart';
 import 'package:ats/domain/repositories/application_repository.dart';
 import 'package:ats/domain/repositories/job_repository.dart';
 import 'package:ats/domain/entities/application_entity.dart';
@@ -9,7 +9,7 @@ import 'package:ats/domain/entities/job_entity.dart';
 
 class ApplicationsController extends GetxController {
   final ApplicationRepository applicationRepository;
-  final AuthRepository authRepository;
+  final CandidateAuthRepository authRepository;
 
   ApplicationsController(this.applicationRepository, this.authRepository);
 

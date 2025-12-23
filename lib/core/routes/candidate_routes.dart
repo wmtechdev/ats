@@ -15,59 +15,68 @@ class CandidateRoutes {
   static const String initial = AppConstants.routeLogin;
 
   static List<GetPage> get routes => [
-        // Candidate Auth Routes
-        GetPage(
-          name: AppConstants.routeLogin,
-          page: () => const CandidateLoginScreen(),
-          binding: CandidateBindings(),
-          middlewares: [AuthMiddleware()],
-          transition: Transition.fadeIn,
-          transitionDuration: const Duration(milliseconds: 300),
-        ),
-        GetPage(
-          name: AppConstants.routeSignUp,
-          page: () => const CandidateSignUpScreen(),
-          binding: CandidateBindings(),
-          middlewares: [AuthMiddleware()],
-          transition: Transition.fadeIn,
-          transitionDuration: const Duration(milliseconds: 300),
-        ),
-        // Candidate Routes
-        GetPage(
-          name: AppConstants.routeCandidateDashboard,
-          page: () => const CandidateDashboardScreen(),
-          binding: CandidateBindings(),
-        ),
-        GetPage(
-          name: AppConstants.routeCandidateProfile,
-          page: () => const CandidateProfileScreen(),
-          binding: CandidateBindings(),
-        ),
-        GetPage(
-          name: AppConstants.routeCandidateJobs,
-          page: () => const JobsListScreen(),
-          binding: CandidateBindings(),
-        ),
-        GetPage(
-          name: AppConstants.routeCandidateJobDetails,
-          page: () => const JobDetailsScreen(),
-          binding: CandidateBindings(),
-        ),
-        GetPage(
-          name: AppConstants.routeCandidateApplications,
-          page: () => const MyApplicationsScreen(),
-          binding: CandidateBindings(),
-        ),
-        GetPage(
-          name: AppConstants.routeCandidateDocuments,
-          page: () => const MyDocumentsScreen(),
-          binding: CandidateBindings(),
-        ),
-      ];
+    // Candidate Auth Routes
+    GetPage(
+      name: AppConstants.routeLogin,
+      page: () => const CandidateLoginScreen(),
+      binding: CandidateBindings(),
+      middlewares: [AuthMiddleware()],
+      transition: Transition.fadeIn,
+      transitionDuration: const Duration(milliseconds: 300),
+    ),
+    GetPage(
+      name: AppConstants.routeSignUp,
+      page: () => const CandidateSignUpScreen(),
+      binding: CandidateBindings(),
+      middlewares: [AuthMiddleware()],
+      transition: Transition.fadeIn,
+      transitionDuration: const Duration(milliseconds: 300),
+    ),
+    // Candidate Routes
+    GetPage(
+      name: AppConstants.routeCandidateDashboard,
+      page: () => const CandidateDashboardScreen(),
+      binding: CandidateBindings(),
+      transition: Transition.rightToLeft,
+      transitionDuration: const Duration(milliseconds: 300),
+    ),
+    GetPage(
+      name: AppConstants.routeCandidateProfile,
+      page: () => const CandidateProfileScreen(),
+      binding: CandidateBindings(),
+      transition: Transition.rightToLeft,
+      transitionDuration: const Duration(milliseconds: 300),
+    ),
+    GetPage(
+      name: AppConstants.routeCandidateJobs,
+      page: () => const JobsListScreen(),
+      binding: CandidateBindings(),
+      transition: Transition.rightToLeft,
+      transitionDuration: const Duration(milliseconds: 300),
+    ),
+    GetPage(
+      name: AppConstants.routeCandidateJobDetails,
+      page: () => const JobDetailsScreen(),
+      binding: CandidateBindings(),
+      transition: Transition.rightToLeft,
+      transitionDuration: const Duration(milliseconds: 300),
+    ),
+    GetPage(
+      name: AppConstants.routeCandidateApplications,
+      page: () => const MyApplicationsScreen(),
+      binding: CandidateBindings(),
+      transition: Transition.rightToLeft,
+      transitionDuration: const Duration(milliseconds: 300),
+    ),
+    GetPage(
+      name: AppConstants.routeCandidateDocuments,
+      page: () => const MyDocumentsScreen(),
+      binding: CandidateBindings(),
+      transition: Transition.rightToLeft,
+      transitionDuration: const Duration(milliseconds: 300),
+    ),
+  ];
 
-  static GetPage get unknownRoute => GetPage(
-        name: '/not-found',
-        page: () => const CandidateLoginScreen(),
-      );
+  static GetPage get unknownRoute =>
+      GetPage(name: '/not-found', page: () => const CandidateLoginScreen());
 }
-

@@ -1,19 +1,19 @@
 import 'package:ats/core/errors/failures.dart';
 import 'package:ats/domain/entities/user_entity.dart';
-import 'package:ats/domain/repositories/auth_repository.dart';
+import 'package:ats/domain/repositories/candidate_auth_repository.dart';
 import 'package:dartz/dartz.dart';
 
-class SignUpUseCase {
-  final AuthRepository repository;
+/// Use case for candidate sign up
+class CandidateSignUpUseCase {
+  final CandidateAuthRepository repository;
 
-  SignUpUseCase(this.repository);
+  CandidateSignUpUseCase(this.repository);
 
   Future<Either<Failure, UserEntity>> call({
     required String email,
     required String password,
     required String firstName,
     required String lastName,
-    required String role,
     String? phone,
     String? address,
   }) {
@@ -22,7 +22,6 @@ class SignUpUseCase {
       password: password,
       firstName: firstName,
       lastName: lastName,
-      role: role,
       phone: phone,
       address: address,
     );

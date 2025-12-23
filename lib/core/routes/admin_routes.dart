@@ -17,69 +17,82 @@ class AdminRoutes {
   static const String initial = AppConstants.routeAdminLogin;
 
   static List<GetPage> get routes => [
-        // Admin Auth Routes
-        GetPage(
-          name: AppConstants.routeAdminLogin,
-          page: () => const AdminLoginScreen(),
-          binding: AdminBindings(),
-          middlewares: [AuthMiddleware()],
-          transition: Transition.fadeIn,
-          transitionDuration: const Duration(milliseconds: 300),
-        ),
-        GetPage(
-          name: AppConstants.routeAdminSignUp,
-          page: () => const AdminSignUpScreen(),
-          binding: AdminBindings(),
-          middlewares: [AuthMiddleware()],
-          transition: Transition.fadeIn,
-          transitionDuration: const Duration(milliseconds: 300),
-        ),
-        // Admin Routes
-        GetPage(
-          name: AppConstants.routeAdminDashboard,
-          page: () => const AdminDashboardScreen(),
-          binding: AdminBindings(),
-        ),
-        GetPage(
-          name: AppConstants.routeAdminJobs,
-          page: () => const AdminJobsListScreen(),
-          binding: AdminBindings(),
-        ),
-        GetPage(
-          name: AppConstants.routeAdminJobCreate,
-          page: () => const AdminJobCreateScreen(),
-          binding: AdminBindings(),
-        ),
-        GetPage(
-          name: AppConstants.routeAdminJobEdit,
-          page: () => const AdminJobEditScreen(),
-          binding: AdminBindings(),
-        ),
-        GetPage(
-          name: AppConstants.routeAdminCandidates,
-          page: () => const AdminCandidatesListScreen(),
-          binding: AdminBindings(),
-        ),
-        GetPage(
-          name: AppConstants.routeAdminCandidateDetails,
-          page: () => const AdminCandidateDetailsScreen(),
-          binding: AdminBindings(),
-        ),
-        GetPage(
-          name: AppConstants.routeAdminDocumentTypes,
-          page: () => const AdminDocumentTypesScreen(),
-          binding: AdminBindings(),
-        ),
-        GetPage(
-          name: AppConstants.routeAdminManageAdmins,
-          page: () => const AdminManageAdminsScreen(),
-          binding: AdminBindings(),
-        ),
-      ];
+    // Admin Auth Routes
+    GetPage(
+      name: AppConstants.routeAdminLogin,
+      page: () => const AdminLoginScreen(),
+      binding: AdminBindings(),
+      middlewares: [AuthMiddleware()],
+      transition: Transition.fadeIn,
+      transitionDuration: const Duration(milliseconds: 300),
+    ),
+    GetPage(
+      name: AppConstants.routeAdminSignUp,
+      page: () => const AdminSignUpScreen(),
+      binding: AdminBindings(),
+      middlewares: [AuthMiddleware()],
+      transition: Transition.fadeIn,
+      transitionDuration: const Duration(milliseconds: 300),
+    ),
+    // Admin Routes
+    GetPage(
+      name: AppConstants.routeAdminDashboard,
+      page: () => const AdminDashboardScreen(),
+      binding: AdminBindings(),
+      transition: Transition.rightToLeft,
+      transitionDuration: const Duration(milliseconds: 300),
+    ),
+    GetPage(
+      name: AppConstants.routeAdminJobs,
+      page: () => const AdminJobsListScreen(),
+      binding: AdminBindings(),
+      transition: Transition.rightToLeft,
+      transitionDuration: const Duration(milliseconds: 300),
+    ),
+    GetPage(
+      name: AppConstants.routeAdminJobCreate,
+      page: () => const AdminJobCreateScreen(),
+      binding: AdminBindings(),
+      transition: Transition.rightToLeft,
+      transitionDuration: const Duration(milliseconds: 300),
+    ),
+    GetPage(
+      name: AppConstants.routeAdminJobEdit,
+      page: () => const AdminJobEditScreen(),
+      binding: AdminBindings(),
+      transition: Transition.rightToLeft,
+      transitionDuration: const Duration(milliseconds: 300),
+    ),
+    GetPage(
+      name: AppConstants.routeAdminCandidates,
+      page: () => const AdminCandidatesListScreen(),
+      binding: AdminBindings(),
+      transition: Transition.rightToLeft,
+      transitionDuration: const Duration(milliseconds: 300),
+    ),
+    GetPage(
+      name: AppConstants.routeAdminCandidateDetails,
+      page: () => const AdminCandidateDetailsScreen(),
+      binding: AdminBindings(),
+      transition: Transition.rightToLeft,
+      transitionDuration: const Duration(milliseconds: 300),
+    ),
+    GetPage(
+      name: AppConstants.routeAdminDocumentTypes,
+      page: () => const AdminDocumentTypesScreen(),
+      binding: AdminBindings(),
+      transition: Transition.rightToLeft,
+      transitionDuration: const Duration(milliseconds: 300),
+    ),
+    GetPage(
+      name: AppConstants.routeAdminManageAdmins,
+      page: () => const AdminManageAdminsScreen(),
+      binding: AdminBindings(),
+      transition: Transition.rightToLeft,
+      transitionDuration: const Duration(milliseconds: 300),
+    ),
+  ];
 
-  static GetPage get unknownRoute => GetPage(
-        name: '/not-found',
-        page: () => const AdminLoginScreen(),
-      );
+  static GetPage get unknownRoute =>
+      GetPage(name: '/not-found', page: () => const AdminLoginScreen());
 }
-

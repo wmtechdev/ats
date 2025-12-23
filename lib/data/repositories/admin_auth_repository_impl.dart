@@ -2,17 +2,19 @@ import 'package:ats/core/errors/failures.dart';
 import 'package:ats/core/errors/exceptions.dart';
 import 'package:ats/core/constants/app_constants.dart';
 import 'package:ats/domain/entities/user_entity.dart';
-import 'package:ats/domain/repositories/auth_repository.dart';
+import 'package:ats/domain/repositories/admin_auth_repository.dart';
 import 'package:ats/data/data_sources/firebase_auth_data_source.dart';
 import 'package:ats/data/data_sources/firestore_data_source.dart';
 import 'package:ats/data/models/user_model.dart';
 import 'package:dartz/dartz.dart';
 
-class AuthRepositoryImpl implements AuthRepository {
+/// Admin authentication repository implementation
+/// Handles admin-specific authentication with role validation
+class AdminAuthRepositoryImpl implements AdminAuthRepository {
   final FirebaseAuthDataSource authDataSource;
   final FirestoreDataSource firestoreDataSource;
 
-  AuthRepositoryImpl({
+  AdminAuthRepositoryImpl({
     required this.authDataSource,
     required this.firestoreDataSource,
   });
@@ -23,9 +25,6 @@ class AuthRepositoryImpl implements AuthRepository {
     required String password,
     required String firstName,
     required String lastName,
-    required String role,
-    String? phone,
-    String? address,
   }) async {
     try {
       // Create Firebase Auth user
@@ -39,34 +38,20 @@ class AuthRepositoryImpl implements AuthRepository {
         return const Left(AuthFailure('User creation failed'));
       }
 
-      // Create user document in Firestore
+      // Create user document in Firestore with admin role
       await firestoreDataSource.createUser(
         userId: userId,
         email: email,
-        role: role,
+        role: AppConstants.roleAdmin,
       );
 
-      String? profileId;
-
-      // Create profile based on role
-      if (role == AppConstants.roleAdmin) {
-        // Create admin profile
-        profileId = await firestoreDataSource.createAdminProfile(
-          userId: userId,
-          firstName: firstName,
-          lastName: lastName,
-          accessLevel: AppConstants.accessLevelRecruiter, // Default access level
-        );
-      } else {
-        // Create candidate profile
-        profileId = await firestoreDataSource.createCandidateProfile(
-          userId: userId,
-          firstName: firstName,
-          lastName: lastName,
-          phone: phone ?? '',
-          address: address ?? '',
-        );
-      }
+      // Create admin profile
+      final profileId = await firestoreDataSource.createAdminProfile(
+        userId: userId,
+        firstName: firstName,
+        lastName: lastName,
+        accessLevel: AppConstants.accessLevelRecruiter, // Default access level
+      );
 
       // Update user with profileId
       await firestoreDataSource.updateUser(
@@ -83,7 +68,7 @@ class AuthRepositoryImpl implements AuthRepository {
       final userModel = UserModel(
         userId: userId,
         email: email,
-        role: role,
+        role: AppConstants.roleAdmin,
         profileId: profileId,
         createdAt: DateTime.now(),
       );
@@ -113,10 +98,9 @@ class AuthRepositoryImpl implements AuthRepository {
       }
 
       // Add a delay to ensure Firebase Auth token is fully propagated
-      // This helps avoid permission errors immediately after sign-in
       await Future.delayed(const Duration(milliseconds: 300));
 
-      // Retry logic for reading user data (in case of timing issues)
+      // Retry logic for reading user data
       Map<String, dynamic>? userData;
       int retries = 3;
       Exception? lastException;
@@ -127,19 +111,15 @@ class AuthRepositoryImpl implements AuthRepository {
           if (userData != null) break;
         } on ServerException catch (e) {
           lastException = e;
-          // If it's a permission error and we have retries left, wait and retry
           if (i < retries - 1 && (e.message.contains('permission') || e.message.contains('Permission'))) {
             await Future.delayed(Duration(milliseconds: 200 * (i + 1)));
             continue;
           }
-          // If no more retries, break and handle error below
           break;
         } catch (e) {
-          // For other exceptions, don't retry
           lastException = e is Exception ? e : Exception(e.toString());
           break;
         }
-        // If userData is null but no error, wait a bit and retry
         if (userData == null && i < retries - 1) {
           await Future.delayed(Duration(milliseconds: 200 * (i + 1)));
         }
@@ -147,16 +127,21 @@ class AuthRepositoryImpl implements AuthRepository {
       
       if (userData == null) {
         if (lastException is ServerException) {
-          // Re-throw ServerException to be handled by outer catch
           throw lastException;
         }
         return const Left(AuthFailure('User data not found. Please contact support.'));
       }
 
+      // CRITICAL: Validate that user is an admin
+      final userRole = userData['role'] as String?;
+      if (userRole != AppConstants.roleAdmin) {
+        return const Left(AuthFailure('Access denied. This account is not authorized for admin access. Please use the candidate login page.'));
+      }
+
       final userModel = UserModel(
         userId: currentUser.uid,
         email: userData['email'] ?? currentUser.email ?? '',
-        role: userData['role'] ?? AppConstants.roleCandidate,
+        role: AppConstants.roleAdmin,
         profileId: userData['profileId'],
         createdAt: DateTime.now(),
       );
@@ -165,7 +150,6 @@ class AuthRepositoryImpl implements AuthRepository {
     } on AuthException catch (e) {
       return Left(AuthFailure(e.message));
     } on ServerException catch (e) {
-      // Handle Firestore permission errors
       if (e.message.contains('permission') || e.message.contains('Permission')) {
         return const Left(AuthFailure('Permission denied. Please try again or contact support.'));
       }
@@ -179,8 +163,6 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<Either<Failure, void>> signOut() async {
     try {
       await authDataSource.signOut();
-      // Add a small delay to ensure Firebase Auth state is fully cleared
-      // This helps avoid issues when signing in again immediately
       await Future.delayed(const Duration(milliseconds: 200));
       return const Right(null);
     } on AuthException catch (e) {
@@ -193,24 +175,26 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   Stream<UserEntity?> get authStateChanges {
     return authDataSource.authStateChanges.asyncMap((firebaseUser) async {
-      // If user is null (signed out), return null immediately
-      // Don't try to read from Firestore when user is signed out
       if (firebaseUser == null) return null;
 
       try {
         final userData = await firestoreDataSource.getUser(firebaseUser.uid);
         if (userData == null) return null;
 
+        // Only return user if they are an admin
+        final userRole = userData['role'] as String?;
+        if (userRole != AppConstants.roleAdmin) {
+          return null; // Filter out non-admin users
+        }
+
         return UserModel(
           userId: firebaseUser.uid,
           email: userData['email'] ?? firebaseUser.email ?? '',
-          role: userData['role'] ?? AppConstants.roleCandidate,
+          role: AppConstants.roleAdmin,
           profileId: userData['profileId'],
           createdAt: DateTime.now(),
         ).toEntity();
       } catch (e) {
-        // If there's a permission error (user signed out during read), return null
-        // This prevents errors when user signs out while stream is active
         return null;
       }
     });
@@ -226,7 +210,7 @@ class AuthRepositoryImpl implements AuthRepository {
     return UserEntity(
       userId: firebaseUser.uid,
       email: firebaseUser.email ?? '',
-      role: '', // Will be loaded from Firestore when needed
+      role: AppConstants.roleAdmin, // Assume admin for this context
       createdAt: DateTime.now(),
     );
   }

@@ -2,11 +2,10 @@ import 'package:ats/core/utils/app_colors/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
-import 'package:ats/presentation/candidate/controllers/auth_controller.dart';
+import 'package:ats/presentation/candidate/controllers/candidate_auth_controller.dart';
 import 'package:ats/core/constants/app_constants.dart';
 import 'package:ats/core/utils/app_texts/app_texts.dart';
 import 'package:ats/core/utils/app_spacing/app_spacing.dart';
-import 'package:ats/core/utils/app_navigation/app_navigation.dart';
 import 'package:ats/core/widgets/app_widgets.dart';
 
 class CandidateLoginScreen extends StatelessWidget {
@@ -16,7 +15,7 @@ class CandidateLoginScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     // Ensure controller is fresh - this simulates app restart behavior after sign-out
     // The controller is deleted on sign-out, so Get.find() will create a fresh instance via lazyPut
-    final controller = Get.find<AuthController>();
+    final controller = Get.find<CandidateAuthController>();
     
     // Use controller instance as key to force widget recreation when controller is recreated
     final controllerKey = controller.hashCode;
@@ -28,7 +27,7 @@ class CandidateLoginScreen extends StatelessWidget {
         // Already on login screen
       },
       onSignUpTap: () {
-        AppNavigation.toNamedWithFade(AppConstants.routeSignUp);
+        Get.offNamed(AppConstants.routeSignUp);
       },
       formFields: [
         AppTextField(
@@ -75,6 +74,15 @@ class CandidateLoginScreen extends StatelessWidget {
               : const SizedBox.shrink(),
         ),
       ],
+      errorMessage: Obx(
+        () => controller.errorMessage.value.isNotEmpty
+            ? AppErrorMessage(
+                message: controller.errorMessage.value,
+                icon: Iconsax.info_circle,
+                messageColor: AppColors.white,
+              )
+            : const SizedBox.shrink(),
+      ),
       actionButton: Obx(
         () => AppButton(
           text: AppTexts.login,

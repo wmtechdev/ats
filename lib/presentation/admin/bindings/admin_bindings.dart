@@ -5,11 +5,12 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:ats/data/data_sources/firebase_auth_data_source.dart';
 import 'package:ats/data/data_sources/firestore_data_source.dart';
 import 'package:ats/data/data_sources/firebase_storage_data_source.dart';
+import 'package:ats/data/repositories/admin_auth_repository_impl.dart';
 import 'package:ats/data/repositories/job_repository_impl.dart';
 import 'package:ats/data/repositories/document_repository_impl.dart';
 import 'package:ats/data/repositories/application_repository_impl.dart';
 import 'package:ats/data/repositories/admin_repository_impl.dart';
-import 'package:ats/domain/repositories/auth_repository.dart';
+import 'package:ats/domain/repositories/admin_auth_repository.dart';
 import 'package:ats/domain/repositories/job_repository.dart';
 import 'package:ats/domain/repositories/document_repository.dart';
 import 'package:ats/domain/repositories/application_repository.dart';
@@ -28,8 +29,11 @@ class AdminBindings extends Bindings {
     final firestoreDataSource = FirestoreDataSourceImpl(FirebaseFirestore.instance);
     final storageDataSource = FirebaseStorageDataSourceImpl(FirebaseStorage.instance);
 
-    // Get globally registered AuthRepository
-    final authRepo = Get.find<AuthRepository>();
+    // Admin Auth Repository (completely isolated)
+    final adminAuthRepo = AdminAuthRepositoryImpl(
+      authDataSource: authDataSource,
+      firestoreDataSource: firestoreDataSource,
+    );
 
     // Repositories
     final jobRepo = JobRepositoryImpl(firestoreDataSource);
@@ -44,13 +48,14 @@ class AdminBindings extends Bindings {
     );
 
     // Register repositories
+    Get.lazyPut<AdminAuthRepository>(() => adminAuthRepo);
     Get.lazyPut<JobRepository>(() => jobRepo);
     Get.lazyPut<DocumentRepository>(() => documentRepo);
     Get.lazyPut<ApplicationRepository>(() => applicationRepo);
     Get.lazyPut<AdminRepository>(() => adminRepo);
 
     // Controllers
-    Get.lazyPut(() => AdminAuthController(authRepo));
+    Get.lazyPut(() => AdminAuthController(adminAuthRepo));
     Get.lazyPut(() => AdminDashboardController(applicationRepo, jobRepo));
     Get.lazyPut(() => AdminJobsController(jobRepo));
     Get.lazyPut(() => AdminCandidatesController(adminRepo, applicationRepo, documentRepo));

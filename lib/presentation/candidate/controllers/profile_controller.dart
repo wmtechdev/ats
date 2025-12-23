@@ -1,14 +1,14 @@
 import 'dart:async';
 import 'package:get/get.dart';
 import 'package:ats/core/constants/app_constants.dart';
-import 'package:ats/domain/repositories/auth_repository.dart';
+import 'package:ats/domain/repositories/candidate_auth_repository.dart';
 import 'package:ats/domain/repositories/candidate_profile_repository.dart';
 import 'package:ats/domain/entities/candidate_profile_entity.dart';
 import 'package:ats/domain/usecases/candidate_profile/create_profile_usecase.dart';
 
 class ProfileController extends GetxController {
   final CandidateProfileRepository profileRepository;
-  final AuthRepository authRepository;
+  final CandidateAuthRepository authRepository;
 
   ProfileController(this.profileRepository, this.authRepository);
 

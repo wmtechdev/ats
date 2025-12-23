@@ -108,6 +108,15 @@ class AdminSignUpScreen extends StatelessWidget {
               : const SizedBox.shrink(),
         ),
       ],
+      errorMessage: Obx(
+        () => controller.errorMessage.value.isNotEmpty
+            ? AppErrorMessage(
+                message: controller.errorMessage.value,
+                icon: Iconsax.info_circle,
+                messageColor: AppColors.white,
+              )
+            : const SizedBox.shrink(),
+      ),
       actionButton: Obx(
         () => AppButton(
           text: AppTexts.signUp,

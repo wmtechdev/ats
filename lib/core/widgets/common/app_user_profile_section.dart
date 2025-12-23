@@ -7,7 +7,9 @@ import 'package:ats/core/utils/app_spacing/app_spacing.dart';
 import 'package:ats/core/utils/app_styles/app_text_styles.dart';
 import 'package:ats/core/utils/app_texts/app_texts.dart';
 import 'package:ats/core/constants/app_constants.dart';
-import 'package:ats/domain/repositories/auth_repository.dart';
+import 'package:ats/domain/repositories/candidate_auth_repository.dart';
+import 'package:ats/domain/repositories/admin_auth_repository.dart';
+import 'package:ats/domain/entities/user_entity.dart';
 
 class AppUserProfileSection extends StatelessWidget {
   final VoidCallback onLogout;
@@ -18,9 +20,15 @@ class AppUserProfileSection extends StatelessWidget {
   Widget build(BuildContext context) {
     final isMobile = AppResponsive.isMobile(context);
 
-    // Get current user
-    final authRepo = Get.find<AuthRepository>();
-    final currentUser = authRepo.getCurrentUser();
+    // Get current user - try candidate first, then admin
+    UserEntity? currentUser;
+    if (Get.isRegistered<CandidateAuthRepository>()) {
+      final authRepo = Get.find<CandidateAuthRepository>();
+      currentUser = authRepo.getCurrentUser();
+    } else if (Get.isRegistered<AdminAuthRepository>()) {
+      final authRepo = Get.find<AdminAuthRepository>();
+      currentUser = authRepo.getCurrentUser();
+    }
 
     // For now, we'll use placeholder data until profile is loaded
     String userName = AppTexts.admin;

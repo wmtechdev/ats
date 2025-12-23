@@ -2,51 +2,51 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ats/core/constants/app_constants.dart';
 import 'package:ats/domain/entities/user_entity.dart';
-import 'package:ats/domain/repositories/admin_auth_repository.dart';
-import 'package:ats/domain/usecases/admin_auth/admin_sign_up_usecase.dart';
-import 'package:ats/domain/usecases/admin_auth/admin_sign_in_usecase.dart';
-import 'package:ats/domain/usecases/admin_auth/admin_sign_out_usecase.dart';
+import 'package:ats/domain/repositories/candidate_auth_repository.dart';
+import 'package:ats/domain/usecases/candidate_auth/candidate_sign_up_usecase.dart';
+import 'package:ats/domain/usecases/candidate_auth/candidate_sign_in_usecase.dart';
+import 'package:ats/domain/usecases/candidate_auth/candidate_sign_out_usecase.dart';
 import 'package:ats/presentation/common/controllers/base_auth_controller.dart';
 
-/// Admin authentication controller
-/// Handles admin-specific authentication flows with complete isolation
-class AdminAuthController extends BaseAuthController {
-  final AdminAuthRepository adminAuthRepository;
-  late final AdminSignUpUseCase signUpUseCase;
-  late final AdminSignInUseCase signInUseCase;
-  late final AdminSignOutUseCase signOutUseCase;
+/// Candidate authentication controller
+/// Handles candidate-specific authentication flows with complete isolation
+class CandidateAuthController extends BaseAuthController {
+  final CandidateAuthRepository candidateAuthRepository;
+  late final CandidateSignUpUseCase signUpUseCase;
+  late final CandidateSignInUseCase signInUseCase;
+  late final CandidateSignOutUseCase signOutUseCase;
 
-  AdminAuthController(this.adminAuthRepository) : super() {
-    signUpUseCase = AdminSignUpUseCase(adminAuthRepository);
-    signInUseCase = AdminSignInUseCase(adminAuthRepository);
-    signOutUseCase = AdminSignOutUseCase(adminAuthRepository);
+  CandidateAuthController(this.candidateAuthRepository) : super() {
+    signUpUseCase = CandidateSignUpUseCase(candidateAuthRepository);
+    signInUseCase = CandidateSignInUseCase(candidateAuthRepository);
+    signOutUseCase = CandidateSignOutUseCase(candidateAuthRepository);
   }
 
   @override
-  String get signUpRole => AppConstants.roleAdmin;
+  String get signUpRole => AppConstants.roleCandidate;
 
   @override
   void handleSignUpSuccess(UserEntity user) {
-    // Admin signup always redirects to admin dashboard
-    Get.offAllNamed(AppConstants.routeAdminDashboard);
+    // Candidate signup redirects to profile screen to complete profile
+    Get.offAllNamed(AppConstants.routeCandidateProfile);
   }
 
   @override
   void handleSignInSuccess(UserEntity user) {
-    // Admin login redirects to admin dashboard
+    // Candidate login redirects to dashboard
     // Role validation is handled at repository level
-    Get.offAllNamed(AppConstants.routeAdminDashboard);
+    Get.offAllNamed(AppConstants.routeCandidateDashboard);
   }
 
   @override
-  String get signOutRoute => AppConstants.routeAdminLogin;
+  String get signOutRoute => AppConstants.routeLogin;
 
   @override
-  String get controllerTypeName => 'AdminAuthController';
+  String get controllerTypeName => 'CandidateAuthController';
 
   @override
   void deleteController() {
-    Get.delete<AdminAuthController>();
+    Get.delete<CandidateAuthController>();
   }
 
   @override
@@ -59,6 +59,8 @@ class AdminAuthController extends BaseAuthController {
       password: passwordController.text,
       firstName: firstNameController.text.trim(),
       lastName: lastNameController.text.trim(),
+      phone: phoneForSignUp,
+      address: addressForSignUp,
     );
 
     result.fold(
@@ -76,11 +78,15 @@ class AdminAuthController extends BaseAuthController {
         lastNameError.value = null;
         emailError.value = null;
         passwordError.value = null;
+        phoneError.value = null;
+        addressError.value = null;
         // Clear stored values
         firstNameValue.value = '';
         lastNameValue.value = '';
         emailValue.value = '';
         passwordValue.value = '';
+        phoneValue.value = '';
+        addressValue.value = '';
         // Handle navigation
         handleSignUpSuccess(user);
       },
@@ -143,7 +149,7 @@ class AdminAuthController extends BaseAuthController {
 
         // Delete this controller to force fresh recreation
         try {
-          Get.delete<AdminAuthController>();
+          Get.delete<CandidateAuthController>();
         } catch (e) {
           // Controller might already be deleted, ignore
         }
