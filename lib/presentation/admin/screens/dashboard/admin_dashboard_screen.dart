@@ -20,9 +20,9 @@ class AdminDashboardScreen extends StatelessWidget {
       title: AppTexts.adminDashboard,
       child: Obx(
         () => GridView.count(
-          crossAxisCount: AppResponsive.isMobile(context) ? 2 : 4,
+          crossAxisCount: AppResponsive.isMobile(context) ? 2 : 5,
           padding: AppSpacing.padding(context),
-          childAspectRatio: AppResponsive.isMobile(context) ? 0.85 : 1.0,
+          childAspectRatio: AppResponsive.isMobile(context) ? 0.85 : 1.2,
           mainAxisSpacing: AppResponsive.screenWidth(context) * 0.03,
           crossAxisSpacing: AppResponsive.screenWidth(context) * 0.03,
           children: [

@@ -38,19 +38,25 @@ class AppSideLayout extends StatelessWidget {
         backgroundColor: AppColors.lightBackground,
         drawer: _buildDrawer(context),
         appBar: AppBar(
-          backgroundColor: AppColors.white,
-          foregroundColor: AppColors.black,
+          backgroundColor: AppColors.primary,
+          foregroundColor: AppColors.white,
           elevation: 0,
           leading: IconButton(
             icon: Icon(
               Iconsax.menu_1,
               size: AppResponsive.iconSize(context),
-              color: AppColors.black,
+              color: AppColors.white,
             ),
             onPressed: () => drawerKey.currentState?.openDrawer(),
           ),
           title: title != null
-              ? Text(title!, style: AppTextStyles.heading(context))
+              ? Text(
+                  title!,
+                  style: AppTextStyles.heading(context).copyWith(
+                    fontWeight: FontWeight.w500,
+                    color: AppColors.white,
+                  ),
+                )
               : null,
           actions: actions,
         ),
@@ -105,10 +111,12 @@ class AppSideLayout extends StatelessWidget {
             child: ListView(
               padding: EdgeInsets.zero,
               children: navigationItems
-                  .map((item) => AppNavigationItem(
-                        item: item,
-                        dashboardRoute: dashboardRoute,
-                      ))
+                  .map(
+                    (item) => AppNavigationItem(
+                      item: item,
+                      dashboardRoute: dashboardRoute,
+                    ),
+                  )
                   .toList(),
             ),
           ),

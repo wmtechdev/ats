@@ -31,7 +31,7 @@ class AppDashboardCard extends StatelessWidget {
     final cardBackground = gradient != null
         ? null
         : (backgroundColor ?? AppColors.white);
-    
+
     return Card(
       elevation: 4,
       shape: RoundedRectangleBorder(
@@ -56,73 +56,74 @@ class AppDashboardCard extends StatelessWidget {
             ),
             child: Padding(
               padding: AppSpacing.all(context, factor: 1),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  // Icon with background circle
-                  Flexible(
-                    flex: 2,
-                    child: Container(
-                      padding: EdgeInsets.all(
-                        AppResponsive.screenWidth(context) * 0.02,
-                      ),
-                      decoration: BoxDecoration(
-                        color: (iconColor ?? AppColors.primary)
-                            .withValues(alpha: 0.1),
-                        shape: BoxShape.circle,
-                      ),
-                      child: Icon(
-                        icon,
-                        size: AppResponsive.iconSize(context, factor: 2),
-                        color: iconColor ?? AppColors.primary,
-                      ),
-                    ),
-                  ),
-                  if (value != null) ...[
-                    Flexible(
-                      flex: 1,
-                      child: Padding(
-                        padding: EdgeInsets.only(
-                          top: AppResponsive.screenHeight(context) * 0.01,
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  // Calculate icon size based on available card width
+                  final iconSize = AppResponsive.isMobile(context)
+                      ? constraints.maxWidth * 0.25
+                      : AppResponsive.isTablet(context)
+                          ? constraints.maxWidth * 0.20
+                          : constraints.maxWidth * 0.18;
+                  
+                  return Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      // Icon
+                      Flexible(
+                        flex: 2,
+                        child: Icon(
+                          icon,
+                          size: iconSize,
+                          color: iconColor ?? AppColors.primary,
                         ),
-                        child: FittedBox(
-                          fit: BoxFit.scaleDown,
-                          child: Text(
-                            value!,
-                            style: AppTextStyles.headline(context).copyWith(
-                              fontWeight: FontWeight.bold,
-                              color: textColor ?? AppColors.black,
+                      ),
+                      if (value != null) ...[
+                        Flexible(
+                          flex: 1,
+                          child: Padding(
+                            padding: EdgeInsets.only(
+                              top: AppResponsive.screenHeight(context) * 0.01,
                             ),
-                            textAlign: TextAlign.center,
+                            child: FittedBox(
+                              fit: BoxFit.scaleDown,
+                              child: Text(
+                                value!,
+                                style: AppTextStyles.headline(context).copyWith(
+                                  fontWeight: FontWeight.bold,
+                                  color: textColor ?? AppColors.black,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                      Flexible(
+                        flex: 1,
+                        child: Padding(
+                          padding: EdgeInsets.only(
+                            top: AppResponsive.screenHeight(context) * 0.005,
+                          ),
+                          child: FittedBox(
+                            fit: BoxFit.scaleDown,
+                            child: Text(
+                              title,
+                              style: AppTextStyles.bodyText(context).copyWith(
+                                fontWeight: FontWeight.w600,
+                                color: textColor ?? AppColors.black,
+                              ),
+                              textAlign: TextAlign.center,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                  ],
-                  Flexible(
-                    flex: 1,
-                    child: Padding(
-                      padding: EdgeInsets.only(
-                        top: AppResponsive.screenHeight(context) * 0.005,
-                      ),
-                      child: FittedBox(
-                        fit: BoxFit.scaleDown,
-                        child: Text(
-                          title,
-                          style: AppTextStyles.bodyText(context).copyWith(
-                            fontWeight: FontWeight.w600,
-                            color: textColor ?? AppColors.black,
-                          ),
-                          textAlign: TextAlign.center,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
+                    ],
+                  );
+                },
               ),
             ),
           ),
@@ -131,4 +132,3 @@ class AppDashboardCard extends StatelessWidget {
     );
   }
 }
-

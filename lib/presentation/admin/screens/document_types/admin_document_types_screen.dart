@@ -5,8 +5,6 @@ import 'package:ats/core/constants/app_constants.dart';
 import 'package:ats/presentation/admin/controllers/admin_documents_controller.dart';
 import 'package:ats/core/utils/app_texts/app_texts.dart';
 import 'package:ats/core/utils/app_spacing/app_spacing.dart';
-import 'package:ats/core/utils/app_colors/app_colors.dart';
-import 'package:ats/core/utils/app_responsive/app_responsive.dart';
 import 'package:ats/core/widgets/app_widgets.dart';
 
 class AdminDocumentTypesScreen extends StatelessWidget {
@@ -54,12 +52,7 @@ class AdminDocumentTypesScreen extends StatelessWidget {
                     title: docType.name,
                     subtitle: docType.description,
                     icon: Iconsax.document_text,
-                    trailing: IconButton(
-                      icon: Icon(
-                        Iconsax.trash,
-                        size: AppResponsive.iconSize(context),
-                        color: AppColors.error,
-                      ),
+                    trailing: AppActionButton.delete(
                       onPressed: () => controller.deleteDocumentType(docType.docTypeId),
                     ),
                     onTap: null,

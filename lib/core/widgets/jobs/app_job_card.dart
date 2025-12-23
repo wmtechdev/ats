@@ -3,8 +3,6 @@ import 'package:iconsax/iconsax.dart';
 import 'package:ats/core/constants/app_constants.dart';
 import 'package:ats/core/utils/app_texts/app_texts.dart';
 import 'package:ats/core/utils/app_spacing/app_spacing.dart';
-import 'package:ats/core/utils/app_colors/app_colors.dart';
-import 'package:ats/core/utils/app_responsive/app_responsive.dart';
 import 'package:ats/core/widgets/app_widgets.dart';
 import 'package:ats/domain/entities/job_entity.dart';
 
@@ -32,8 +30,15 @@ class AppJobCard extends StatelessWidget {
       title: job.title,
       subtitle: _buildSubtitle(context),
       icon: Iconsax.briefcase,
+      statusWidget: AppStatusChip(
+        status: job.status,
+        customText: job.status == AppConstants.jobStatusOpen
+            ? AppTexts.open
+            : AppTexts.closed,
+      ),
       trailing: _buildTrailing(context),
       onTap: onTap,
+      useRowLayout: true,
     );
   }
 
@@ -48,48 +53,15 @@ class AppJobCard extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        AppStatusChip(
-          status: job.status,
-          customText: job.status == AppConstants.jobStatusOpen
-              ? AppTexts.open
-              : AppTexts.closed,
-        ),
-        AppSpacing.horizontal(context, 0.01),
-        IconButton(
-          icon: Icon(
-            job.status == AppConstants.jobStatusOpen
-                ? Iconsax.eye_slash
-                : Iconsax.eye,
-            size: AppResponsive.iconSize(context),
-            color: job.status == AppConstants.jobStatusOpen
-                ? AppColors.warning
-                : AppColors.success,
-          ),
-          tooltip: job.status == AppConstants.jobStatusOpen
-              ? AppTexts.closeJob
-              : AppTexts.openJob,
-          onPressed: onStatusToggle,
-        ),
-        AppSpacing.horizontal(context, 0.01),
-        IconButton(
-          icon: Icon(
-            Iconsax.edit,
-            size: AppResponsive.iconSize(context),
-            color: AppColors.information,
-          ),
-          onPressed: onEdit,
-        ),
-        AppSpacing.horizontal(context, 0.01),
-        IconButton(
-          icon: Icon(
-            Iconsax.trash,
-            size: AppResponsive.iconSize(context),
-            color: AppColors.error,
-          ),
-          onPressed: onDelete,
-        ),
+        if (onStatusToggle != null)
+          job.status == AppConstants.jobStatusOpen
+              ? AppActionButton.closeJob(onPressed: onStatusToggle)
+              : AppActionButton.openJob(onPressed: onStatusToggle),
+        if (onStatusToggle != null) AppSpacing.horizontal(context, 0.01),
+        if (onEdit != null) AppActionButton.edit(onPressed: onEdit),
+        if (onEdit != null) AppSpacing.horizontal(context, 0.01),
+        if (onDelete != null) AppActionButton.delete(onPressed: onDelete),
       ],
     );
   }
 }
-
