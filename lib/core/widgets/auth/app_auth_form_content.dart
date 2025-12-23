@@ -5,12 +5,14 @@ class AppAuthFormContent extends StatelessWidget {
   final bool isLoginSelected;
   final List<Widget> formFields;
   final Widget actionButton;
+  final Widget? errorMessage;
 
   const AppAuthFormContent({
     super.key,
     required this.isLoginSelected,
     required this.formFields,
     required this.actionButton,
+    this.errorMessage,
   });
 
   @override
@@ -39,6 +41,10 @@ class AppAuthFormContent extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           ...formFields,
+          if (errorMessage != null) ...[
+            AppSpacing.vertical(context, 0.02),
+            errorMessage!,
+          ],
           AppSpacing.vertical(context, 0.03),
           actionButton,
         ],

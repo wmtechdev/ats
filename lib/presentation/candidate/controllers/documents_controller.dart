@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:get/get.dart';
-import 'package:ats/domain/repositories/auth_repository.dart';
+import 'package:ats/domain/repositories/candidate_auth_repository.dart';
 import 'package:ats/domain/repositories/document_repository.dart';
 import 'package:ats/domain/entities/document_type_entity.dart';
 import 'package:ats/domain/entities/candidate_document_entity.dart';
@@ -9,7 +9,7 @@ import 'package:file_picker/file_picker.dart';
 
 class DocumentsController extends GetxController {
   final DocumentRepository documentRepository;
-  final AuthRepository authRepository;
+  final CandidateAuthRepository authRepository;
 
   DocumentsController(this.documentRepository, this.authRepository);
 

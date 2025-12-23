@@ -16,6 +16,7 @@ class AppAuthLayout extends StatelessWidget {
   final VoidCallback onSignUpTap;
   final List<Widget> formFields;
   final Widget actionButton;
+  final Widget? errorMessage;
 
   const AppAuthLayout({
     super.key,
@@ -25,6 +26,7 @@ class AppAuthLayout extends StatelessWidget {
     required this.onSignUpTap,
     required this.formFields,
     required this.actionButton,
+    this.errorMessage,
   });
 
   @override
@@ -61,6 +63,7 @@ class AppAuthLayout extends StatelessWidget {
                   isLoginSelected: isLoginSelected,
                   formFields: formFields,
                   actionButton: actionButton,
+                  errorMessage: errorMessage,
                 ),
               ],
             ),

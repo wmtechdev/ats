@@ -1,30 +1,25 @@
 import 'package:ats/core/errors/failures.dart';
 import 'package:ats/domain/entities/user_entity.dart';
-import 'package:ats/domain/repositories/auth_repository.dart';
+import 'package:ats/domain/repositories/admin_auth_repository.dart';
 import 'package:dartz/dartz.dart';
 
-class SignUpUseCase {
-  final AuthRepository repository;
+/// Use case for admin sign up
+class AdminSignUpUseCase {
+  final AdminAuthRepository repository;
 
-  SignUpUseCase(this.repository);
+  AdminSignUpUseCase(this.repository);
 
   Future<Either<Failure, UserEntity>> call({
     required String email,
     required String password,
     required String firstName,
     required String lastName,
-    required String role,
-    String? phone,
-    String? address,
   }) {
     return repository.signUp(
       email: email,
       password: password,
       firstName: firstName,
       lastName: lastName,
-      role: role,
-      phone: phone,
-      address: address,
     );
   }
 }

@@ -17,6 +17,29 @@ class AuthMiddleware extends GetMiddleware {
       AppConstants.routeAdminSignUp,
     ];
     
+    // Get current route to check if user is navigating between auth screens
+    final currentRoute = Get.currentRoute;
+    
+    // Candidate auth routes
+    final candidateAuthRoutes = [
+      AppConstants.routeLogin,
+      AppConstants.routeSignUp,
+    ];
+    
+    // Admin auth routes
+    final adminAuthRoutes = [
+      AppConstants.routeAdminLogin,
+      AppConstants.routeAdminSignUp,
+    ];
+    
+    // Check if navigating between auth screens of the same type
+    final isNavigatingBetweenCandidateAuth = 
+        candidateAuthRoutes.contains(currentRoute) && 
+        candidateAuthRoutes.contains(route);
+    final isNavigatingBetweenAdminAuth = 
+        adminAuthRoutes.contains(currentRoute) && 
+        adminAuthRoutes.contains(route);
+    
     if (firebaseUser == null) {
       // Not authenticated - allow only public auth routes
       if (publicRoutes.contains(route)) {
@@ -26,9 +49,17 @@ class AuthMiddleware extends GetMiddleware {
       return const RouteSettings(name: AppConstants.routeLogin);
     } else {
       // Authenticated - redirect away from auth routes
-      // The actual role-based redirect will be handled by the route or AdminMiddleware
+      // BUT allow navigation between auth screens of the same type
       if (publicRoutes.contains(route)) {
-        // User is logged in but trying to access auth routes
+        // Allow navigation between candidate auth screens
+        if (isNavigatingBetweenCandidateAuth) {
+          return null; // Allow switching between login and signup
+        }
+        // Allow navigation between admin auth screens
+        if (isNavigatingBetweenAdminAuth) {
+          return null; // Allow switching between admin login and signup
+        }
+        // User is logged in but trying to access auth routes from outside
         // Redirect to candidate dashboard (default)
         // AdminMiddleware will handle admin-specific routes
         return const RouteSettings(name: AppConstants.routeCandidateDashboard);

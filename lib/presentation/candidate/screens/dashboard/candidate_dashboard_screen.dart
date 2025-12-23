@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:ats/core/constants/app_constants.dart';
-import 'package:ats/presentation/candidate/controllers/auth_controller.dart';
+import 'package:ats/presentation/candidate/controllers/candidate_auth_controller.dart';
 import 'package:ats/core/utils/app_texts/app_texts.dart';
 import 'package:ats/core/utils/app_spacing/app_spacing.dart';
 import 'package:ats/core/utils/app_colors/app_colors.dart';
@@ -14,7 +14,7 @@ class CandidateDashboardScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final authController = Get.find<AuthController>();
+    final authController = Get.find<CandidateAuthController>();
 
     return Scaffold(
       backgroundColor: AppColors.lightBackground,
