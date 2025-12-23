@@ -57,7 +57,7 @@ class AdminBindings extends Bindings {
     // Controllers
     Get.lazyPut(() => AdminAuthController(adminAuthRepo));
     Get.lazyPut(() => AdminDashboardController(applicationRepo, jobRepo));
-    Get.lazyPut(() => AdminJobsController(jobRepo));
+    Get.lazyPut(() => AdminJobsController(jobRepo, applicationRepo));
     Get.lazyPut(() => AdminCandidatesController(adminRepo, applicationRepo, documentRepo));
     Get.lazyPut(() => AdminDocumentsController(documentRepo));
   }

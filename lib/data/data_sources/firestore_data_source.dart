@@ -62,8 +62,8 @@ abstract class FirestoreDataSource {
   Future<String> createJob({
     required String title,
     required String description,
-    required String hospitalName,
-    required List<String> requirements,
+    required String requirements,
+    required List<String> requiredDocumentIds,
   });
 
   Future<Map<String, dynamic>?> getJob(String jobId);
@@ -366,15 +366,15 @@ class FirestoreDataSourceImpl implements FirestoreDataSource {
   Future<String> createJob({
     required String title,
     required String description,
-    required String hospitalName,
-    required List<String> requirements,
+    required String requirements,
+    required List<String> requiredDocumentIds,
   }) async {
     try {
       final docRef = await firestore.collection(AppConstants.jobsCollection).add({
         'title': title,
         'description': description,
-        'hospitalName': hospitalName,
         'requirements': requirements,
+        'requiredDocumentIds': requiredDocumentIds,
         'status': AppConstants.jobStatusOpen,
         'createdAt': FieldValue.serverTimestamp(),
       });
@@ -407,7 +407,10 @@ class FirestoreDataSourceImpl implements FirestoreDataSource {
       }
       final querySnapshot = await query.get();
       return querySnapshot.docs
-          .map((doc) => doc.data() as Map<String, dynamic>)
+          .map((doc) => {
+                ...doc.data() as Map<String, dynamic>,
+                'jobId': doc.id,
+              })
           .toList();
     } catch (e) {
       throw ServerException('Failed to get jobs: $e');
@@ -421,7 +424,10 @@ class FirestoreDataSourceImpl implements FirestoreDataSource {
       query = query.where('status', isEqualTo: status);
     }
     return query.snapshots().map((snapshot) => snapshot.docs
-        .map((doc) => doc.data() as Map<String, dynamic>)
+        .map((doc) => {
+              ...doc.data() as Map<String, dynamic>,
+              'jobId': doc.id,
+            })
         .toList());
   }
 
@@ -556,7 +562,12 @@ class FirestoreDataSourceImpl implements FirestoreDataSource {
       final querySnapshot = await firestore
           .collection(AppConstants.documentTypesCollection)
           .get();
-      return querySnapshot.docs.map((doc) => doc.data()).toList();
+      return querySnapshot.docs
+          .map((doc) => {
+                ...doc.data(),
+                'docTypeId': doc.id,
+              })
+          .toList();
     } catch (e) {
       throw ServerException('Failed to get document types: $e');
     }
@@ -567,8 +578,12 @@ class FirestoreDataSourceImpl implements FirestoreDataSource {
     return firestore
         .collection(AppConstants.documentTypesCollection)
         .snapshots()
-        .map((snapshot) =>
-            snapshot.docs.map((doc) => doc.data()).toList());
+        .map((snapshot) => snapshot.docs
+            .map((doc) => {
+                  ...doc.data(),
+                  'docTypeId': doc.id,
+                })
+            .toList());
   }
 
   @override

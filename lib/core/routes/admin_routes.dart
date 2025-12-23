@@ -8,9 +8,11 @@ import 'package:ats/presentation/admin/screens/dashboard/admin_dashboard_screen.
 import 'package:ats/presentation/admin/screens/jobs/admin_jobs_list_screen.dart';
 import 'package:ats/presentation/admin/screens/jobs/admin_job_create_screen.dart';
 import 'package:ats/presentation/admin/screens/jobs/admin_job_edit_screen.dart';
+import 'package:ats/presentation/admin/screens/jobs/admin_job_details_screen.dart';
 import 'package:ats/presentation/admin/screens/candidates/admin_candidates_list_screen.dart';
 import 'package:ats/presentation/admin/screens/candidates/admin_candidate_details_screen.dart';
 import 'package:ats/presentation/admin/screens/document_types/admin_document_types_screen.dart';
+import 'package:ats/presentation/admin/screens/document_types/admin_create_document_type_screen.dart';
 import 'package:ats/presentation/admin/screens/admins/admin_manage_admins_screen.dart';
 
 class AdminRoutes {
@@ -64,6 +66,13 @@ class AdminRoutes {
       transitionDuration: const Duration(milliseconds: 300),
     ),
     GetPage(
+      name: AppConstants.routeAdminJobDetails,
+      page: () => const AdminJobDetailsScreen(),
+      binding: AdminBindings(),
+      transition: Transition.rightToLeft,
+      transitionDuration: const Duration(milliseconds: 300),
+    ),
+    GetPage(
       name: AppConstants.routeAdminCandidates,
       page: () => const AdminCandidatesListScreen(),
       binding: AdminBindings(),
@@ -80,6 +89,13 @@ class AdminRoutes {
     GetPage(
       name: AppConstants.routeAdminDocumentTypes,
       page: () => const AdminDocumentTypesScreen(),
+      binding: AdminBindings(),
+      transition: Transition.rightToLeft,
+      transitionDuration: const Duration(milliseconds: 300),
+    ),
+    GetPage(
+      name: AppConstants.routeAdminCreateDocumentType,
+      page: () => const AdminCreateDocumentTypeScreen(),
       binding: AdminBindings(),
       transition: Transition.rightToLeft,
       transitionDuration: const Duration(milliseconds: 300),

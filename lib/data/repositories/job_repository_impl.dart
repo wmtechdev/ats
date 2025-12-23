@@ -17,14 +17,20 @@ class JobRepositoryImpl implements JobRepository {
     try {
       final jobsData = await firestoreDataSource.getJobs(status: status);
       final jobs = jobsData.map((data) {
-        // We need jobId from the document, but our data source doesn't return it
-        // This is a limitation - we need to fix the data source
+        // Handle backward compatibility: if requirements is List, convert to String
+        String requirements;
+        if (data['requirements'] is List) {
+          requirements = (data['requirements'] as List).join(', ');
+        } else {
+          requirements = data['requirements'] ?? '';
+        }
+        
         return JobModel(
-          jobId: '', // This needs to be fixed
+          jobId: data['jobId'] ?? '',
           title: data['title'] ?? '',
           description: data['description'] ?? '',
-          hospitalName: data['hospitalName'] ?? '',
-          requirements: List<String>.from(data['requirements'] ?? []),
+          requirements: requirements,
+          requiredDocumentIds: List<String>.from(data['requiredDocumentIds'] ?? []),
           status: data['status'] ?? 'open',
           createdAt: (data['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
         ).toEntity();
@@ -45,12 +51,20 @@ class JobRepositoryImpl implements JobRepository {
         return const Left(ServerFailure('Job not found'));
       }
 
+      // Handle backward compatibility
+      String requirements;
+      if (jobData['requirements'] is List) {
+        requirements = (jobData['requirements'] as List).join(', ');
+      } else {
+        requirements = jobData['requirements'] ?? '';
+      }
+
       final jobModel = JobModel(
         jobId: jobId,
         title: jobData['title'] ?? '',
         description: jobData['description'] ?? '',
-        hospitalName: jobData['hospitalName'] ?? '',
-        requirements: List<String>.from(jobData['requirements'] ?? []),
+        requirements: requirements,
+        requiredDocumentIds: List<String>.from(jobData['requiredDocumentIds'] ?? []),
         status: jobData['status'] ?? 'open',
         createdAt: (jobData['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
       );
@@ -67,12 +81,20 @@ class JobRepositoryImpl implements JobRepository {
   Stream<List<JobEntity>> streamJobs({String? status}) {
     return firestoreDataSource.streamJobs(status: status).map((jobsData) {
       return jobsData.map((data) {
+        // Handle backward compatibility
+        String requirements;
+        if (data['requirements'] is List) {
+          requirements = (data['requirements'] as List).join(', ');
+        } else {
+          requirements = data['requirements'] ?? '';
+        }
+        
         return JobModel(
-          jobId: '', // This needs to be fixed
+          jobId: data['jobId'] ?? '',
           title: data['title'] ?? '',
           description: data['description'] ?? '',
-          hospitalName: data['hospitalName'] ?? '',
-          requirements: List<String>.from(data['requirements'] ?? []),
+          requirements: requirements,
+          requiredDocumentIds: List<String>.from(data['requiredDocumentIds'] ?? []),
           status: data['status'] ?? 'open',
           createdAt: (data['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
         ).toEntity();
@@ -84,15 +106,15 @@ class JobRepositoryImpl implements JobRepository {
   Future<Either<Failure, JobEntity>> createJob({
     required String title,
     required String description,
-    required String hospitalName,
-    required List<String> requirements,
+    required String requirements,
+    required List<String> requiredDocumentIds,
   }) async {
     try {
       final jobId = await firestoreDataSource.createJob(
         title: title,
         description: description,
-        hospitalName: hospitalName,
         requirements: requirements,
+        requiredDocumentIds: requiredDocumentIds,
       );
 
       final jobData = await firestoreDataSource.getJob(jobId);
@@ -104,8 +126,8 @@ class JobRepositoryImpl implements JobRepository {
         jobId: jobId,
         title: jobData['title'] ?? title,
         description: jobData['description'] ?? description,
-        hospitalName: jobData['hospitalName'] ?? hospitalName,
-        requirements: List<String>.from(jobData['requirements'] ?? requirements),
+        requirements: jobData['requirements'] ?? requirements,
+        requiredDocumentIds: List<String>.from(jobData['requiredDocumentIds'] ?? requiredDocumentIds),
         status: jobData['status'] ?? 'open',
         createdAt: (jobData['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
       );
@@ -123,16 +145,16 @@ class JobRepositoryImpl implements JobRepository {
     required String jobId,
     String? title,
     String? description,
-    String? hospitalName,
-    List<String>? requirements,
+    String? requirements,
+    List<String>? requiredDocumentIds,
     String? status,
   }) async {
     try {
       final updateData = <String, dynamic>{};
       if (title != null) updateData['title'] = title;
       if (description != null) updateData['description'] = description;
-      if (hospitalName != null) updateData['hospitalName'] = hospitalName;
       if (requirements != null) updateData['requirements'] = requirements;
+      if (requiredDocumentIds != null) updateData['requiredDocumentIds'] = requiredDocumentIds;
       if (status != null) updateData['status'] = status;
 
       await firestoreDataSource.updateJob(
@@ -145,12 +167,20 @@ class JobRepositoryImpl implements JobRepository {
         return const Left(ServerFailure('Failed to retrieve updated job'));
       }
 
+      // Handle backward compatibility
+      String reqs;
+      if (jobData['requirements'] is List) {
+        reqs = (jobData['requirements'] as List).join(', ');
+      } else {
+        reqs = jobData['requirements'] ?? '';
+      }
+
       final jobModel = JobModel(
         jobId: jobId,
         title: jobData['title'] ?? '',
         description: jobData['description'] ?? '',
-        hospitalName: jobData['hospitalName'] ?? '',
-        requirements: List<String>.from(jobData['requirements'] ?? []),
+        requirements: reqs,
+        requiredDocumentIds: List<String>.from(jobData['requiredDocumentIds'] ?? []),
         status: jobData['status'] ?? 'open',
         createdAt: (jobData['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
       );
@@ -175,4 +205,3 @@ class JobRepositoryImpl implements JobRepository {
     }
   }
 }
-

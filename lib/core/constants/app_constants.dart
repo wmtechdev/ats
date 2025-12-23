@@ -51,12 +51,14 @@ class AppConstants {
   static const String routeCandidateApplications = '/candidate/applications';
   static const String routeCandidateDocuments = '/candidate/documents';
   static const String routeAdminDashboard = '/admin/dashboard';
-  static const String routeAdminJobs = '/admin/jobs';
-  static const String routeAdminJobCreate = '/admin/jobs/create';
-  static const String routeAdminJobEdit = '/admin/jobs/edit';
-  static const String routeAdminCandidates = '/admin/candidates';
-  static const String routeAdminCandidateDetails = '/admin/candidates/details';
-  static const String routeAdminDocumentTypes = '/admin/document-types';
-  static const String routeAdminManageAdmins = '/admin/manage-admins';
+    static const String routeAdminJobs = '/admin/jobs';
+    static const String routeAdminJobCreate = '/admin/jobs/create';
+    static const String routeAdminJobEdit = '/admin/jobs/edit';
+    static const String routeAdminJobDetails = '/admin/jobs/details';
+    static const String routeAdminCandidates = '/admin/candidates';
+    static const String routeAdminCandidateDetails = '/admin/candidates/details';
+    static const String routeAdminDocumentTypes = '/admin/document-types';
+    static const String routeAdminCreateDocumentType = '/admin/document-types/create';
+    static const String routeAdminManageAdmins = '/admin/manage-admins';
 }
 

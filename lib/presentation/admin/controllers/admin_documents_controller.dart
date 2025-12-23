@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:get/get.dart';
+import 'package:ats/core/constants/app_constants.dart';
 import 'package:ats/domain/repositories/document_repository.dart';
 import 'package:ats/domain/entities/document_type_entity.dart';
 
@@ -11,6 +12,8 @@ class AdminDocumentsController extends GetxController {
   final isLoading = false.obs;
   final errorMessage = ''.obs;
   final documentTypes = <DocumentTypeEntity>[].obs;
+  final filteredDocumentTypes = <DocumentTypeEntity>[].obs;
+  final searchQuery = ''.obs;
 
   // Stream subscription
   StreamSubscription<List<DocumentTypeEntity>>? _documentTypesSubscription;
@@ -33,11 +36,33 @@ class AdminDocumentsController extends GetxController {
     _documentTypesSubscription = documentRepository.streamDocumentTypes().listen(
       (types) {
         documentTypes.value = types;
+        _applyFilters();
       },
       onError: (error) {
         // Silently handle permission errors
       },
     );
+  }
+
+  void setSearchQuery(String query) {
+    searchQuery.value = query;
+    _applyFilters();
+  }
+
+  void _applyFilters() {
+    var filtered = List<DocumentTypeEntity>.from(documentTypes);
+
+    // Apply search filter
+    if (searchQuery.value.isNotEmpty) {
+      final query = searchQuery.value.toLowerCase();
+      filtered = filtered
+          .where((docType) =>
+              docType.name.toLowerCase().contains(query) ||
+              docType.description.toLowerCase().contains(query))
+          .toList();
+    }
+
+    filteredDocumentTypes.value = filtered;
   }
 
   Future<void> createDocumentType({
@@ -62,7 +87,10 @@ class AdminDocumentsController extends GetxController {
       (docType) {
         isLoading.value = false;
         Get.snackbar('Success', 'Document type created successfully');
-        Get.back();
+        Get.offNamedUntil(
+          AppConstants.routeAdminDocumentTypes,
+          (route) => route.settings.name == AppConstants.routeAdminDocumentTypes,
+        );
       },
     );
   }
@@ -91,7 +119,10 @@ class AdminDocumentsController extends GetxController {
       (docType) {
         isLoading.value = false;
         Get.snackbar('Success', 'Document type updated successfully');
-        Get.back();
+        Get.offNamedUntil(
+          AppConstants.routeAdminDocumentTypes,
+          (route) => route.settings.name == AppConstants.routeAdminDocumentTypes,
+        );
       },
     );
   }

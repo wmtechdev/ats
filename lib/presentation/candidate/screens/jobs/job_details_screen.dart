@@ -49,18 +49,6 @@ class JobDetailsScreen extends StatelessWidget {
                   ),
                 ],
               ),
-              AppSpacing.vertical(context, 0.01),
-              Row(
-                children: [
-                  Icon(
-                    Iconsax.hospital,
-                    size: AppResponsive.iconSize(context),
-                    color: AppColors.secondary,
-                  ),
-                  AppSpacing.horizontal(context, 0.01),
-                  Text(job.hospitalName, style: AppTextStyles.heading(context)),
-                ],
-              ),
               AppSpacing.vertical(context, 0.03),
               Text(AppTexts.description, style: AppTextStyles.heading(context)),
               AppSpacing.vertical(context, 0.01),
@@ -71,30 +59,18 @@ class JobDetailsScreen extends StatelessWidget {
                 style: AppTextStyles.heading(context),
               ),
               AppSpacing.vertical(context, 0.01),
-              ...job.requirements.asMap().entries.map(
-                (entry) => Padding(
-                  key: ValueKey('requirement_${entry.key}_${entry.value}'),
-                  padding: EdgeInsets.only(
-                    top: AppResponsive.screenHeight(context) * 0.005,
-                    bottom: AppResponsive.screenHeight(context) * 0.005,
+              Container(
+                width: double.infinity,
+                padding: AppSpacing.all(context),
+                decoration: BoxDecoration(
+                  color: AppColors.lightGrey,
+                  borderRadius: BorderRadius.circular(
+                    AppResponsive.radius(context, factor: 5),
                   ),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Icon(
-                        Iconsax.tick_circle,
-                        size: AppResponsive.iconSize(context, factor: 0.8),
-                        color: AppColors.success,
-                      ),
-                      AppSpacing.horizontal(context, 0.01),
-                      Expanded(
-                        child: Text(
-                          entry.value,
-                          style: AppTextStyles.bodyText(context),
-                        ),
-                      ),
-                    ],
-                  ),
+                ),
+                child: Text(
+                  job.requirements,
+                  style: AppTextStyles.bodyText(context),
                 ),
               ),
               AppSpacing.vertical(context, 0.04),

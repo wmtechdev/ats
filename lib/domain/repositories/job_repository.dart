@@ -12,16 +12,16 @@ abstract class JobRepository {
   Future<Either<Failure, JobEntity>> createJob({
     required String title,
     required String description,
-    required String hospitalName,
-    required List<String> requirements,
+    required String requirements,
+    required List<String> requiredDocumentIds,
   });
 
   Future<Either<Failure, JobEntity>> updateJob({
     required String jobId,
     String? title,
     String? description,
-    String? hospitalName,
-    List<String>? requirements,
+    String? requirements,
+    List<String>? requiredDocumentIds,
     String? status,
   });
 

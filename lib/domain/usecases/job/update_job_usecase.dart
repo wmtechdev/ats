@@ -3,23 +3,26 @@ import 'package:ats/domain/entities/job_entity.dart';
 import 'package:ats/domain/repositories/job_repository.dart';
 import 'package:dartz/dartz.dart';
 
-class CreateJobUseCase {
+class UpdateJobUseCase {
   final JobRepository repository;
 
-  CreateJobUseCase(this.repository);
+  UpdateJobUseCase(this.repository);
 
   Future<Either<Failure, JobEntity>> call({
-    required String title,
-    required String description,
-    required String requirements,
-    required List<String> requiredDocumentIds,
+    required String jobId,
+    String? title,
+    String? description,
+    String? requirements,
+    List<String>? requiredDocumentIds,
+    String? status,
   }) {
-    return repository.createJob(
+    return repository.updateJob(
+      jobId: jobId,
       title: title,
       description: description,
       requirements: requirements,
       requiredDocumentIds: requiredDocumentIds,
+      status: status,
     );
   }
 }
-

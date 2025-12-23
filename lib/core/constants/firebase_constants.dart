@@ -16,7 +16,6 @@ class FirebaseConstants {
   static const String fieldAccessLevel = 'accessLevel';
   static const String fieldTitle = 'title';
   static const String fieldDescription = 'description';
-  static const String fieldHospitalName = 'hospitalName';
   static const String fieldRequirements = 'requirements';
   static const String fieldStatus = 'status';
   static const String fieldIsRequired = 'isRequired';

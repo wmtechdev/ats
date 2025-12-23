@@ -6,8 +6,8 @@ class JobModel extends JobEntity {
     required super.jobId,
     required super.title,
     required super.description,
-    required super.hospitalName,
     required super.requirements,
+    required super.requiredDocumentIds,
     required super.status,
     required super.createdAt,
   });
@@ -18,8 +18,8 @@ class JobModel extends JobEntity {
       jobId: doc.id,
       title: data['title'] ?? '',
       description: data['description'] ?? '',
-      hospitalName: data['hospitalName'] ?? '',
-      requirements: List<String>.from(data['requirements'] ?? []),
+      requirements: data['requirements'] ?? '',
+      requiredDocumentIds: List<String>.from(data['requiredDocumentIds'] ?? []),
       status: data['status'] ?? 'open',
       createdAt: (data['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
     );
@@ -29,8 +29,8 @@ class JobModel extends JobEntity {
     return {
       'title': title,
       'description': description,
-      'hospitalName': hospitalName,
       'requirements': requirements,
+      'requiredDocumentIds': requiredDocumentIds,
       'status': status,
       'createdAt': Timestamp.fromDate(createdAt),
     };
@@ -41,8 +41,8 @@ class JobModel extends JobEntity {
       jobId: jobId,
       title: title,
       description: description,
-      hospitalName: hospitalName,
       requirements: requirements,
+      requiredDocumentIds: requiredDocumentIds,
       status: status,
       createdAt: createdAt,
     );

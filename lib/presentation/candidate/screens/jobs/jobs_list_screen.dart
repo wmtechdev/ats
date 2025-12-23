@@ -30,7 +30,9 @@ class JobsListScreen extends StatelessWidget {
                 final job = controller.jobs[index];
                 return AppListCard(
                   title: job.title,
-                  subtitle: job.hospitalName,
+                  subtitle: job.description.length > 50 
+                      ? job.description.substring(0, 50) + '...' 
+                      : job.description,
                   icon: Iconsax.briefcase,
                   trailing: controller.hasApplied(job.jobId)
                       ? AppStatusChip(

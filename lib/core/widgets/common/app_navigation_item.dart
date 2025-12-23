@@ -22,7 +22,13 @@ class AppNavigationItem extends StatelessWidget {
   Widget build(BuildContext context) {
     // Check current route - GetX rebuilds widgets on navigation
     final currentRoute = Get.currentRoute;
-    final isCurrentlyActive = currentRoute == item.route;
+    // Check if current route matches exactly or starts with the item route
+    // This allows sub-routes to highlight the parent navigation item
+    final isCurrentlyActive =
+        currentRoute == item.route ||
+        (currentRoute.startsWith(item.route) &&
+            currentRoute.length > item.route.length &&
+            currentRoute[item.route.length] == '/');
 
     return InkWell(
       onTap: () {
@@ -32,8 +38,8 @@ class AppNavigationItem extends StatelessWidget {
         if (Get.currentRoute != item.route) {
           // If dashboard route is provided and we're not going to dashboard,
           // use offNamedUntil to keep dashboard in stack for back navigation
-          if (dashboardRoute != null && 
-              item.route != dashboardRoute && 
+          if (dashboardRoute != null &&
+              item.route != dashboardRoute &&
               currentRoute != dashboardRoute) {
             Get.offNamedUntil(
               item.route,
@@ -52,8 +58,12 @@ class AppNavigationItem extends StatelessWidget {
           color: isCurrentlyActive ? AppColors.secondary : Colors.transparent,
           borderRadius: isCurrentlyActive
               ? BorderRadius.only(
-                  topLeft: Radius.circular(AppResponsive.radius(context)),
-                  bottomLeft: Radius.circular(AppResponsive.radius(context)),
+                  topLeft: Radius.circular(
+                    AppResponsive.radius(context, factor: 5),
+                  ),
+                  bottomLeft: Radius.circular(
+                    AppResponsive.radius(context, factor: 5),
+                  ),
                 )
               : null,
         ),

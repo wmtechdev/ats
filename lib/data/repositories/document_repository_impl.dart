@@ -27,7 +27,7 @@ class DocumentRepositoryImpl implements DocumentRepository {
       final docsData = await firestoreDataSource.getDocumentTypes();
       final docs = docsData.map((data) {
         return DocumentTypeModel(
-          docTypeId: '', // This needs to be fixed
+          docTypeId: data['docTypeId'] ?? '',
           name: data['name'] ?? '',
           description: data['description'] ?? '',
           isRequired: data['isRequired'] ?? false,
@@ -46,7 +46,7 @@ class DocumentRepositoryImpl implements DocumentRepository {
     return firestoreDataSource.streamDocumentTypes().map((docsData) {
       return docsData.map((data) {
         return DocumentTypeModel(
-          docTypeId: '', // This needs to be fixed
+          docTypeId: data['docTypeId'] ?? '',
           name: data['name'] ?? '',
           description: data['description'] ?? '',
           isRequired: data['isRequired'] ?? false,

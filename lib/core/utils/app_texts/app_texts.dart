@@ -39,7 +39,6 @@ class AppTexts {
   // Jobs
   static const String jobDetails = "Job Details";
   static const String jobTitle = "Job Title";
-  static const String hospitalName = "Hospital Name";
   static const String description = "Description";
   static const String requirements = "Requirements";
   static const String requirementsCommaSeparated = "Requirements (comma separated)";
