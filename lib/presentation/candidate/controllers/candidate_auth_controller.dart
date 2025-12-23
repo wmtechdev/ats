@@ -27,8 +27,8 @@ class CandidateAuthController extends BaseAuthController {
 
   @override
   void handleSignUpSuccess(UserEntity user) {
-    // Candidate signup redirects to profile screen to complete profile
-    Get.offAllNamed(AppConstants.routeCandidateProfile);
+    // Candidate signup redirects to dashboard
+    Get.offAllNamed(AppConstants.routeCandidateDashboard);
   }
 
   @override

@@ -173,14 +173,37 @@ abstract class BaseAuthController extends GetxController {
   }
 
   bool validateSignUpForm() {
-    validateFirstName(firstNameController.text);
-    validateLastName(lastNameController.text);
-    validateEmail(emailController.text);
-    validatePassword(passwordController.text);
+    // Sync stored values with controller values as fallback
+    // This ensures we have the latest values even if onChanged wasn't called
+    if (firstNameValue.value != firstNameController.text) {
+      firstNameValue.value = firstNameController.text;
+    }
+    if (lastNameValue.value != lastNameController.text) {
+      lastNameValue.value = lastNameController.text;
+    }
+    if (emailValue.value != emailController.text) {
+      emailValue.value = emailController.text;
+    }
+    if (passwordValue.value != passwordController.text) {
+      passwordValue.value = passwordController.text;
+    }
+    if (phoneValue.value != phoneController.text) {
+      phoneValue.value = phoneController.text;
+    }
+    if (addressValue.value != addressController.text) {
+      addressValue.value = addressController.text;
+    }
+    
+    // Use stored values (updated in real-time via onChanged callbacks)
+    // This is more reliable than reading from controllers which may have sync issues
+    validateFirstName(firstNameValue.value);
+    validateLastName(lastNameValue.value);
+    validateEmail(emailValue.value);
+    validatePassword(passwordValue.value);
     // Phone and address validation only for candidate (optional)
     if (signUpRole == AppConstants.roleCandidate) {
-      validatePhone(phoneController.text);
-      validateAddress(addressController.text);
+      validatePhone(phoneValue.value);
+      validateAddress(addressValue.value);
     }
     return firstNameError.value == null &&
         lastNameError.value == null &&

@@ -52,7 +52,9 @@ class CandidateBindings extends Bindings {
     Get.lazyPut<ApplicationRepository>(() => applicationRepo);
 
     // Controllers
-    Get.lazyPut(() => CandidateAuthController(candidateAuthRepo));
+    // Use put instead of lazyPut for auth controller to ensure it's always available
+    // even if it was deleted during sign out. Put will replace any existing instance.
+    Get.put(CandidateAuthController(candidateAuthRepo), permanent: false);
     Get.lazyPut(() => ProfileController(profileRepo, candidateAuthRepo));
     Get.lazyPut(() => JobsController(jobRepo, applicationRepo, candidateAuthRepo));
     Get.lazyPut(() => DocumentsController(documentRepo, candidateAuthRepo));
