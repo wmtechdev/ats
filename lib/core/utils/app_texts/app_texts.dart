@@ -61,6 +61,8 @@ class AppTexts {
   static const String requiredDocuments = "Required Documents";
   static const String noDocumentsAvailable = "No documents available. Create documents first.";
   static const String noRequiredDocuments = "No required documents";
+  static const String uploadRequiredDocuments = "Please upload all required documents in the Documents screen before applying for this job";
+  static const String allDocumentsUploaded = "All required documents have been uploaded";
   static const String deleteJob = "Delete Job";
   static const String deleteJobConfirmation = "Are you sure you want to delete";
   static const String deleteJobWarning = "This action cannot be undone.";
@@ -97,6 +99,12 @@ class AppTexts {
   static const String documentTitle = "Document Title";
   static const String searchDocuments = "Search documents by title or description...";
   static const String noDocumentsFound = "No documents found matching your search";
+  static const String addNewDocument = "Add New Document";
+  static const String selectDocument = "Select Document";
+  static const String documentFileRequired = "Please select a document file";
+  static const String noFileSelected = "No file selected";
+  static const String documentFile = "Document File";
+  static const String goToDocuments = "Go to Documents";
 
   // Candidates
   static const String candidates = "Candidates";
@@ -158,4 +166,8 @@ class AppTexts {
   static const String success = "Success";
   static const String error = "Error";
   static const String unknownJob = "Unknown Job";
+  static const String workHistory = "Work History";
+  static const String addWorkHistory = "Add Work History";
+  static const String company = "Company";
+  static const String position = "Position";
 }

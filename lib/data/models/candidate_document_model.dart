@@ -10,6 +10,8 @@ class CandidateDocumentModel extends CandidateDocumentEntity {
     required super.storageUrl,
     required super.status,
     required super.uploadedAt,
+    super.title,
+    super.description,
   });
 
   factory CandidateDocumentModel.fromFirestore(DocumentSnapshot doc) {
@@ -22,6 +24,8 @@ class CandidateDocumentModel extends CandidateDocumentEntity {
       storageUrl: data['storageUrl'] ?? '',
       status: data['status'] ?? 'pending',
       uploadedAt: (data['uploadedAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
+      title: data['title'] as String?,
+      description: data['description'] as String?,
     );
   }
 
@@ -33,6 +37,8 @@ class CandidateDocumentModel extends CandidateDocumentEntity {
       'storageUrl': storageUrl,
       'status': status,
       'uploadedAt': Timestamp.fromDate(uploadedAt),
+      if (title != null) 'title': title,
+      if (description != null) 'description': description,
     };
   }
 
@@ -45,6 +51,8 @@ class CandidateDocumentModel extends CandidateDocumentEntity {
       storageUrl: storageUrl,
       status: status,
       uploadedAt: uploadedAt,
+      title: title,
+      description: description,
     );
   }
 }

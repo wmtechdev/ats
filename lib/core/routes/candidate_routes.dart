@@ -11,6 +11,7 @@ import 'package:ats/presentation/candidate/screens/jobs/jobs_list_screen.dart';
 import 'package:ats/presentation/candidate/screens/jobs/job_details_screen.dart';
 import 'package:ats/presentation/candidate/screens/applications/my_applications_screen.dart';
 import 'package:ats/presentation/candidate/screens/documents/my_documents_screen.dart';
+import 'package:ats/presentation/candidate/screens/documents/my_document_create_screen.dart';
 
 class CandidateRoutes {
   static const String initial = AppConstants.routeLogin;
@@ -76,6 +77,14 @@ class CandidateRoutes {
     GetPage(
       name: AppConstants.routeCandidateDocuments,
       page: () => const MyDocumentsScreen(),
+      binding: CandidateBindings(),
+      middlewares: [ProfileCompletionMiddleware()],
+      transition: Transition.rightToLeft,
+      transitionDuration: const Duration(milliseconds: 300),
+    ),
+    GetPage(
+      name: AppConstants.routeCandidateCreateDocument,
+      page: () => const MyDocumentCreateScreen(),
       binding: CandidateBindings(),
       middlewares: [ProfileCompletionMiddleware()],
       transition: Transition.rightToLeft,

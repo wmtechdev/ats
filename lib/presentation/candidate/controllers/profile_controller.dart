@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ats/core/constants/app_constants.dart';
 import 'package:ats/core/utils/app_validators/app_validators.dart';
@@ -307,6 +308,39 @@ class ProfileController extends GetxController {
         }
       },
     );
+  }
+
+  // Work history management methods
+  List<Map<String, dynamic>> getWorkHistoryFromControllers(
+    List<Map<String, TextEditingController>> controllers,
+  ) {
+    return controllers.map((entry) {
+      return {
+        'company': entry['company']!.text.trim(),
+        'position': entry['position']!.text.trim(),
+        'description': entry['description']!.text.trim(),
+      };
+    }).where((entry) => 
+      entry['company']!.isNotEmpty || 
+      entry['position']!.isNotEmpty
+    ).toList();
+  }
+
+  void initializeWorkHistoryControllers(
+    List<Map<String, dynamic>>? workHistory,
+    List<Map<String, TextEditingController>> controllers,
+  ) {
+    if (workHistory == null || workHistory.isEmpty) {
+      return;
+    }
+
+    for (var entry in workHistory) {
+      controllers.add({
+        'company': TextEditingController(text: entry['company']?.toString() ?? ''),
+        'position': TextEditingController(text: entry['position']?.toString() ?? ''),
+        'description': TextEditingController(text: entry['description']?.toString() ?? ''),
+      });
+    }
   }
 }
 

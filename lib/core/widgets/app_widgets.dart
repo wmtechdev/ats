@@ -50,3 +50,10 @@ export 'jobs/app_job_header.dart';
 
 // Documents widgets (used in document screens)
 export 'documents/app_document_form_fields.dart';
+export 'documents/app_document_upload_widget.dart';
+
+// Common widgets (info messages)
+export 'common/app_info_message.dart';
+
+// Jobs widgets (required documents)
+export 'jobs/app_required_documents_list.dart';

@@ -128,6 +128,8 @@ abstract class FirestoreDataSource {
     required String docTypeId,
     required String documentName,
     required String storageUrl,
+    String? title,
+    String? description,
   });
 
   Future<List<Map<String, dynamic>>> getCandidateDocuments(String candidateId);
@@ -644,6 +646,8 @@ class FirestoreDataSourceImpl implements FirestoreDataSource {
     required String docTypeId,
     required String documentName,
     required String storageUrl,
+    String? title,
+    String? description,
   }) async {
     try {
       final docRef = await firestore
@@ -655,6 +659,8 @@ class FirestoreDataSourceImpl implements FirestoreDataSource {
         'storageUrl': storageUrl,
         'status': AppConstants.documentStatusPending,
         'uploadedAt': FieldValue.serverTimestamp(),
+        if (title != null) 'title': title,
+        if (description != null) 'description': description,
       });
       return docRef.id;
     } catch (e) {
@@ -670,7 +676,11 @@ class FirestoreDataSourceImpl implements FirestoreDataSource {
           .collection(AppConstants.candidateDocumentsCollection)
           .where('candidateId', isEqualTo: candidateId)
           .get();
-      return querySnapshot.docs.map((doc) => doc.data()).toList();
+      return querySnapshot.docs.map((doc) {
+        final data = doc.data();
+        data['candidateDocId'] = doc.id;
+        return data;
+      }).toList();
     } catch (e) {
       throw ServerException('Failed to get candidate documents: $e');
     }
@@ -683,8 +693,11 @@ class FirestoreDataSourceImpl implements FirestoreDataSource {
         .collection(AppConstants.candidateDocumentsCollection)
         .where('candidateId', isEqualTo: candidateId)
         .snapshots()
-        .map((snapshot) =>
-            snapshot.docs.map((doc) => doc.data()).toList());
+        .map((snapshot) => snapshot.docs.map((doc) {
+              final data = doc.data();
+              data['candidateDocId'] = doc.id;
+              return data;
+            }).toList());
   }
 
   @override

@@ -179,6 +179,59 @@ class DocumentRepositoryImpl implements DocumentRepository {
   }
 
   @override
+  Future<Either<Failure, CandidateDocumentEntity>> createUserDocument({
+    required String candidateId,
+    required String title,
+    required String description,
+    required String documentName,
+    required String filePath,
+  }) async {
+    try {
+      final file = File(filePath);
+      if (!await file.exists()) {
+        return const Left(StorageFailure('File does not exist'));
+      }
+
+      // Upload to Firebase Storage
+      final downloadUrl = await storageDataSource.uploadFile(
+        path: '${AppConstants.documentsStoragePath}/$candidateId',
+        fileName: documentName,
+        file: file,
+      );
+
+      // Create document record in Firestore with empty docTypeId to indicate user-added document
+      final candidateDocId = await firestoreDataSource.createCandidateDocument(
+        candidateId: candidateId,
+        docTypeId: '', // Empty docTypeId indicates user-added document
+        documentName: documentName,
+        storageUrl: downloadUrl,
+        title: title,
+        description: description,
+      );
+
+      final doc = CandidateDocumentModel(
+        candidateDocId: candidateDocId,
+        candidateId: candidateId,
+        docTypeId: '', // Empty docTypeId indicates user-added document
+        documentName: documentName,
+        storageUrl: downloadUrl,
+        status: AppConstants.documentStatusPending,
+        uploadedAt: DateTime.now(),
+        title: title,
+        description: description,
+      );
+
+      return Right(doc.toEntity());
+    } on StorageException catch (e) {
+      return Left(StorageFailure(e.message));
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message));
+    } catch (e) {
+      return Left(StorageFailure('An unexpected error occurred: $e'));
+    }
+  }
+
+  @override
   Future<Either<Failure, List<CandidateDocumentEntity>>> getCandidateDocuments(
     String candidateId,
   ) async {
@@ -186,13 +239,15 @@ class DocumentRepositoryImpl implements DocumentRepository {
       final docsData = await firestoreDataSource.getCandidateDocuments(candidateId);
       final docs = docsData.map((data) {
         return CandidateDocumentModel(
-          candidateDocId: '', // This needs to be fixed
+          candidateDocId: data['candidateDocId'] ?? '',
           candidateId: data['candidateId'] ?? candidateId,
           docTypeId: data['docTypeId'] ?? '',
           documentName: data['documentName'] ?? '',
           storageUrl: data['storageUrl'] ?? '',
           status: data['status'] ?? AppConstants.documentStatusPending,
           uploadedAt: (data['uploadedAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
+          title: data['title'] as String?,
+          description: data['description'] as String?,
         ).toEntity();
       }).toList();
       return Right(docs);
@@ -210,13 +265,15 @@ class DocumentRepositoryImpl implements DocumentRepository {
     return firestoreDataSource.streamCandidateDocuments(candidateId).map((docsData) {
       return docsData.map((data) {
         return CandidateDocumentModel(
-          candidateDocId: '', // This needs to be fixed
+          candidateDocId: data['candidateDocId'] ?? '',
           candidateId: data['candidateId'] ?? candidateId,
           docTypeId: data['docTypeId'] ?? '',
           documentName: data['documentName'] ?? '',
           storageUrl: data['storageUrl'] ?? '',
           status: data['status'] ?? AppConstants.documentStatusPending,
           uploadedAt: (data['uploadedAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
+          title: data['title'] as String?,
+          description: data['description'] as String?,
         ).toEntity();
       }).toList();
     });

@@ -32,6 +32,14 @@ abstract class DocumentRepository {
     required String filePath,
   });
 
+  Future<Either<Failure, CandidateDocumentEntity>> createUserDocument({
+    required String candidateId,
+    required String title,
+    required String description,
+    required String documentName,
+    required String filePath,
+  });
+
   Future<Either<Failure, List<CandidateDocumentEntity>>> getCandidateDocuments(
     String candidateId,
   );

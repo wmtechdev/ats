@@ -3,8 +3,10 @@ import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:ats/presentation/candidate/controllers/profile_controller.dart';
 import 'package:ats/core/utils/app_texts/app_texts.dart';
+import 'package:ats/core/utils/app_styles/app_text_styles.dart';
 import 'package:ats/core/utils/app_spacing/app_spacing.dart';
 import 'package:ats/core/utils/app_colors/app_colors.dart';
+import 'package:ats/core/utils/app_responsive/app_responsive.dart';
 import 'package:ats/core/widgets/app_widgets.dart';
 
 class CandidateProfileScreen extends StatefulWidget {
@@ -60,13 +62,10 @@ class _CandidateProfileScreenState extends State<CandidateProfileScreen> {
             }
             workHistoryControllers.clear();
             
-            for (var entry in profile.workHistory!) {
-              workHistoryControllers.add({
-                'company': TextEditingController(text: entry['company']?.toString() ?? ''),
-                'position': TextEditingController(text: entry['position']?.toString() ?? ''),
-                'description': TextEditingController(text: entry['description']?.toString() ?? ''),
-              });
-            }
+            controller.initializeWorkHistoryControllers(
+              profile.workHistory,
+              workHistoryControllers,
+            );
             if (mounted) setState(() {});
           }
         } else if (workHistoryControllers.isNotEmpty) {
@@ -93,13 +92,10 @@ class _CandidateProfileScreenState extends State<CandidateProfileScreen> {
         if (profile.workHistory != null && 
             profile.workHistory!.isNotEmpty && 
             workHistoryControllers.isEmpty) {
-          for (var entry in profile.workHistory!) {
-            workHistoryControllers.add({
-              'company': TextEditingController(text: entry['company']?.toString() ?? ''),
-              'position': TextEditingController(text: entry['position']?.toString() ?? ''),
-              'description': TextEditingController(text: entry['description']?.toString() ?? ''),
-            });
-          }
+          controller.initializeWorkHistoryControllers(
+            profile.workHistory,
+            workHistoryControllers,
+          );
           setState(() {});
         }
       }
@@ -135,23 +131,11 @@ class _CandidateProfileScreenState extends State<CandidateProfileScreen> {
       // Clear validation errors for this entry
       controller.clearWorkHistoryEntryErrors(index);
       // Re-validate all remaining work history entries to update indices
-      final workHistory = _getWorkHistory();
+      final workHistory = controller.getWorkHistoryFromControllers(workHistoryControllers);
       controller.validateWorkHistory(workHistory.isEmpty ? null : workHistory);
     });
   }
 
-  List<Map<String, dynamic>> _getWorkHistory() {
-    return workHistoryControllers.map((entry) {
-      return {
-        'company': entry['company']!.text.trim(),
-        'position': entry['position']!.text.trim(),
-        'description': entry['description']!.text.trim(),
-      };
-    }).where((entry) => 
-      entry['company']!.isNotEmpty || 
-      entry['position']!.isNotEmpty
-    ).toList();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -249,15 +233,13 @@ class _CandidateProfileScreenState extends State<CandidateProfileScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'Work History',
-                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
+                  AppTexts.workHistory,
+                  style: AppTextStyles.heading(context),
                 ),
                 TextButton.icon(
                   onPressed: _addWorkHistoryEntry,
-                  icon: const Icon(Iconsax.add, size: 20),
-                  label: const Text('Add Work History'),
+                  icon: Icon(Iconsax.add, size: AppResponsive.iconSize(context)),
+                  label: Text(AppTexts.addWorkHistory),
                 ),
               ],
             ),
@@ -267,73 +249,70 @@ class _CandidateProfileScreenState extends State<CandidateProfileScreen> {
             ...workHistoryControllers.asMap().entries.map((entry) {
               final index = entry.key;
               final controllers = entry.value;
-              return Card(
-                margin: EdgeInsets.only(bottom: AppSpacing.vertical(context, 0.02).height!),
-                child: Padding(
-                  padding: AppSpacing.all(context, factor: 0.8),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            'Work ${index + 1}',
-                            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                              fontWeight: FontWeight.bold,
-                            ),
+              return Padding(
+                padding: AppSpacing.all(context, factor: 0.8),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          '${AppTexts.workHistory} ${index + 1}',
+                          style: AppTextStyles.bodyText(context).copyWith(
+                            fontWeight: FontWeight.w600,
                           ),
-                          IconButton(
-                            icon: const Icon(Iconsax.trash, color: AppColors.error),
-                            onPressed: () => _removeWorkHistoryEntry(index),
-                          ),
-                        ],
-                      ),
-                      AppSpacing.vertical(context, 0.01),
-                      AppTextField(
-                        controller: controllers['company']!,
-                        labelText: 'Company',
-                        prefixIcon: Iconsax.building,
-                        onChanged: (value) => controller.validateWorkHistoryField(index, 'company', value),
-                      ),
-                      Obx(
-                        () => controller.getWorkHistoryFieldError(index, 'company') != null
-                            ? Padding(
-                                padding: EdgeInsets.only(top: AppSpacing.vertical(context, 0.01).height!),
-                                child: AppErrorMessage(
-                                  message: controller.getWorkHistoryFieldError(index, 'company')!,
-                                  icon: Iconsax.info_circle,
-                                ),
-                              )
-                            : const SizedBox.shrink(),
-                      ),
-                      AppSpacing.vertical(context, 0.01),
-                      AppTextField(
-                        controller: controllers['position']!,
-                        labelText: 'Position',
-                        prefixIcon: Iconsax.briefcase,
-                        onChanged: (value) => controller.validateWorkHistoryField(index, 'position', value),
-                      ),
-                      Obx(
-                        () => controller.getWorkHistoryFieldError(index, 'position') != null
-                            ? Padding(
-                                padding: EdgeInsets.only(top: AppSpacing.vertical(context, 0.01).height!),
-                                child: AppErrorMessage(
-                                  message: controller.getWorkHistoryFieldError(index, 'position')!,
-                                  icon: Iconsax.info_circle,
-                                ),
-                              )
-                            : const SizedBox.shrink(),
-                      ),
-                      AppSpacing.vertical(context, 0.01),
-                      AppTextField(
-                        controller: controllers['description']!,
-                        labelText: 'Description',
-                        prefixIcon: Iconsax.document_text,
-                        maxLines: 3,
-                      ),
-                    ],
-                  ),
+                        ),
+                        IconButton(
+                          icon: const Icon(Iconsax.trash, color: AppColors.error),
+                          onPressed: () => _removeWorkHistoryEntry(index),
+                        ),
+                      ],
+                    ),
+                    AppSpacing.vertical(context, 0.01),
+                    AppTextField(
+                      controller: controllers['company']!,
+                      labelText: AppTexts.company,
+                      prefixIcon: Iconsax.building,
+                      onChanged: (value) => controller.validateWorkHistoryField(index, 'company', value),
+                    ),
+                    Obx(
+                      () => controller.getWorkHistoryFieldError(index, 'company') != null
+                          ? Padding(
+                              padding: EdgeInsets.only(top: AppSpacing.vertical(context, 0.01).height!),
+                              child: AppErrorMessage(
+                                message: controller.getWorkHistoryFieldError(index, 'company')!,
+                                icon: Iconsax.info_circle,
+                              ),
+                            )
+                          : const SizedBox.shrink(),
+                    ),
+                    AppSpacing.vertical(context, 0.01),
+                    AppTextField(
+                      controller: controllers['position']!,
+                      labelText: AppTexts.position,
+                      prefixIcon: Iconsax.briefcase,
+                      onChanged: (value) => controller.validateWorkHistoryField(index, 'position', value),
+                    ),
+                    Obx(
+                      () => controller.getWorkHistoryFieldError(index, 'position') != null
+                          ? Padding(
+                              padding: EdgeInsets.only(top: AppSpacing.vertical(context, 0.01).height!),
+                              child: AppErrorMessage(
+                                message: controller.getWorkHistoryFieldError(index, 'position')!,
+                                icon: Iconsax.info_circle,
+                              ),
+                            )
+                          : const SizedBox.shrink(),
+                    ),
+                    AppSpacing.vertical(context, 0.01),
+                    AppTextField(
+                      controller: controllers['description']!,
+                      labelText: AppTexts.description,
+                      prefixIcon: Iconsax.document_text,
+                      maxLines: 3,
+                    ),
+                  ],
                 ),
               );
             }),
@@ -371,7 +350,7 @@ class _CandidateProfileScreenState extends State<CandidateProfileScreen> {
                   text: AppTexts.saveProfile,
                   onPressed: () {
                     // Validate all work history entries before submitting
-                    final workHistory = _getWorkHistory();
+                    final workHistory = controller.getWorkHistoryFromControllers(workHistoryControllers);
                     controller.validateWorkHistory(workHistory.isEmpty ? null : workHistory);
                     
                     controller.createOrUpdateProfile(

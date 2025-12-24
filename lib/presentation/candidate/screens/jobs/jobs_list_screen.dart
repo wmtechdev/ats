@@ -40,7 +40,10 @@ class JobsListScreen extends StatelessWidget {
                       : AppButton(
                           text: AppTexts.apply,
                           icon: Iconsax.send_2,
-                          onPressed: () => controller.applyToJob(job.jobId),
+                          onPressed: () {
+                            controller.selectJob(job);
+                            Get.toNamed(AppConstants.routeCandidateJobDetails);
+                          },
                           isFullWidth: false,
                         ),
                   onTap: () {

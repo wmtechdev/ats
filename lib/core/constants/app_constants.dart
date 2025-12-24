@@ -47,9 +47,10 @@ class AppConstants {
   static const String routeCandidateDashboard = '/candidate/dashboard';
   static const String routeCandidateProfile = '/candidate/profile';
   static const String routeCandidateJobs = '/candidate/jobs';
-  static const String routeCandidateJobDetails = '/candidate/job-details';
+  static const String routeCandidateJobDetails = '/candidate/jobs/details';
   static const String routeCandidateApplications = '/candidate/applications';
   static const String routeCandidateDocuments = '/candidate/documents';
+  static const String routeCandidateCreateDocument = '/candidate/documents/create';
   static const String routeAdminDashboard = '/admin/dashboard';
     static const String routeAdminJobs = '/admin/jobs';
     static const String routeAdminJobCreate = '/admin/jobs/create';
