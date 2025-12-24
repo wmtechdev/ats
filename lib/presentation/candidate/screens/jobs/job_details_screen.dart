@@ -16,10 +16,9 @@ class JobDetailsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final controller = Get.find<JobsController>();
 
-    return Scaffold(
-      backgroundColor: AppColors.lightBackground,
-      appBar: AppAppBar(title: AppTexts.jobDetails),
-      body: Obx(() {
+    return AppCandidateLayout(
+      title: AppTexts.jobDetails,
+      child: Obx(() {
         final job = controller.selectedJob.value;
         if (job == null) {
           return AppEmptyState(

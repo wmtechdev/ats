@@ -16,6 +16,7 @@ import 'package:ats/domain/repositories/job_repository.dart';
 import 'package:ats/domain/repositories/document_repository.dart';
 import 'package:ats/domain/repositories/application_repository.dart';
 import 'package:ats/presentation/candidate/controllers/candidate_auth_controller.dart';
+import 'package:ats/presentation/candidate/controllers/candidate_dashboard_controller.dart';
 import 'package:ats/presentation/candidate/controllers/profile_controller.dart';
 import 'package:ats/presentation/candidate/controllers/jobs_controller.dart';
 import 'package:ats/presentation/candidate/controllers/documents_controller.dart';
@@ -55,6 +56,11 @@ class CandidateBindings extends Bindings {
     // Use put instead of lazyPut for auth controller to ensure it's always available
     // even if it was deleted during sign out. Put will replace any existing instance.
     Get.put(CandidateAuthController(candidateAuthRepo), permanent: false);
+    Get.lazyPut(() => CandidateDashboardController(
+          candidateAuthRepo,
+          applicationRepo,
+          jobRepo,
+        ));
     Get.lazyPut(() => ProfileController(profileRepo, candidateAuthRepo));
     Get.lazyPut(() => JobsController(jobRepo, applicationRepo, candidateAuthRepo));
     Get.lazyPut(() => DocumentsController(documentRepo, candidateAuthRepo));

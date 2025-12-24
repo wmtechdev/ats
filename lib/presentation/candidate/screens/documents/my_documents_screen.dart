@@ -4,7 +4,6 @@ import 'package:iconsax/iconsax.dart';
 import 'package:ats/presentation/candidate/controllers/documents_controller.dart';
 import 'package:ats/core/utils/app_texts/app_texts.dart';
 import 'package:ats/core/utils/app_spacing/app_spacing.dart';
-import 'package:ats/core/utils/app_colors/app_colors.dart';
 import 'package:ats/core/widgets/app_widgets.dart';
 
 class MyDocumentsScreen extends StatelessWidget {
@@ -14,10 +13,9 @@ class MyDocumentsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final controller = Get.find<DocumentsController>();
 
-    return Scaffold(
-      backgroundColor: AppColors.lightBackground,
-      appBar: AppAppBar(title: AppTexts.myDocuments),
-      body: Obx(() => controller.documentTypes.isEmpty
+    return AppCandidateLayout(
+      title: AppTexts.myDocuments,
+      child: Obx(() => controller.documentTypes.isEmpty
           ? AppEmptyState(
               message: AppTexts.noDocumentTypesAvailable,
               icon: Iconsax.document_text,

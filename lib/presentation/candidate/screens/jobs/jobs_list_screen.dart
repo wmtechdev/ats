@@ -5,7 +5,6 @@ import 'package:ats/core/constants/app_constants.dart';
 import 'package:ats/presentation/candidate/controllers/jobs_controller.dart';
 import 'package:ats/core/utils/app_texts/app_texts.dart';
 import 'package:ats/core/utils/app_spacing/app_spacing.dart';
-import 'package:ats/core/utils/app_colors/app_colors.dart';
 import 'package:ats/core/widgets/app_widgets.dart';
 
 class JobsListScreen extends StatelessWidget {
@@ -15,10 +14,9 @@ class JobsListScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final controller = Get.find<JobsController>();
 
-    return Scaffold(
-      backgroundColor: AppColors.lightBackground,
-      appBar: AppAppBar(title: AppTexts.jobs),
-      body: Obx(() => controller.jobs.isEmpty
+    return AppCandidateLayout(
+      title: AppTexts.jobs,
+      child: Obx(() => controller.jobs.isEmpty
           ? AppEmptyState(
               message: AppTexts.noJobsAvailable,
               icon: Iconsax.briefcase,

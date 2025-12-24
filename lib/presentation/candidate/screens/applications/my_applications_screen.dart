@@ -5,7 +5,6 @@ import 'package:ats/presentation/candidate/controllers/applications_controller.d
 import 'package:ats/presentation/candidate/controllers/jobs_controller.dart';
 import 'package:ats/core/utils/app_texts/app_texts.dart';
 import 'package:ats/core/utils/app_spacing/app_spacing.dart';
-import 'package:ats/core/utils/app_colors/app_colors.dart';
 import 'package:ats/core/widgets/app_widgets.dart';
 
 class MyApplicationsScreen extends StatelessWidget {
@@ -16,10 +15,9 @@ class MyApplicationsScreen extends StatelessWidget {
     final applicationsController = Get.find<ApplicationsController>();
     final jobsController = Get.find<JobsController>();
 
-    return Scaffold(
-      backgroundColor: AppColors.lightBackground,
-      appBar: AppAppBar(title: AppTexts.myApplications),
-      body: Obx(() => applicationsController.applications.isEmpty
+    return AppCandidateLayout(
+      title: AppTexts.myApplications,
+      child: Obx(() => applicationsController.applications.isEmpty
           ? AppEmptyState(
               message: AppTexts.noApplicationsYet,
               icon: Iconsax.document,

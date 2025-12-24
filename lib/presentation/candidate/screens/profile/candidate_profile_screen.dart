@@ -4,7 +4,6 @@ import 'package:iconsax/iconsax.dart';
 import 'package:ats/presentation/candidate/controllers/profile_controller.dart';
 import 'package:ats/core/utils/app_texts/app_texts.dart';
 import 'package:ats/core/utils/app_spacing/app_spacing.dart';
-import 'package:ats/core/utils/app_colors/app_colors.dart';
 import 'package:ats/core/widgets/app_widgets.dart';
 
 class CandidateProfileScreen extends StatelessWidget {
@@ -18,10 +17,9 @@ class CandidateProfileScreen extends StatelessWidget {
     final phoneController = TextEditingController();
     final addressController = TextEditingController();
 
-    return Scaffold(
-      backgroundColor: AppColors.lightBackground,
-      appBar: AppAppBar(title: AppTexts.profile),
-      body: SingleChildScrollView(
+    return AppCandidateLayout(
+      title: AppTexts.profile,
+      child: SingleChildScrollView(
         padding: AppSpacing.padding(context),
         child: Column(
           children: [

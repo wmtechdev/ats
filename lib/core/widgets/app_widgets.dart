@@ -30,6 +30,9 @@ export 'common/app_user_profile_section.dart';
 // Admin widgets (used in admin screens)
 export 'admin/app_admin_layout.dart';
 
+// Candidate widgets (used in candidate screens)
+export 'candidate/app_candidate_layout.dart';
+
 // Jobs widgets (used in job screens)
 export 'jobs/app_search_create_bar.dart';
 export 'jobs/app_filter_tabs.dart';
