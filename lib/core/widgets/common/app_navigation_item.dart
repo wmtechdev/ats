@@ -30,8 +30,10 @@ class AppNavigationItem extends StatelessWidget {
             currentRoute.length > item.route.length &&
             currentRoute[item.route.length] == '/');
 
+    final isEnabled = item.enabled;
+    
     return InkWell(
-      onTap: () {
+      onTap: isEnabled ? () {
         if (onTap != null) {
           onTap!();
         }
@@ -50,47 +52,52 @@ class AppNavigationItem extends StatelessWidget {
             Get.toNamed(item.route);
           }
         }
-      },
-      child: Container(
-        margin: AppSpacing.all(context, factor: 0.1).copyWith(right: 0),
-        padding: AppSpacing.symmetric(context, h: 0.02, v: 0.01),
-        decoration: BoxDecoration(
-          color: isCurrentlyActive ? AppColors.secondary : Colors.transparent,
-          borderRadius: isCurrentlyActive
-              ? BorderRadius.only(
-                  topLeft: Radius.circular(
-                    AppResponsive.radius(context, factor: 5),
-                  ),
-                  bottomLeft: Radius.circular(
-                    AppResponsive.radius(context, factor: 5),
-                  ),
-                )
-              : null,
-        ),
-        child: Row(
-          children: [
-            Icon(
-              item.icon,
-              size: AppResponsive.iconSize(context, factor: 1.2),
-              color: isCurrentlyActive ? AppColors.white : AppColors.secondary,
-            ),
-            AppSpacing.horizontal(context, 0.01),
-            Expanded(
-              child: Text(
-                item.title,
-                style: AppTextStyles.bodyText(context).copyWith(
-                  color: isCurrentlyActive
-                      ? AppColors.white
-                      : AppColors.secondary,
-                  fontWeight: isCurrentlyActive
-                      ? FontWeight.w700
-                      : FontWeight.w500,
-                ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
+      } : null,
+      child: Opacity(
+        opacity: isEnabled ? 1.0 : 0.5,
+        child: Container(
+          margin: AppSpacing.all(context, factor: 0.1).copyWith(right: 0),
+          padding: AppSpacing.symmetric(context, h: 0.02, v: 0.01),
+          decoration: BoxDecoration(
+            color: isCurrentlyActive ? AppColors.secondary : Colors.transparent,
+            borderRadius: isCurrentlyActive
+                ? BorderRadius.only(
+                    topLeft: Radius.circular(
+                      AppResponsive.radius(context, factor: 5),
+                    ),
+                    bottomLeft: Radius.circular(
+                      AppResponsive.radius(context, factor: 5),
+                    ),
+                  )
+                : null,
+          ),
+          child: Row(
+            children: [
+              Icon(
+                item.icon,
+                size: AppResponsive.iconSize(context, factor: 1.2),
+                color: isCurrentlyActive 
+                    ? AppColors.white 
+                    : (isEnabled ? AppColors.secondary : AppColors.white),
               ),
-            ),
-          ],
+              AppSpacing.horizontal(context, 0.01),
+              Expanded(
+                child: Text(
+                  item.title,
+                  style: AppTextStyles.bodyText(context).copyWith(
+                    color: isCurrentlyActive
+                        ? AppColors.white
+                        : (isEnabled ? AppColors.secondary : AppColors.white),
+                    fontWeight: isCurrentlyActive
+                        ? FontWeight.w700
+                        : FontWeight.w500,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

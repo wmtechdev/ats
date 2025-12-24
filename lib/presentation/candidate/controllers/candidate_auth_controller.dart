@@ -27,14 +27,14 @@ class CandidateAuthController extends BaseAuthController {
 
   @override
   void handleSignUpSuccess(UserEntity user) {
-    // Candidate signup redirects to dashboard
-    Get.offAllNamed(AppConstants.routeCandidateDashboard);
+    // Candidate signup redirects to profile screen to complete profile
+    Get.offAllNamed(AppConstants.routeCandidateProfile);
   }
 
   @override
   void handleSignInSuccess(UserEntity user) {
-    // Candidate login redirects to dashboard
-    // Role validation is handled at repository level
+    // Candidate login redirects based on profile completion
+    // Profile completion check will be handled by middleware
     Get.offAllNamed(AppConstants.routeCandidateDashboard);
   }
 
@@ -50,17 +50,57 @@ class CandidateAuthController extends BaseAuthController {
   }
 
   @override
+  bool validateSignUpForm() {
+    // For candidate signup, only validate email and password
+    // Stored values are updated in real-time via onChanged callbacks, so they're the source of truth
+    // Only sync from controller if stored values are empty or controller has more complete data
+    
+    final emailFromController = emailController.text.trim();
+    final passwordFromController = passwordController.text;
+    
+    // Only sync if stored value is empty or controller value is longer (more complete)
+    // This prevents overwriting correct stored values with stale controller values
+    if (emailValue.value.isEmpty || emailFromController.length > emailValue.value.length) {
+      if (emailValue.value != emailFromController) {
+        emailValue.value = emailFromController;
+      }
+    }
+    
+    if (passwordValue.value.isEmpty || passwordFromController.length > passwordValue.value.length) {
+      if (passwordValue.value != passwordFromController) {
+        passwordValue.value = passwordFromController;
+      }
+    }
+    
+    // Use stored values (updated in real-time via onChanged callbacks)
+    // This is more reliable than reading from controllers which may have sync issues
+    // The validation methods will update error observables correctly
+    validateEmail(emailValue.value);
+    validatePassword(passwordValue.value);
+    
+    // Return true only if both validations pass (no errors)
+    return emailError.value == null && passwordError.value == null;
+  }
+
+  @override
   Future<void> performSignUp() async {
     isLoading.value = true;
     errorMessage.value = '';
 
+    // Use stored values (the ones that were validated) instead of controller values
+    // Controller values may be stale due to sync issues with the text field
+    final email = emailValue.value.trim();
+    final password = passwordValue.value;
+
+    // For candidate signup, only email and password are required
+    // Profile will be completed in the profile screen
     final result = await signUpUseCase(
-      email: emailController.text.trim(),
-      password: passwordController.text,
-      firstName: firstNameController.text.trim(),
-      lastName: lastNameController.text.trim(),
-      phone: phoneForSignUp,
-      address: addressForSignUp,
+      email: email,
+      password: password,
+      firstName: '', // Will be filled in profile screen
+      lastName: '', // Will be filled in profile screen
+      phone: null, // Will be filled in profile screen
+      address: null, // Will be filled in profile screen
     );
 
     result.fold(
@@ -74,19 +114,11 @@ class CandidateAuthController extends BaseAuthController {
         // Clear form fields after successful signup
         clearControllers();
         // Clear all validation errors
-        firstNameError.value = null;
-        lastNameError.value = null;
         emailError.value = null;
         passwordError.value = null;
-        phoneError.value = null;
-        addressError.value = null;
         // Clear stored values
-        firstNameValue.value = '';
-        lastNameValue.value = '';
         emailValue.value = '';
         passwordValue.value = '';
-        phoneValue.value = '';
-        addressValue.value = '';
         // Handle navigation
         handleSignUpSuccess(user);
       },

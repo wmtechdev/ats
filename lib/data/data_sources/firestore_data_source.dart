@@ -287,8 +287,15 @@ class FirestoreDataSourceImpl implements FirestoreDataSource {
         .where('userId', isEqualTo: userId)
         .limit(1)
         .snapshots()
-        .map((snapshot) =>
-            snapshot.docs.isNotEmpty ? snapshot.docs.first.data() : null);
+        .map((snapshot) {
+          if (snapshot.docs.isNotEmpty) {
+            final doc = snapshot.docs.first;
+            final data = doc.data();
+            data['profileId'] = doc.id; // Include document ID
+            return data;
+          }
+          return null;
+        });
   }
 
   @override

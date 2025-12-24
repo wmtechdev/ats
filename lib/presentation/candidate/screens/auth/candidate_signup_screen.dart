@@ -26,54 +26,14 @@ class CandidateSignUpScreen extends StatelessWidget {
       },
       formFields: [
         AppTextField(
-          controller: controller.firstNameController,
-          labelText: AppTexts.firstName,
-          prefixIcon: Iconsax.user,
-          onChanged: (value) {
-            // Always validate on change to clear errors when user types
-            // Use the value parameter directly instead of reading from controller
-            controller.validateFirstName(value);
-          },
-        ),
-        Obx(
-          () => controller.firstNameError.value != null
-              ? AppErrorMessage(
-                  message: controller.firstNameError.value!,
-                  icon: Iconsax.info_circle,
-                  messageColor: AppColors.white,
-                )
-              : const SizedBox.shrink(),
-        ),
-        AppSpacing.vertical(context, 0.02),
-        AppTextField(
-          controller: controller.lastNameController,
-          labelText: AppTexts.lastName,
-          prefixIcon: Iconsax.user,
-          onChanged: (value) {
-            // Always validate on change to clear errors when user types
-            // Use the value parameter directly instead of reading from controller
-            controller.validateLastName(value);
-          },
-        ),
-        Obx(
-          () => controller.lastNameError.value != null
-              ? AppErrorMessage(
-                  message: controller.lastNameError.value!,
-                  icon: Iconsax.info_circle,
-                  messageColor: AppColors.white,
-                )
-              : const SizedBox.shrink(),
-        ),
-        AppSpacing.vertical(context, 0.02),
-        AppTextField(
           controller: controller.emailController,
           labelText: AppTexts.email,
           prefixIcon: Iconsax.sms,
           keyboardType: TextInputType.emailAddress,
           onChanged: (value) {
             // Always validate on change to clear errors when user types
-            // Use the value parameter directly instead of reading from controller
-            controller.validateEmail(value);
+            // Trim the value to match validateSignUpForm behavior
+            controller.validateEmail(value.trim());
           },
         ),
         Obx(
@@ -101,48 +61,6 @@ class CandidateSignUpScreen extends StatelessWidget {
           () => controller.passwordError.value != null
               ? AppErrorMessage(
                   message: controller.passwordError.value!,
-                  icon: Iconsax.info_circle,
-                  messageColor: AppColors.white,
-                )
-              : const SizedBox.shrink(),
-        ),
-        AppSpacing.vertical(context, 0.02),
-        AppTextField(
-          controller: controller.phoneController,
-          labelText: AppTexts.phone,
-          prefixIcon: Iconsax.call,
-          keyboardType: TextInputType.phone,
-          onChanged: (value) {
-            // Always validate on change to clear errors when user types
-            // Use the value parameter directly instead of reading from controller
-            controller.validatePhone(value);
-          },
-        ),
-        Obx(
-          () => controller.phoneError.value != null
-              ? AppErrorMessage(
-                  message: controller.phoneError.value!,
-                  icon: Iconsax.info_circle,
-                  messageColor: AppColors.white,
-                )
-              : const SizedBox.shrink(),
-        ),
-        AppSpacing.vertical(context, 0.02),
-        AppTextField(
-          controller: controller.addressController,
-          labelText: AppTexts.address,
-          prefixIcon: Iconsax.location,
-          maxLines: 3,
-          onChanged: (value) {
-            // Always validate on change to clear errors when user types
-            // Use the value parameter directly instead of reading from controller
-            controller.validateAddress(value);
-          },
-        ),
-        Obx(
-          () => controller.addressError.value != null
-              ? AppErrorMessage(
-                  message: controller.addressError.value!,
                   icon: Iconsax.info_circle,
                   messageColor: AppColors.white,
                 )

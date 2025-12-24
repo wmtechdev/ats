@@ -45,5 +45,47 @@ class AppValidators {
     }
     return null;
   }
+
+  static String? validatePhone(String? value) {
+    if (value == null || value.trim().isEmpty) {
+      return AppTexts.phoneRequired;
+    }
+    // Remove all non-digit characters for validation
+    final digitsOnly = value.replaceAll(RegExp(r'[^\d]'), '');
+    if (digitsOnly.length < 10) {
+      return AppTexts.phoneInvalid;
+    }
+    return null;
+  }
+
+  static String? validateAddress(String? value) {
+    if (value == null || value.trim().isEmpty) {
+      return AppTexts.addressRequired;
+    }
+    if (value.trim().length < 5) {
+      return AppTexts.addressMinLength;
+    }
+    return null;
+  }
+
+  static String? validateCompany(String? value) {
+    if (value == null || value.trim().isEmpty) {
+      return AppTexts.companyRequired;
+    }
+    if (value.trim().length < 2) {
+      return AppTexts.companyMinLength;
+    }
+    return null;
+  }
+
+  static String? validatePosition(String? value) {
+    if (value == null || value.trim().isEmpty) {
+      return AppTexts.positionRequired;
+    }
+    if (value.trim().length < 2) {
+      return AppTexts.positionMinLength;
+    }
+    return null;
+  }
 }
 

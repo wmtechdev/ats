@@ -44,7 +44,7 @@ class _AppTextFieldState extends State<AppTextField> {
     super.initState();
     // Always create internal controller for safety
     _internalController = TextEditingController();
-    
+
     // If external controller provided, sync with it
     if (widget.controller != null) {
       _syncWithExternalController();
@@ -65,17 +65,17 @@ class _AppTextFieldState extends State<AppTextField> {
 
   void _syncWithExternalController() {
     if (widget.controller == null) return;
-    
+
     try {
       // Try to access controller to check if it's valid
       final _ = widget.controller!.value;
       _externalController = widget.controller;
-      
+
       // Sync initial value
       if (_internalController.text != _externalController!.text) {
         _internalController.text = _externalController!.text;
       }
-      
+
       // Listen to external controller changes
       _externalControllerListener = () {
         if (mounted && _externalController != null) {
@@ -119,7 +119,7 @@ class _AppTextFieldState extends State<AppTextField> {
   Widget build(BuildContext context) {
     // Always use internal controller to avoid disposal errors
     // It's synced with external controller via listener
-    
+
     // Ensure sync is up to date before building
     // This helps when controller is recreated after sign-out
     if (_externalController != null && widget.controller != null) {
@@ -131,7 +131,7 @@ class _AppTextFieldState extends State<AppTextField> {
         // External controller disposed, ignore
       }
     }
-    
+
     return TextField(
       controller: _internalController,
       obscureText: widget.obscureText,
@@ -158,20 +158,20 @@ class _AppTextFieldState extends State<AppTextField> {
         hintText: widget.hintText,
         floatingLabelBehavior: FloatingLabelBehavior.never,
         filled: true,
-        fillColor: AppColors.lightGrey,
+        fillColor: AppColors.white,
         labelStyle: AppTextStyles.hintText(context),
         hintStyle: AppTextStyles.hintText(context),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(
             AppResponsive.radius(context, factor: 5),
           ),
-          borderSide: BorderSide(color: AppColors.grey.withValues(alpha: 0.3)),
+          borderSide: BorderSide(color: AppColors.white.withValues(alpha: 0.3)),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(
             AppResponsive.radius(context, factor: 5),
           ),
-          borderSide: BorderSide(color: AppColors.grey.withValues(alpha: 0.3)),
+          borderSide: BorderSide(color: AppColors.white.withValues(alpha: 0.3)),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(
@@ -191,4 +191,3 @@ class _AppTextFieldState extends State<AppTextField> {
     );
   }
 }
-

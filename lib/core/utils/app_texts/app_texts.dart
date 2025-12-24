@@ -122,6 +122,14 @@ class AppTexts {
   static const String firstNameMinLength = "First name must be at least 2 characters";
   static const String lastNameRequired = "Last name is required";
   static const String lastNameMinLength = "Last name must be at least 2 characters";
+  static const String phoneRequired = "Phone number is required";
+  static const String phoneInvalid = "Please enter a valid phone number (at least 10 digits)";
+  static const String addressRequired = "Address is required";
+  static const String addressMinLength = "Address must be at least 5 characters";
+  static const String companyRequired = "Company name is required";
+  static const String companyMinLength = "Company name must be at least 2 characters";
+  static const String positionRequired = "Position is required";
+  static const String positionMinLength = "Position must be at least 2 characters";
   static const String jobTitleRequired = "Job title is required";
   static const String jobTitleMinLength = "Job title must be at least 3 characters";
   static const String descriptionRequired = "Description is required";

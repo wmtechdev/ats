@@ -1,6 +1,7 @@
 import 'package:get/get.dart';
 import 'package:ats/core/constants/app_constants.dart';
 import 'package:ats/core/middleware/auth_middleware.dart';
+import 'package:ats/core/middleware/profile_completion_middleware.dart';
 import 'package:ats/presentation/candidate/bindings/candidate_bindings.dart';
 import 'package:ats/presentation/candidate/screens/auth/candidate_login_screen.dart';
 import 'package:ats/presentation/candidate/screens/auth/candidate_signup_screen.dart';
@@ -37,6 +38,7 @@ class CandidateRoutes {
       name: AppConstants.routeCandidateDashboard,
       page: () => const CandidateDashboardScreen(),
       binding: CandidateBindings(),
+      middlewares: [ProfileCompletionMiddleware()],
       transition: Transition.rightToLeft,
       transitionDuration: const Duration(milliseconds: 300),
     ),
@@ -51,6 +53,7 @@ class CandidateRoutes {
       name: AppConstants.routeCandidateJobs,
       page: () => const JobsListScreen(),
       binding: CandidateBindings(),
+      middlewares: [ProfileCompletionMiddleware()],
       transition: Transition.rightToLeft,
       transitionDuration: const Duration(milliseconds: 300),
     ),
@@ -58,6 +61,7 @@ class CandidateRoutes {
       name: AppConstants.routeCandidateJobDetails,
       page: () => const JobDetailsScreen(),
       binding: CandidateBindings(),
+      middlewares: [ProfileCompletionMiddleware()],
       transition: Transition.rightToLeft,
       transitionDuration: const Duration(milliseconds: 300),
     ),
@@ -65,6 +69,7 @@ class CandidateRoutes {
       name: AppConstants.routeCandidateApplications,
       page: () => const MyApplicationsScreen(),
       binding: CandidateBindings(),
+      middlewares: [ProfileCompletionMiddleware()],
       transition: Transition.rightToLeft,
       transitionDuration: const Duration(milliseconds: 300),
     ),
@@ -72,6 +77,7 @@ class CandidateRoutes {
       name: AppConstants.routeCandidateDocuments,
       page: () => const MyDocumentsScreen(),
       binding: CandidateBindings(),
+      middlewares: [ProfileCompletionMiddleware()],
       transition: Transition.rightToLeft,
       transitionDuration: const Duration(milliseconds: 300),
     ),

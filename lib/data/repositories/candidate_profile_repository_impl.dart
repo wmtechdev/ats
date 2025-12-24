@@ -11,6 +11,22 @@ class CandidateProfileRepositoryImpl implements CandidateProfileRepository {
 
   CandidateProfileRepositoryImpl(this.firestoreDataSource);
 
+  // Helper method to safely cast workHistory from Firestore
+  List<Map<String, dynamic>>? _parseWorkHistory(dynamic workHistoryData) {
+    if (workHistoryData == null) return null;
+    if (workHistoryData is! List) return null;
+    return workHistoryData
+        .map((item) {
+          if (item is Map) {
+            return Map<String, dynamic>.from(item.map((key, value) => MapEntry(key.toString(), value)));
+          }
+          return <String, dynamic>{};
+        })
+        .where((map) => map.isNotEmpty)
+        .cast<Map<String, dynamic>>()
+        .toList();
+  }
+
   @override
   Future<Either<Failure, CandidateProfileEntity>> createProfile({
     required String userId,
@@ -42,7 +58,7 @@ class CandidateProfileRepositoryImpl implements CandidateProfileRepository {
         lastName: profileData['lastName'] ?? lastName,
         phone: profileData['phone'] ?? phone,
         address: profileData['address'] ?? address,
-        workHistory: profileData['workHistory'],
+        workHistory: _parseWorkHistory(profileData['workHistory']),
       );
 
       return Right(profileModel.toEntity());
@@ -87,7 +103,7 @@ class CandidateProfileRepositoryImpl implements CandidateProfileRepository {
         lastName: profileData['lastName'] ?? '',
         phone: profileData['phone'] ?? '',
         address: profileData['address'] ?? '',
-        workHistory: profileData['workHistory'],
+        workHistory: _parseWorkHistory(profileData['workHistory']),
       );
 
       return Right(profileModel.toEntity());
@@ -106,16 +122,21 @@ class CandidateProfileRepositoryImpl implements CandidateProfileRepository {
         return const Left(ServerFailure('Profile not found'));
       }
 
-      // We need profileId, but we only have userId. We'll need to query differently
-      // For now, let's assume we can get it from the data
+      // We need to get the profileId, but getCandidateProfileByUserId doesn't return it
+      // So we'll need to query again or modify the data source
+      // For now, let's try to get it from the user's profileId field
+      // Actually, we can use streamProfile which now includes profileId
+      // But for a one-time get, we need a different approach
+      // Let's add profileId to the data source method or query directly
+      // For now, we'll use an empty profileId and handle updates differently
       final profileModel = CandidateProfileModel(
-        profileId: '', // This needs to be fixed in the data source
+        profileId: '', // Will be populated from stream or when updating
         userId: profileData['userId'] ?? userId,
         firstName: profileData['firstName'] ?? '',
         lastName: profileData['lastName'] ?? '',
         phone: profileData['phone'] ?? '',
         address: profileData['address'] ?? '',
-        workHistory: profileData['workHistory'],
+        workHistory: _parseWorkHistory(profileData['workHistory']),
       );
 
       return Right(profileModel.toEntity());
@@ -131,13 +152,13 @@ class CandidateProfileRepositoryImpl implements CandidateProfileRepository {
     return firestoreDataSource.streamCandidateProfile(userId).map((data) {
       if (data == null) return null;
       return CandidateProfileModel(
-        profileId: '', // This needs to be fixed
+        profileId: data['profileId'] ?? '',
         userId: data['userId'] ?? userId,
         firstName: data['firstName'] ?? '',
         lastName: data['lastName'] ?? '',
         phone: data['phone'] ?? '',
         address: data['address'] ?? '',
-        workHistory: data['workHistory'],
+        workHistory: _parseWorkHistory(data['workHistory']),
       ).toEntity();
     });
   }
