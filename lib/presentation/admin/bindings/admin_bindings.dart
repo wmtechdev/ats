@@ -10,11 +10,13 @@ import 'package:ats/data/repositories/job_repository_impl.dart';
 import 'package:ats/data/repositories/document_repository_impl.dart';
 import 'package:ats/data/repositories/application_repository_impl.dart';
 import 'package:ats/data/repositories/admin_repository_impl.dart';
+import 'package:ats/data/repositories/candidate_profile_repository_impl.dart';
 import 'package:ats/domain/repositories/admin_auth_repository.dart';
 import 'package:ats/domain/repositories/job_repository.dart';
 import 'package:ats/domain/repositories/document_repository.dart';
 import 'package:ats/domain/repositories/application_repository.dart';
 import 'package:ats/domain/repositories/admin_repository.dart';
+import 'package:ats/domain/repositories/candidate_profile_repository.dart';
 import 'package:ats/presentation/admin/controllers/admin_auth_controller.dart';
 import 'package:ats/presentation/admin/controllers/admin_dashboard_controller.dart';
 import 'package:ats/presentation/admin/controllers/admin_jobs_controller.dart';
@@ -48,6 +50,7 @@ class AdminBindings extends Bindings {
       firestoreDataSource: firestoreDataSource,
       authDataSource: authDataSource,
     );
+    final candidateProfileRepo = CandidateProfileRepositoryImpl(firestoreDataSource);
 
     // Register repositories
     Get.lazyPut<AdminAuthRepository>(() => adminAuthRepo);
@@ -55,12 +58,13 @@ class AdminBindings extends Bindings {
     Get.lazyPut<DocumentRepository>(() => documentRepo);
     Get.lazyPut<ApplicationRepository>(() => applicationRepo);
     Get.lazyPut<AdminRepository>(() => adminRepo);
+    Get.lazyPut<CandidateProfileRepository>(() => candidateProfileRepo);
 
     // Controllers
     Get.lazyPut(() => AdminAuthController(adminAuthRepo, adminRepo));
     Get.lazyPut(() => AdminDashboardController(applicationRepo, jobRepo));
     Get.lazyPut(() => AdminJobsController(jobRepo, applicationRepo));
-    Get.lazyPut(() => AdminCandidatesController(adminRepo, applicationRepo, documentRepo));
+    Get.lazyPut(() => AdminCandidatesController(adminRepo, applicationRepo, documentRepo, candidateProfileRepo, jobRepo));
     Get.lazyPut(() => AdminDocumentsController(documentRepo));
     Get.lazyPut(() => AdminManageAdminsController(adminRepo));
     Get.lazyPut(() => AdminCreateNewUserController(adminRepo));

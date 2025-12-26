@@ -1,3 +1,4 @@
+import 'package:ats/core/utils/app_colors/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
@@ -37,7 +38,8 @@ class MyDocumentsScreen extends StatelessWidget {
 
               if (!hasAnyDocs) {
                 return AppEmptyState(
-                  message: controller.documentTypes.isEmpty &&
+                  message:
+                      controller.documentTypes.isEmpty &&
                           controller.candidateDocuments
                               .where((doc) => doc.isUserAdded)
                               .isEmpty
@@ -55,17 +57,18 @@ class MyDocumentsScreen extends StatelessWidget {
                   if (index < adminDocs.length) {
                     final docType = adminDocs[index];
                     final hasDoc = controller.hasDocument(docType.docTypeId);
-                    final document = controller.getDocumentByType(docType.docTypeId);
+                    final document = controller.getDocumentByType(
+                      docType.docTypeId,
+                    );
 
                     return AppListCard(
                       title: docType.name,
                       subtitle: docType.description,
                       icon: Iconsax.document_text,
                       trailing: hasDoc
-                          ? AppStatusChip(
-                              status: document?.status ?? 'pending',
-                            )
+                          ? AppStatusChip(status: document?.status ?? 'pending')
                           : AppButton(
+                              backgroundColor: AppColors.primary,
                               text: AppTexts.upload,
                               icon: Iconsax.document_upload,
                               onPressed: () => controller.uploadDocument(
@@ -83,9 +86,7 @@ class MyDocumentsScreen extends StatelessWidget {
                       title: userDoc.title ?? userDoc.documentName,
                       subtitle: userDoc.description ?? '',
                       icon: Iconsax.document_text,
-                      trailing: AppStatusChip(
-                        status: userDoc.status,
-                      ),
+                      trailing: AppStatusChip(status: userDoc.status),
                       onTap: null,
                     );
                   }

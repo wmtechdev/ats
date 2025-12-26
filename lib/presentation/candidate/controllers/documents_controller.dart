@@ -25,11 +25,14 @@ class DocumentsController extends GetxController {
   final selectedFile = Rxn<PlatformFile>();
   final selectedFileName = ''.obs;
 
-  final uploadDocumentUseCase = UploadDocumentUseCase(Get.find<DocumentRepository>());
+  final uploadDocumentUseCase = UploadDocumentUseCase(
+    Get.find<DocumentRepository>(),
+  );
 
   // Stream subscriptions
   StreamSubscription<List<DocumentTypeEntity>>? _documentTypesSubscription;
-  StreamSubscription<List<CandidateDocumentEntity>>? _candidateDocumentsSubscription;
+  StreamSubscription<List<CandidateDocumentEntity>>?
+  _candidateDocumentsSubscription;
 
   @override
   void onInit() {
@@ -49,7 +52,8 @@ class DocumentsController extends GetxController {
   }
 
   void loadDocumentTypes() {
-    _documentTypesSubscription?.cancel(); // Cancel previous subscription if exists
+    _documentTypesSubscription
+        ?.cancel(); // Cancel previous subscription if exists
     _documentTypesSubscription = documentRepository.streamDocumentTypes().listen(
       (types) {
         documentTypes.value = types;
@@ -66,19 +70,20 @@ class DocumentsController extends GetxController {
     final currentUser = authRepository.getCurrentUser();
     if (currentUser == null) return;
 
-    _candidateDocumentsSubscription?.cancel(); // Cancel previous subscription if exists
+    _candidateDocumentsSubscription
+        ?.cancel(); // Cancel previous subscription if exists
     _candidateDocumentsSubscription = documentRepository
         .streamCandidateDocuments(currentUser.userId)
         .listen(
-      (docs) {
-        candidateDocuments.value = docs;
-        filterDocuments();
-      },
-      onError: (error) {
-        // Silently handle permission errors (user might have signed out)
-        // Don't show errors for permission-denied as it's expected after sign-out
-      },
-    );
+          (docs) {
+            candidateDocuments.value = docs;
+            filterDocuments();
+          },
+          onError: (error) {
+            // Silently handle permission errors (user might have signed out)
+            // Don't show errors for permission-denied as it's expected after sign-out
+          },
+        );
   }
 
   void setSearchQuery(String query) {
@@ -88,7 +93,7 @@ class DocumentsController extends GetxController {
 
   void filterDocuments() {
     final query = searchQuery.value.toLowerCase().trim();
-    
+
     // Filter document types
     if (query.isEmpty) {
       filteredDocumentTypes.value = documentTypes.toList();
@@ -100,7 +105,9 @@ class DocumentsController extends GetxController {
     }
 
     // Filter user-added documents
-    final userDocs = candidateDocuments.where((doc) => doc.isUserAdded).toList();
+    final userDocs = candidateDocuments
+        .where((doc) => doc.isUserAdded)
+        .toList();
     if (query.isEmpty) {
       filteredUserDocuments.value = userDocs;
     } else {
@@ -130,12 +137,16 @@ class DocumentsController extends GetxController {
   }
 
   List<String> getMissingRequiredDocuments(List<String> requiredDocumentIds) {
-    return requiredDocumentIds.where((docTypeId) => !hasDocument(docTypeId)).toList();
+    return requiredDocumentIds
+        .where((docTypeId) => !hasDocument(docTypeId))
+        .toList();
   }
 
   DocumentTypeEntity? getDocumentTypeById(String docTypeId) {
     try {
-      return documentTypes.firstWhere((docType) => docType.docTypeId == docTypeId);
+      return documentTypes.firstWhere(
+        (docType) => docType.docTypeId == docTypeId,
+      );
     } catch (e) {
       return null;
     }
@@ -281,4 +292,3 @@ class DocumentsController extends GetxController {
     }
   }
 }
-

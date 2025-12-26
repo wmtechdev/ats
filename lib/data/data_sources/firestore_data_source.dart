@@ -718,11 +718,62 @@ class FirestoreDataSourceImpl implements FirestoreDataSource {
   @override
   Future<List<Map<String, dynamic>>> getCandidates() async {
     try {
-      final querySnapshot = await firestore
-          .collection(AppConstants.usersCollection)
-          .where('role', isEqualTo: AppConstants.roleCandidate)
+      // Fetch all candidate profiles
+      final profilesSnapshot = await firestore
+          .collection(AppConstants.candidateProfilesCollection)
           .get();
-      return querySnapshot.docs.map((doc) => doc.data()).toList();
+      
+      final candidates = <Map<String, dynamic>>[];
+      
+      // For each profile, get the user email from users collection
+      for (var profileDoc in profilesSnapshot.docs) {
+        final profileData = profileDoc.data();
+        final userId = profileData['userId'] as String?;
+        
+        if (userId == null || userId.isEmpty) {
+          continue;
+        }
+        
+        // Get user data to get email
+        try {
+          final userDoc = await firestore
+              .collection(AppConstants.usersCollection)
+              .doc(userId)
+              .get();
+          
+          if (!userDoc.exists) {
+            continue;
+          }
+          
+          final userData = userDoc.data();
+          final email = userData?['email'] ?? '';
+          final role = userData?['role'] ?? '';
+          
+          if (role != AppConstants.roleCandidate) {
+            continue;
+          }
+          
+          // Combine profile and user data
+          final candidateData = {
+            'userId': userId,
+            'email': email,
+            'role': role,
+            'profileId': profileDoc.id,
+            'firstName': profileData['firstName'] ?? '',
+            'lastName': profileData['lastName'] ?? '',
+            'phone': profileData['phone'] ?? '',
+            'address': profileData['address'] ?? '',
+            'workHistory': profileData['workHistory'],
+            'createdAt': userData?['createdAt'],
+          };
+          
+          candidates.add(candidateData);
+        } catch (e) {
+          continue;
+        }
+      }
+      
+      return candidates;
     } catch (e) {
       throw ServerException('Failed to get candidates: $e');
     }

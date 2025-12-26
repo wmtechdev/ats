@@ -29,8 +29,9 @@ class AppListCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
+      color: AppColors.secondary,
       margin: AppSpacing.all(context, factor: 0.5),
-      elevation: 2,
+      elevation: 0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(AppResponsive.radius(context)),
       ),
@@ -57,7 +58,7 @@ class AppListCard extends StatelessWidget {
                 Icon(
                   icon,
                   size: AppResponsive.iconSize(context),
-                  color: iconColor ?? AppColors.primary,
+                  color: iconColor ?? AppColors.white,
                 ),
                 AppSpacing.horizontal(context, 0.02),
                 Expanded(
@@ -65,6 +66,7 @@ class AppListCard extends StatelessWidget {
                     title,
                     style: AppTextStyles.bodyText(context).copyWith(
                       fontWeight: FontWeight.w700,
+                      color: AppColors.white,
                     ),
                   ),
                 ),
@@ -79,7 +81,9 @@ class AppListCard extends StatelessWidget {
               AppSpacing.vertical(context, 0.01),
               Text(
                 subtitle!,
-                style: AppTextStyles.bodyText(context),
+                style: AppTextStyles.bodyText(
+                  context,
+                ).copyWith(color: AppColors.white),
               ),
             ],
             // Trailing (Action Buttons)
@@ -99,13 +103,13 @@ class AppListCard extends StatelessWidget {
       leading: Icon(
         icon,
         size: AppResponsive.iconSize(context),
-        color: iconColor ?? AppColors.primary,
+        color: iconColor ?? AppColors.white,
       ),
       title: Text(
         title,
-        style: AppTextStyles.bodyText(context).copyWith(
-          fontWeight: FontWeight.w700,
-        ),
+        style: AppTextStyles.bodyText(
+          context,
+        ).copyWith(fontWeight: FontWeight.w700, color: AppColors.white),
       ),
       subtitle: subtitle != null
           ? Padding(
@@ -113,7 +117,12 @@ class AppListCard extends StatelessWidget {
                 top: AppResponsive.screenHeight(context) * 0.01,
                 bottom: AppResponsive.screenHeight(context) * 0.01,
               ),
-              child: Text(subtitle!, style: AppTextStyles.bodyText(context)),
+              child: Text(
+                subtitle!,
+                style: AppTextStyles.bodyText(
+                  context,
+                ).copyWith(color: AppColors.white),
+              ),
             )
           : null,
       trailing: statusWidget ?? trailing,

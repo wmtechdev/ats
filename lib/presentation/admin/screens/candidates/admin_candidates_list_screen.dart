@@ -4,9 +4,6 @@ import 'package:iconsax/iconsax.dart';
 import 'package:ats/core/constants/app_constants.dart';
 import 'package:ats/presentation/admin/controllers/admin_candidates_controller.dart';
 import 'package:ats/core/utils/app_texts/app_texts.dart';
-import 'package:ats/core/utils/app_spacing/app_spacing.dart';
-import 'package:ats/core/utils/app_colors/app_colors.dart';
-import 'package:ats/core/utils/app_responsive/app_responsive.dart';
 import 'package:ats/core/widgets/app_widgets.dart';
 
 class AdminCandidatesListScreen extends StatelessWidget {
@@ -18,32 +15,31 @@ class AdminCandidatesListScreen extends StatelessWidget {
 
     return AppAdminLayout(
       title: AppTexts.candidates,
-      child: Obx(() => controller.candidates.isEmpty
-          ? AppEmptyState(
-              message: AppTexts.noCandidatesAvailable,
-              icon: Iconsax.profile_circle,
-            )
-          : ListView.builder(
-              padding: AppSpacing.padding(context),
-              itemCount: controller.candidates.length,
-              itemBuilder: (context, index) {
-                final candidate = controller.candidates[index];
-                return AppListCard(
-                  title: candidate.email,
-                  subtitle: '${AppTexts.role}: ${candidate.role}',
-                  icon: Iconsax.profile_circle,
-                  trailing: Icon(
-                    Iconsax.arrow_right_3,
-                    size: AppResponsive.iconSize(context),
-                    color: AppColors.primary,
-                  ),
-                  onTap: () {
-                    controller.selectCandidate(candidate);
-                    Get.toNamed(AppConstants.routeAdminCandidateDetails);
-                  },
-                );
-              },
-            )),
+      child: Obx(() {
+        if (controller.candidates.isEmpty) {
+          return AppEmptyState(
+            message: AppTexts.noCandidatesAvailable,
+            icon: Iconsax.profile_circle,
+          );
+        }
+
+        // Observe candidateProfiles to rebuild when profiles load
+        // Access the map to ensure GetX tracks changes
+        for (var candidate in controller.candidates) {
+          final _ = controller.candidateProfiles[candidate.userId];
+        }
+
+        return AppCandidatesTable(
+          candidates: controller.candidates,
+          getName: (userId) => controller.getCandidateName(userId),
+          getCompany: (userId) => controller.getCandidateCompany(userId),
+          getPosition: (userId) => controller.getCandidatePosition(userId),
+          onCandidateTap: (candidate) {
+            controller.selectCandidate(candidate);
+            Get.toNamed(AppConstants.routeAdminCandidateDetails);
+          },
+        );
+      }),
     );
   }
 }

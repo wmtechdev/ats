@@ -7,6 +7,7 @@ import 'package:ats/domain/repositories/admin_repository.dart';
 import 'package:ats/data/data_sources/firestore_data_source.dart';
 import 'package:ats/data/data_sources/firebase_auth_data_source.dart';
 import 'package:ats/data/models/user_model.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dartz/dartz.dart';
 
 class AdminRepositoryImpl implements AdminRepository {
@@ -67,15 +68,36 @@ class AdminRepositoryImpl implements AdminRepository {
   Future<Either<Failure, List<UserEntity>>> getCandidates() async {
     try {
       final candidatesData = await firestoreDataSource.getCandidates();
-      final candidates = candidatesData.map((data) {
-        return UserModel(
-          userId: '', // This needs to be fixed
-          email: data['email'] ?? '',
-          role: data['role'] ?? '',
-          profileId: data['profileId'],
-          createdAt: DateTime.now(),
-        ).toEntity();
-      }).toList();
+      
+      final candidates = <UserEntity>[];
+      
+      for (var data in candidatesData) {
+        try {
+          final userId = data['userId'] as String?;
+          final email = data['email'] as String?;
+          
+          if (userId == null || userId.isEmpty) {
+            continue;
+          }
+          
+          if (email == null || email.isEmpty) {
+            continue;
+          }
+          
+          final candidate = UserModel(
+            userId: userId,
+            email: email,
+            role: data['role'] ?? AppConstants.roleCandidate,
+            profileId: data['profileId'] as String?,
+            createdAt: (data['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
+          ).toEntity();
+          
+          candidates.add(candidate);
+        } catch (e) {
+          continue;
+        }
+      }
+      
       return Right(candidates);
     } on ServerException catch (e) {
       return Left(ServerFailure(e.message));

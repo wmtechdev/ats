@@ -56,3 +56,9 @@ export 'common/app_info_message.dart';
 
 // Jobs widgets (required documents)
 export 'jobs/app_required_documents_list.dart';
+
+// Candidates widgets (used in candidate screens)
+export 'candidates/app_candidates_table.dart';
+export 'candidates/app_candidate_profile_table.dart';
+export 'candidates/app_candidate_documents_list.dart';
+export 'candidates/app_candidate_applications_list.dart';

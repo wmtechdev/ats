@@ -66,9 +66,7 @@ class AdminManageAdminsScreen extends StatelessWidget {
                     subtitle:
                         '${profile.email}\n${AppTexts.role}: ${isAdmin ? AppTexts.admin : AppTexts.recruiter}',
                     icon: Iconsax.user,
-                    iconColor: isAdmin
-                        ? AppColors.primary
-                        : AppColors.secondary,
+                    iconColor: AppColors.primary,
                     statusWidget: AppStatusChip(
                       status: isAdmin ? 'admin' : 'recruiter',
                       customText: isAdmin ? AppTexts.admin : AppTexts.recruiter,

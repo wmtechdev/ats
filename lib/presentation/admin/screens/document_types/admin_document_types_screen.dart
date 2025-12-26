@@ -33,7 +33,7 @@ class AdminDocumentTypesScreen extends StatelessWidget {
             child: Obx(() {
               final filteredDocs = controller.filteredDocumentTypes.toList();
               final allDocs = controller.documentTypes.toList();
-              
+
               if (filteredDocs.isEmpty) {
                 return AppEmptyState(
                   message: allDocs.isEmpty
@@ -53,7 +53,8 @@ class AdminDocumentTypesScreen extends StatelessWidget {
                     subtitle: docType.description,
                     icon: Iconsax.document_text,
                     trailing: AppActionButton.delete(
-                      onPressed: () => controller.deleteDocumentType(docType.docTypeId),
+                      onPressed: () =>
+                          controller.deleteDocumentType(docType.docTypeId),
                     ),
                     onTap: null,
                   );

@@ -165,10 +165,17 @@ class AppTexts {
   static const String edit = "Edit";
   static const String success = "Success";
   static const String error = "Error";
+  static const String info = "Info";
   static const String unknownJob = "Unknown Job";
   static const String workHistory = "Work History";
   static const String workTitle = "Work";
   static const String addWorkHistory = "Add Work History";
   static const String company = "Company";
   static const String position = "Position";
+  static const String field = "Field";
+  static const String value = "Value";
+  static const String view = "View";
+  static const String request = "Request";
+  static const String documentsUploadedCount = "Documents Uploaded Count";
+  static const String jobsAppliedCount = "Jobs Applied Count";
 }
