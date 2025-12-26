@@ -28,18 +28,18 @@ class AppStatusDropdown extends StatelessWidget {
           color: AppColors.primary,
         ),
         filled: true,
-        fillColor: AppColors.lightGrey,
+        fillColor: AppColors.white,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(
             AppResponsive.radius(context, factor: 5),
           ),
-          borderSide: BorderSide(color: AppColors.grey.withValues(alpha: 0.3)),
+          borderSide: BorderSide(color: AppColors.white.withValues(alpha: 0.3)),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(
             AppResponsive.radius(context, factor: 5),
           ),
-          borderSide: BorderSide(color: AppColors.grey.withValues(alpha: 0.3)),
+          borderSide: BorderSide(color: AppColors.white.withValues(alpha: 0.3)),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(
@@ -63,4 +63,3 @@ class AppStatusDropdown extends StatelessWidget {
     );
   }
 }
-

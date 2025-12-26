@@ -34,7 +34,9 @@ class JobDetailsScreen extends StatelessWidget {
         }
 
         final requiredDocIds = job.requiredDocumentIds;
-        final hasAllDocuments = documentsController.hasAllRequiredDocuments(requiredDocIds);
+        final hasAllDocuments = documentsController.hasAllRequiredDocuments(
+          requiredDocIds,
+        );
 
         return SingleChildScrollView(
           padding: AppSpacing.padding(context),
@@ -45,14 +47,16 @@ class JobDetailsScreen extends StatelessWidget {
                 children: [
                   Icon(
                     Iconsax.briefcase,
-                    size: AppResponsive.iconSize(context, factor: 1.5),
+                    size: AppResponsive.iconSize(context),
                     color: AppColors.primary,
                   ),
-                  AppSpacing.horizontal(context, 0.02),
+                  AppSpacing.horizontal(context, 0.01),
                   Expanded(
                     child: Text(
                       job.title,
-                      style: AppTextStyles.headline(context),
+                      style: AppTextStyles.bodyText(
+                        context,
+                      ).copyWith(fontWeight: FontWeight.w700),
                     ),
                   ),
                 ],
@@ -72,19 +76,22 @@ class JobDetailsScreen extends StatelessWidget {
                 AppSpacing.vertical(context, 0.03),
                 Text(
                   AppTexts.requiredDocuments,
-                  style: AppTextStyles.heading(context),
+                  style: AppTextStyles.bodyText(
+                    context,
+                  ).copyWith(fontWeight: FontWeight.w500),
                 ),
                 AppSpacing.vertical(context, 0.01),
                 AppRequiredDocumentsList(
                   requiredDocumentIds: requiredDocIds,
                   documentTypesMap: {
                     for (var docId in requiredDocIds)
-                      if (documentsController.getDocumentTypeById(docId) != null)
-                        docId: documentsController.getDocumentTypeById(docId)!
+                      if (documentsController.getDocumentTypeById(docId) !=
+                          null)
+                        docId: documentsController.getDocumentTypeById(docId)!,
                   },
                   hasDocumentMap: {
                     for (var docId in requiredDocIds)
-                      docId: documentsController.hasDocument(docId)
+                      docId: documentsController.hasDocument(docId),
                   },
                 ),
                 // Message about missing documents
@@ -106,7 +113,7 @@ class JobDetailsScreen extends StatelessWidget {
                         AppTexts.goToDocuments,
                         style: AppTextStyles.bodyText(context).copyWith(
                           color: AppColors.primary,
-                          fontWeight: FontWeight.w600,
+                          fontWeight: FontWeight.w500,
                         ),
                       ),
                     ),
@@ -130,7 +137,9 @@ class JobDetailsScreen extends StatelessWidget {
                         onPressed: hasAllDocuments
                             ? () => jobsController.applyToJob(job.jobId)
                             : null,
-                        backgroundColor: hasAllDocuments ? null : AppColors.grey,
+                        backgroundColor: hasAllDocuments
+                            ? null
+                            : AppColors.grey,
                       ),
               ),
             ],

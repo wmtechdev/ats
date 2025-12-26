@@ -26,47 +26,33 @@ class AppDocumentSelector extends StatelessWidget {
       return _buildEmptyState(context);
     }
 
-    return Container(
-      constraints: BoxConstraints(
-        maxHeight: AppResponsive.screenHeight(context) * 0.3,
-      ),
-      decoration: BoxDecoration(
-        color: AppColors.lightGrey,
-        borderRadius: BorderRadius.circular(
-          AppResponsive.radius(context, factor: 5),
-        ),
-        border: Border.all(
-          color: AppColors.grey.withValues(alpha: 0.3),
-        ),
-      ),
-      child: ListView.builder(
-        shrinkWrap: true,
-        itemCount: documents.length,
-        itemBuilder: (context, index) {
-          final docType = documents[index];
-          final isSelected = selectedDocumentIds.contains(docType.docTypeId);
+    return ListView.builder(
+      shrinkWrap: true,
+      itemCount: documents.length,
+      itemBuilder: (context, index) {
+        final docType = documents[index];
+        final isSelected = selectedDocumentIds.contains(docType.docTypeId);
 
-          return CheckboxListTile(
-            title: Text(
-              docType.name,
-              style: AppTextStyles.bodyText(context),
-            ),
-            subtitle: docType.description.isNotEmpty
-                ? Text(
-                    docType.description,
-                    style: AppTextStyles.bodyText(context).copyWith(
-                      fontSize: 12,
-                    ),
-                  )
-                : null,
-            value: isSelected,
-            activeColor: AppColors.primary,
-            onChanged: (value) {
-              onSelectionChanged(docType.docTypeId, value ?? false);
-            },
-          );
-        },
-      ),
+        return CheckboxListTile(
+          title: Text(
+            docType.name,
+            style: AppTextStyles.bodyText(context),
+          ),
+          subtitle: docType.description.isNotEmpty
+              ? Text(
+                  docType.description,
+                  style: AppTextStyles.bodyText(context).copyWith(
+                    fontSize: 12,
+                  ),
+                )
+              : null,
+          value: isSelected,
+          activeColor: AppColors.primary,
+          onChanged: (value) {
+            onSelectionChanged(docType.docTypeId, value ?? false);
+          },
+        );
+      },
     );
   }
 

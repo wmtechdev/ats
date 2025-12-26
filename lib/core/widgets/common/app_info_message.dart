@@ -54,48 +54,35 @@ class AppInfoMessage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: AppSpacing.all(context),
-      decoration: BoxDecoration(
-        color: _backgroundColor.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(
-          AppResponsive.radius(context, factor: 5),
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Icon(
+          icon ?? _defaultIcon,
+          size: AppResponsive.iconSize(context),
+          color: _backgroundColor,
         ),
-        border: type == AppInfoMessageType.error
-            ? Border.all(
-                color: _backgroundColor.withValues(alpha: 0.3),
-              )
-            : null,
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(
-            icon ?? _defaultIcon,
-            size: AppResponsive.iconSize(context),
-            color: _backgroundColor,
-          ),
-          AppSpacing.horizontal(context, 0.02),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  message,
-                  style: AppTextStyles.bodyText(context).copyWith(
-                    color: _backgroundColor,
-                    fontWeight: FontWeight.w500,
-                  ),
+        AppSpacing.horizontal(context, 0.01),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Text(
+                message,
+                style: AppTextStyles.bodyText(context).copyWith(
+                  color: _backgroundColor,
+                  fontWeight: FontWeight.w500,
                 ),
-                if (action != null) ...[
-                  AppSpacing.vertical(context, 0.01),
-                  action!,
-                ],
+              ),
+              if (action != null) ...[
+                AppSpacing.vertical(context, 0.01),
+                action!,
               ],
-            ),
+            ],
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }

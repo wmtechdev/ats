@@ -6,7 +6,6 @@ import 'package:ats/presentation/admin/controllers/admin_jobs_controller.dart';
 import 'package:ats/presentation/admin/controllers/admin_documents_controller.dart';
 import 'package:ats/core/utils/app_texts/app_texts.dart';
 import 'package:ats/core/utils/app_spacing/app_spacing.dart';
-import 'package:ats/core/utils/app_styles/app_text_styles.dart';
 import 'package:ats/core/widgets/app_widgets.dart';
 
 class AdminJobDetailsScreen extends StatelessWidget {
@@ -41,54 +40,25 @@ class AdminJobDetailsScreen extends StatelessWidget {
               AppJobHeader(
                 job: job,
                 onEdit: () => Get.toNamed(AppConstants.routeAdminJobEdit),
+                label: AppTexts.applications,
+                value: applicationCount,
               ),
-              AppSpacing.vertical(context, 0.03),
+              AppSpacing.vertical(context, 0.02),
               AppContentSection(
                 title: AppTexts.description,
                 content: job.description,
               ),
-              AppSpacing.vertical(context, 0.03),
+              AppSpacing.vertical(context, 0.02),
               AppContentSection(
                 title: AppTexts.requirements,
                 content: job.requirements,
               ),
-              AppSpacing.vertical(context, 0.03),
-              _buildRequiredDocumentsSection(context, requiredDocuments),
-              AppSpacing.vertical(context, 0.03),
-              AppStatisticsCard(
-                icon: Iconsax.document_download,
-                label: AppTexts.applications,
-                value: applicationCount,
-              ),
+              AppSpacing.vertical(context, 0.02),
+              AppRequiredDocumentsSection(requiredDocuments: requiredDocuments),
             ],
           ),
         );
       }),
-    );
-  }
-
-  Widget _buildRequiredDocumentsSection(
-    BuildContext context,
-    List documents,
-  ) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          AppTexts.requiredDocuments,
-          style: AppTextStyles.heading(context),
-        ),
-        AppSpacing.vertical(context, 0.01),
-        if (documents.isEmpty)
-          AppContentSection(
-            title: '',
-            content: AppTexts.noRequiredDocuments,
-          )
-        else
-          ...documents.map(
-            (doc) => AppDocumentListItem(document: doc),
-          ),
-      ],
     );
   }
 }

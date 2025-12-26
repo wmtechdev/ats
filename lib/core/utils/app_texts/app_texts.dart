@@ -167,6 +167,7 @@ class AppTexts {
   static const String error = "Error";
   static const String unknownJob = "Unknown Job";
   static const String workHistory = "Work History";
+  static const String workTitle = "Work";
   static const String addWorkHistory = "Add Work History";
   static const String company = "Company";
   static const String position = "Position";

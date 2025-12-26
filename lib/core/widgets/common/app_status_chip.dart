@@ -25,19 +25,14 @@ class AppStatusChip extends StatelessWidget {
 
     return Container(
       padding: EdgeInsets.symmetric(
-        horizontal: AppResponsive.screenWidth(context) * 0.025,
-        vertical: AppResponsive.screenHeight(context) * 0.008,
+        horizontal: AppResponsive.screenWidth(context) * 0.01,
+        vertical: AppResponsive.screenHeight(context) * 0.005,
       ),
       decoration: BoxDecoration(
         color: statusColor,
-        borderRadius: BorderRadius.circular(AppResponsive.radius(context, factor: 2)),
-        boxShadow: [
-          BoxShadow(
-            color: statusColor.withOpacity(0.3),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
+        borderRadius: BorderRadius.circular(
+          AppResponsive.radius(context, factor: 5),
+        ),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -45,7 +40,7 @@ class AppStatusChip extends StatelessWidget {
           if (showIcon && statusIcon != null) ...[
             Icon(
               statusIcon,
-              size: AppResponsive.iconSize(context, factor: 0.8),
+              size: AppResponsive.iconSize(context),
               color: _getTextColor(statusColor),
             ),
             SizedBox(width: AppResponsive.screenWidth(context) * 0.015),
@@ -54,8 +49,7 @@ class AppStatusChip extends StatelessWidget {
             statusText.toUpperCase(),
             style: AppTextStyles.bodyText(context).copyWith(
               color: _getTextColor(statusColor),
-              fontSize: AppTextStyles.bodyText(context).fontSize! * 0.85,
-              fontWeight: FontWeight.w600,
+              fontWeight: FontWeight.w500,
               letterSpacing: 0.5,
             ),
           ),
@@ -106,4 +100,3 @@ class AppStatusChip extends StatelessWidget {
     return luminance > 0.5 ? AppColors.black : AppColors.white;
   }
 }
-

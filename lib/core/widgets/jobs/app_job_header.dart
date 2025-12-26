@@ -1,3 +1,4 @@
+import 'package:ats/core/utils/app_colors/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:ats/core/constants/app_constants.dart';
 import 'package:ats/core/utils/app_texts/app_texts.dart';
@@ -8,11 +9,15 @@ import 'package:ats/domain/entities/job_entity.dart';
 
 class AppJobHeader extends StatelessWidget {
   final JobEntity job;
+  final String label;
+  final int value;
   final VoidCallback? onEdit;
 
   const AppJobHeader({
     super.key,
     required this.job,
+    required this.label,
+    required this.value,
     this.onEdit,
   });
 
@@ -24,9 +29,22 @@ class AppJobHeader extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                job.title,
-                style: AppTextStyles.headline(context),
+              Row(
+                children: [
+                  Text(
+                    job.title,
+                    style: AppTextStyles.bodyText(
+                      context,
+                    ).copyWith(fontWeight: FontWeight.w700),
+                  ),
+                  AppSpacing.horizontal(context, 0.01),
+                  Text(
+                    '$label: $value',
+                    style: AppTextStyles.bodyText(
+                      context,
+                    ).copyWith(color: AppColors.primary),
+                  ),
+                ],
               ),
               AppSpacing.vertical(context, 0.01),
               AppStatusChip(
@@ -46,4 +64,3 @@ class AppJobHeader extends StatelessWidget {
     );
   }
 }
-

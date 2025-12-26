@@ -38,30 +38,34 @@ class _CandidateProfileScreenState extends State<CandidateProfileScreen> {
     ever(controller.profile, (profile) {
       if (profile != null && mounted) {
         // Only update if controllers are empty or different
-        if (firstNameController.text.isEmpty || firstNameController.text != profile.firstName) {
+        if (firstNameController.text.isEmpty ||
+            firstNameController.text != profile.firstName) {
           firstNameController.text = profile.firstName;
         }
-        if (lastNameController.text.isEmpty || lastNameController.text != profile.lastName) {
+        if (lastNameController.text.isEmpty ||
+            lastNameController.text != profile.lastName) {
           lastNameController.text = profile.lastName;
         }
-        if (phoneController.text.isEmpty || phoneController.text != profile.phone) {
+        if (phoneController.text.isEmpty ||
+            phoneController.text != profile.phone) {
           phoneController.text = profile.phone;
         }
-        if (addressController.text.isEmpty || addressController.text != profile.address) {
+        if (addressController.text.isEmpty ||
+            addressController.text != profile.address) {
           addressController.text = profile.address;
         }
 
         // Load work history
         if (profile.workHistory != null && profile.workHistory!.isNotEmpty) {
           // Always rebuild if work history exists and controllers are empty or lengths differ
-          if (workHistoryControllers.isEmpty || 
+          if (workHistoryControllers.isEmpty ||
               workHistoryControllers.length != profile.workHistory!.length) {
             // Clear existing and rebuild
             for (var entry in workHistoryControllers) {
               entry.values.forEach((controller) => controller.dispose());
             }
             workHistoryControllers.clear();
-            
+
             controller.initializeWorkHistoryControllers(
               profile.workHistory,
               workHistoryControllers,
@@ -83,14 +87,17 @@ class _CandidateProfileScreenState extends State<CandidateProfileScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (controller.profile.value != null && mounted) {
         final profile = controller.profile.value!;
-        if (firstNameController.text.isEmpty) firstNameController.text = profile.firstName;
-        if (lastNameController.text.isEmpty) lastNameController.text = profile.lastName;
+        if (firstNameController.text.isEmpty)
+          firstNameController.text = profile.firstName;
+        if (lastNameController.text.isEmpty)
+          lastNameController.text = profile.lastName;
         if (phoneController.text.isEmpty) phoneController.text = profile.phone;
-        if (addressController.text.isEmpty) addressController.text = profile.address;
-        
+        if (addressController.text.isEmpty)
+          addressController.text = profile.address;
+
         // Load work history if available and controllers are empty
-        if (profile.workHistory != null && 
-            profile.workHistory!.isNotEmpty && 
+        if (profile.workHistory != null &&
+            profile.workHistory!.isNotEmpty &&
             workHistoryControllers.isEmpty) {
           controller.initializeWorkHistoryControllers(
             profile.workHistory,
@@ -126,16 +133,19 @@ class _CandidateProfileScreenState extends State<CandidateProfileScreen> {
 
   void _removeWorkHistoryEntry(int index) {
     setState(() {
-      workHistoryControllers[index].values.forEach((controller) => controller.dispose());
+      workHistoryControllers[index].values.forEach(
+        (controller) => controller.dispose(),
+      );
       workHistoryControllers.removeAt(index);
       // Clear validation errors for this entry
       controller.clearWorkHistoryEntryErrors(index);
       // Re-validate all remaining work history entries to update indices
-      final workHistory = controller.getWorkHistoryFromControllers(workHistoryControllers);
+      final workHistory = controller.getWorkHistoryFromControllers(
+        workHistoryControllers,
+      );
       controller.validateWorkHistory(workHistory.isEmpty ? null : workHistory);
     });
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -156,7 +166,9 @@ class _CandidateProfileScreenState extends State<CandidateProfileScreen> {
             Obx(
               () => controller.firstNameError.value != null
                   ? Padding(
-                      padding: EdgeInsets.only(top: AppSpacing.vertical(context, 0.01).height!),
+                      padding: EdgeInsets.only(
+                        top: AppSpacing.vertical(context, 0.01).height!,
+                      ),
                       child: AppErrorMessage(
                         message: controller.firstNameError.value!,
                         icon: Iconsax.info_circle,
@@ -176,7 +188,9 @@ class _CandidateProfileScreenState extends State<CandidateProfileScreen> {
             Obx(
               () => controller.lastNameError.value != null
                   ? Padding(
-                      padding: EdgeInsets.only(top: AppSpacing.vertical(context, 0.01).height!),
+                      padding: EdgeInsets.only(
+                        top: AppSpacing.vertical(context, 0.01).height!,
+                      ),
                       child: AppErrorMessage(
                         message: controller.lastNameError.value!,
                         icon: Iconsax.info_circle,
@@ -197,7 +211,9 @@ class _CandidateProfileScreenState extends State<CandidateProfileScreen> {
             Obx(
               () => controller.phoneError.value != null
                   ? Padding(
-                      padding: EdgeInsets.only(top: AppSpacing.vertical(context, 0.01).height!),
+                      padding: EdgeInsets.only(
+                        top: AppSpacing.vertical(context, 0.01).height!,
+                      ),
                       child: AppErrorMessage(
                         message: controller.phoneError.value!,
                         icon: Iconsax.info_circle,
@@ -218,7 +234,9 @@ class _CandidateProfileScreenState extends State<CandidateProfileScreen> {
             Obx(
               () => controller.addressError.value != null
                   ? Padding(
-                      padding: EdgeInsets.only(top: AppSpacing.vertical(context, 0.01).height!),
+                      padding: EdgeInsets.only(
+                        top: AppSpacing.vertical(context, 0.01).height!,
+                      ),
                       child: AppErrorMessage(
                         message: controller.addressError.value!,
                         icon: Iconsax.info_circle,
@@ -234,11 +252,16 @@ class _CandidateProfileScreenState extends State<CandidateProfileScreen> {
               children: [
                 Text(
                   AppTexts.workHistory,
-                  style: AppTextStyles.heading(context),
+                  style: AppTextStyles.bodyText(
+                    context,
+                  ).copyWith(fontWeight: FontWeight.w700),
                 ),
                 TextButton.icon(
                   onPressed: _addWorkHistoryEntry,
-                  icon: Icon(Iconsax.add, size: AppResponsive.iconSize(context)),
+                  icon: Icon(
+                    Iconsax.add,
+                    size: AppResponsive.iconSize(context),
+                  ),
                   label: Text(AppTexts.addWorkHistory),
                 ),
               ],
@@ -258,13 +281,16 @@ class _CandidateProfileScreenState extends State<CandidateProfileScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          '${AppTexts.workHistory} ${index + 1}',
-                          style: AppTextStyles.bodyText(context).copyWith(
-                            fontWeight: FontWeight.w600,
-                          ),
+                          '${AppTexts.workTitle} ${index + 1}',
+                          style: AppTextStyles.bodyText(
+                            context,
+                          ).copyWith(fontWeight: FontWeight.w500),
                         ),
                         IconButton(
-                          icon: const Icon(Iconsax.trash, color: AppColors.error),
+                          icon: const Icon(
+                            Iconsax.trash,
+                            color: AppColors.error,
+                          ),
                           onPressed: () => _removeWorkHistoryEntry(index),
                         ),
                       ],
@@ -274,14 +300,28 @@ class _CandidateProfileScreenState extends State<CandidateProfileScreen> {
                       controller: controllers['company']!,
                       labelText: AppTexts.company,
                       prefixIcon: Iconsax.building,
-                      onChanged: (value) => controller.validateWorkHistoryField(index, 'company', value),
+                      onChanged: (value) => controller.validateWorkHistoryField(
+                        index,
+                        'company',
+                        value,
+                      ),
                     ),
                     Obx(
-                      () => controller.getWorkHistoryFieldError(index, 'company') != null
+                      () =>
+                          controller.getWorkHistoryFieldError(
+                                index,
+                                'company',
+                              ) !=
+                              null
                           ? Padding(
-                              padding: EdgeInsets.only(top: AppSpacing.vertical(context, 0.01).height!),
+                              padding: EdgeInsets.only(
+                                top: AppSpacing.vertical(context, 0.01).height!,
+                              ),
                               child: AppErrorMessage(
-                                message: controller.getWorkHistoryFieldError(index, 'company')!,
+                                message: controller.getWorkHistoryFieldError(
+                                  index,
+                                  'company',
+                                )!,
                                 icon: Iconsax.info_circle,
                               ),
                             )
@@ -292,14 +332,28 @@ class _CandidateProfileScreenState extends State<CandidateProfileScreen> {
                       controller: controllers['position']!,
                       labelText: AppTexts.position,
                       prefixIcon: Iconsax.briefcase,
-                      onChanged: (value) => controller.validateWorkHistoryField(index, 'position', value),
+                      onChanged: (value) => controller.validateWorkHistoryField(
+                        index,
+                        'position',
+                        value,
+                      ),
                     ),
                     Obx(
-                      () => controller.getWorkHistoryFieldError(index, 'position') != null
+                      () =>
+                          controller.getWorkHistoryFieldError(
+                                index,
+                                'position',
+                              ) !=
+                              null
                           ? Padding(
-                              padding: EdgeInsets.only(top: AppSpacing.vertical(context, 0.01).height!),
+                              padding: EdgeInsets.only(
+                                top: AppSpacing.vertical(context, 0.01).height!,
+                              ),
                               child: AppErrorMessage(
-                                message: controller.getWorkHistoryFieldError(index, 'position')!,
+                                message: controller.getWorkHistoryFieldError(
+                                  index,
+                                  'position',
+                                )!,
                                 icon: Iconsax.info_circle,
                               ),
                             )
@@ -321,7 +375,9 @@ class _CandidateProfileScreenState extends State<CandidateProfileScreen> {
             Obx(
               () => controller.workHistoryError.value != null
                   ? Padding(
-                      padding: EdgeInsets.only(bottom: AppSpacing.vertical(context, 0.02).height!),
+                      padding: EdgeInsets.only(
+                        bottom: AppSpacing.vertical(context, 0.02).height!,
+                      ),
                       child: AppErrorMessage(
                         message: controller.workHistoryError.value!,
                         icon: Iconsax.info_circle,
@@ -336,7 +392,9 @@ class _CandidateProfileScreenState extends State<CandidateProfileScreen> {
             Obx(
               () => controller.errorMessage.value.isNotEmpty
                   ? Padding(
-                      padding: EdgeInsets.only(bottom: AppSpacing.vertical(context, 0.02).height!),
+                      padding: EdgeInsets.only(
+                        bottom: AppSpacing.vertical(context, 0.02).height!,
+                      ),
                       child: AppErrorMessage(
                         message: controller.errorMessage.value,
                         icon: Iconsax.info_circle,
@@ -346,23 +404,29 @@ class _CandidateProfileScreenState extends State<CandidateProfileScreen> {
             ),
 
             // Save Button
-            Obx(() => AppButton(
-                  text: AppTexts.saveProfile,
-                  onPressed: () {
-                    // Validate all work history entries before submitting
-                    final workHistory = controller.getWorkHistoryFromControllers(workHistoryControllers);
-                    controller.validateWorkHistory(workHistory.isEmpty ? null : workHistory);
-                    
-                    controller.createOrUpdateProfile(
-                      firstName: firstNameController.text,
-                      lastName: lastNameController.text,
-                      phone: phoneController.text,
-                      address: addressController.text,
-                      workHistory: workHistory.isEmpty ? null : workHistory,
-                    );
-                  },
-                  isLoading: controller.isLoading.value,
-                )),
+            Obx(
+              () => AppButton(
+                text: AppTexts.saveProfile,
+                onPressed: () {
+                  // Validate all work history entries before submitting
+                  final workHistory = controller.getWorkHistoryFromControllers(
+                    workHistoryControllers,
+                  );
+                  controller.validateWorkHistory(
+                    workHistory.isEmpty ? null : workHistory,
+                  );
+
+                  controller.createOrUpdateProfile(
+                    firstName: firstNameController.text,
+                    lastName: lastNameController.text,
+                    phone: phoneController.text,
+                    address: addressController.text,
+                    workHistory: workHistory.isEmpty ? null : workHistory,
+                  );
+                },
+                isLoading: controller.isLoading.value,
+              ),
+            ),
           ],
         ),
       ),
