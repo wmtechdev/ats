@@ -45,7 +45,6 @@ export 'common/app_alert_dialog.dart';
 export 'jobs/app_document_list_item.dart';
 export 'jobs/app_required_documents_section.dart';
 export 'jobs/app_job_form_fields.dart';
-export 'jobs/app_section_title.dart';
 export 'jobs/app_job_header.dart';
 
 // Documents widgets (used in document screens)

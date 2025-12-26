@@ -1,3 +1,4 @@
+import 'package:ats/core/utils/app_styles/app_text_styles.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
@@ -57,10 +58,16 @@ class _AdminJobCreateScreenState extends State<AdminJobCreateScreen> {
                 requirementsController: requirementsController,
               ),
               AppSpacing.vertical(context, 0.02),
-              AppSectionTitle(title: AppTexts.requiredDocuments),
+              Text(
+                AppTexts.requiredDocuments,
+                style: AppTextStyles.bodyText(
+                  context,
+                ).copyWith(fontWeight: FontWeight.w500),
+              ),
               AppSpacing.vertical(context, 0.01),
               Obx(() {
-                final documents = documentsController.filteredDocumentTypes.toList();
+                final documents = documentsController.filteredDocumentTypes
+                    .toList();
                 return AppDocumentSelector(
                   documents: documents,
                   selectedDocumentIds: selectedDocumentIds,
@@ -76,21 +83,23 @@ class _AdminJobCreateScreenState extends State<AdminJobCreateScreen> {
                 );
               }),
               AppSpacing.vertical(context, 0.03),
-              Obx(() => AppButton(
-                    text: AppTexts.createJob,
-                    icon: Iconsax.add,
-                    onPressed: () {
-                      if (_formKey.currentState!.validate()) {
-                        jobsController.createJob(
-                          title: titleController.text.trim(),
-                          description: descriptionController.text.trim(),
-                          requirements: requirementsController.text.trim(),
-                          requiredDocumentIds: selectedDocumentIds.toList(),
-                        );
-                      }
-                    },
-                    isLoading: jobsController.isLoading.value,
-                  )),
+              Obx(
+                () => AppButton(
+                  text: AppTexts.createJob,
+                  icon: Iconsax.add,
+                  onPressed: () {
+                    if (_formKey.currentState!.validate()) {
+                      jobsController.createJob(
+                        title: titleController.text.trim(),
+                        description: descriptionController.text.trim(),
+                        requirements: requirementsController.text.trim(),
+                        requiredDocumentIds: selectedDocumentIds.toList(),
+                      );
+                    }
+                  },
+                  isLoading: jobsController.isLoading.value,
+                ),
+              ),
             ],
           ),
         ),
