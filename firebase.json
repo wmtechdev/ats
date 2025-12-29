@@ -9,6 +9,38 @@
     "source": "functions",
     "runtime": "nodejs20"
   },
+  "hosting": [
+    {
+      "target": "candidate",
+      "public": "build/candidate-web",
+      "ignore": [
+        "firebase.json",
+        "**/.*",
+        "**/node_modules/**"
+      ],
+      "rewrites": [
+        {
+          "source": "**",
+          "destination": "/index.html"
+        }
+      ]
+    },
+    {
+      "target": "admin",
+      "public": "build/admin-web",
+      "ignore": [
+        "firebase.json",
+        "**/.*",
+        "**/node_modules/**"
+      ],
+      "rewrites": [
+        {
+          "source": "**",
+          "destination": "/index.html"
+        }
+      ]
+    }
+  ],
   "flutter": {
     "platforms": {
       "dart": {

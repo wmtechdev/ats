@@ -8,9 +8,11 @@ import 'package:ats/core/utils/app_spacing/app_spacing.dart';
 import 'package:ats/core/utils/app_responsive/app_responsive.dart';
 import 'package:ats/core/utils/app_texts/app_texts.dart';
 
-// Conditional imports for web
-import 'dart:html' as html show window, AnchorElement, IFrameElement, document;
-import 'dart:ui_web' as ui_web;
+// Conditional imports for web - use stubs for WebAssembly builds  
+import 'package:ats/core/widgets/documents/html_stub.dart' as html
+    if (dart.library.html) 'dart:html' show window, AnchorElement, IFrameElement, document;
+import 'package:ats/core/widgets/documents/ui_web_stub.dart' as ui_web
+    if (dart.library.html) 'dart:ui_web';
 
 class AppDocumentViewer extends StatelessWidget {
   final String documentUrl;
