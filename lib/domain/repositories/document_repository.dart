@@ -30,6 +30,7 @@ abstract class DocumentRepository {
     required String docTypeId,
     required String documentName,
     required String filePath,
+    void Function(double progress)? onProgress,
   });
 
   Future<Either<Failure, CandidateDocumentEntity>> createUserDocument({
@@ -38,6 +39,7 @@ abstract class DocumentRepository {
     required String description,
     required String documentName,
     required String filePath,
+    void Function(double progress)? onProgress,
   });
 
   Future<Either<Failure, List<CandidateDocumentEntity>>> getCandidateDocuments(
@@ -51,6 +53,11 @@ abstract class DocumentRepository {
   Future<Either<Failure, CandidateDocumentEntity>> updateDocumentStatus({
     required String candidateDocId,
     required String status,
+  });
+
+  Future<Either<Failure, void>> deleteDocument({
+    required String candidateDocId,
+    required String storageUrl,
   });
 }
 

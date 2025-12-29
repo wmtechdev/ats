@@ -34,6 +34,9 @@ class AppCandidateApplicationsList extends StatelessWidget {
       itemBuilder: (context, index) {
         final app = applications[index];
         final jobTitle = jobTitles[app.jobId] ?? AppTexts.unknownJob;
+        final isPending = app.status == AppConstants.applicationStatusPending;
+        final isApproved = app.status == AppConstants.applicationStatusApproved;
+        final isDenied = app.status == AppConstants.applicationStatusDenied;
 
         return AppListCard(
           key: ValueKey('application_${app.applicationId}'),
@@ -43,25 +46,36 @@ class AppCandidateApplicationsList extends StatelessWidget {
           trailing: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              AppActionButton(
-                text: AppTexts.approved,
-                onPressed: () => onStatusUpdate(
-                  app.applicationId,
-                  AppConstants.applicationStatusApproved,
+              // Show only status chip when application is approved
+              if (isApproved) ...[
+                AppStatusChip(status: app.status),
+              ],
+              // Show approve/deny buttons only when application is pending
+              if (isPending) ...[
+                AppActionButton(
+                  text: AppTexts.approve,
+                  onPressed: () => onStatusUpdate(
+                    app.applicationId,
+                    AppConstants.applicationStatusApproved,
+                  ),
+                  backgroundColor: AppColors.success,
+                  foregroundColor: AppColors.white,
                 ),
-                backgroundColor: AppColors.success,
-                foregroundColor: AppColors.white,
-              ),
-              AppSpacing.horizontal(context, 0.01),
-              AppActionButton(
-                text: AppTexts.denied,
-                onPressed: () => onStatusUpdate(
-                  app.applicationId,
-                  AppConstants.applicationStatusDenied,
+                AppSpacing.horizontal(context, 0.01),
+                AppActionButton(
+                  text: AppTexts.deny,
+                  onPressed: () => onStatusUpdate(
+                    app.applicationId,
+                    AppConstants.applicationStatusDenied,
+                  ),
+                  backgroundColor: AppColors.error,
+                  foregroundColor: AppColors.white,
                 ),
-                backgroundColor: AppColors.error,
-                foregroundColor: AppColors.white,
-              ),
+              ],
+              // Show status chip when application is denied (no buttons for admin)
+              if (isDenied) ...[
+                AppStatusChip(status: app.status),
+              ],
             ],
           ),
           onTap: null,

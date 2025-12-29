@@ -32,36 +32,84 @@ class AppDocumentUploadWidget extends StatelessWidget {
         Obx(() {
           final hasFile = controller.selectedFile.value != null;
           final fileName = controller.selectedFileName.value;
-          
+          final fileSize = controller.selectedFileSize.value;
+          final isUploading = controller.isUploading.value;
+          final uploadProgress = controller.uploadProgress.value;
+
           return Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               if (hasFile)
-                Row(
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    Icon(
-                      Iconsax.document_text,
-                      size: AppResponsive.iconSize(context),
-                      color: AppColors.primary,
+                    Row(
+                      children: [
+                        Icon(
+                          Iconsax.document_text,
+                          size: AppResponsive.iconSize(context),
+                          color: AppColors.primary,
+                        ),
+                        AppSpacing.horizontal(context, 0.02),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                fileName,
+                                style: AppTextStyles.bodyText(context).copyWith(
+                                  fontWeight: FontWeight.w500,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              if (fileSize.isNotEmpty)
+                                Text(
+                                  fileSize,
+                                  style: AppTextStyles.bodyText(context)
+                                      .copyWith(
+                                    fontSize: AppTextStyles
+                                        .bodyText(context)
+                                        .fontSize! * 0.85,
+                                    color: AppColors.grey,
+                                  ),
+                                ),
+                            ],
+                          ),
+                        ),
+                        if (!isUploading)
+                          IconButton(
+                            icon: Icon(
+                              Iconsax.close_circle,
+                              size: AppResponsive.iconSize(context),
+                              color: AppColors.error,
+                            ),
+                            onPressed: () => controller.clearSelectedFile(),
+                          ),
+                      ],
                     ),
-                    AppSpacing.horizontal(context, 0.02),
-                    Expanded(
-                      child: Text(
-                        fileName,
+                    if (isUploading) ...[
+                      AppSpacing.vertical(context, 0.01),
+                      LinearProgressIndicator(
+                        value: uploadProgress,
+                        backgroundColor: AppColors.grey.withOpacity(0.2),
+                        valueColor: AlwaysStoppedAnimation<Color>(
+                            AppColors.primary),
+                        minHeight: 6,
+                      ),
+                      AppSpacing.vertical(context, 0.005),
+                      Text(
+                        'Uploading: ${(uploadProgress * 100).toStringAsFixed(
+                            0)}%',
                         style: AppTextStyles.bodyText(context).copyWith(
+                          fontSize: AppTextStyles
+                              .bodyText(context)
+                              .fontSize! * 0.85,
+                          color: AppColors.primary,
                           fontWeight: FontWeight.w500,
                         ),
-                        overflow: TextOverflow.ellipsis,
+                        textAlign: TextAlign.center,
                       ),
-                    ),
-                    IconButton(
-                      icon: Icon(
-                        Iconsax.close_circle,
-                        size: AppResponsive.iconSize(context),
-                        color: AppColors.error,
-                      ),
-                      onPressed: () => controller.clearSelectedFile(),
-                    ),
+                    ],
                   ],
                 )
               else
@@ -85,9 +133,19 @@ class AppDocumentUploadWidget extends StatelessWidget {
                 ),
               AppSpacing.vertical(context, 0.02),
               AppButton(
-                text: hasFile ? AppTexts.upload : AppTexts.selectDocument,
-                icon: hasFile ? Iconsax.document_upload : Iconsax.folder,
-                onPressed: () => controller.pickFileForUserDocument(),
+                text: isUploading
+                    ? AppTexts.uploading
+                    : hasFile
+                    ? AppTexts.upload
+                    : AppTexts.selectDocument,
+                icon: isUploading
+                    ? Iconsax.refresh
+                    : hasFile
+                    ? Iconsax.document_upload
+                    : Iconsax.folder,
+                onPressed: isUploading
+                    ? null
+                    : () => controller.pickFileForUserDocument(),
                 isFullWidth: true,
               ),
             ],

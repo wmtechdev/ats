@@ -34,6 +34,8 @@ class AppCandidateDocumentsList extends StatelessWidget {
       itemBuilder: (context, index) {
         final doc = documents[index];
         final isRejected = doc.status == AppConstants.documentStatusDenied;
+        final isApproved = doc.status == AppConstants.documentStatusApproved;
+        final isPending = doc.status == AppConstants.documentStatusPending;
 
         return AppListCard(
           key: ValueKey('document_${doc.candidateDocId}'),
@@ -43,37 +45,46 @@ class AppCandidateDocumentsList extends StatelessWidget {
           trailing: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              AppActionButton(
-                text: AppTexts.view,
-                onPressed: () {
-                  if (doc.storageUrl.isNotEmpty && onView != null) {
-                    onView!(doc.storageUrl);
-                  }
-                },
-                backgroundColor: AppColors.information,
-                foregroundColor: AppColors.white,
-              ),
-              AppSpacing.horizontal(context, 0.01),
-              AppActionButton(
-                text: AppTexts.approved,
-                onPressed: () => onStatusUpdate(
-                  doc.candidateDocId,
-                  AppConstants.documentStatusApproved,
+              // Show only status chip when document is approved
+              if (isApproved) ...[
+                AppStatusChip(status: doc.status),
+              ],
+              // Show view/approve/deny buttons only when document is pending
+              if (isPending) ...[
+                AppActionButton(
+                  text: AppTexts.view,
+                  onPressed: () {
+                    if (doc.storageUrl.isNotEmpty && onView != null) {
+                      onView!(doc.storageUrl);
+                    }
+                  },
+                  backgroundColor: AppColors.information,
+                  foregroundColor: AppColors.white,
                 ),
-                backgroundColor: AppColors.success,
-                foregroundColor: AppColors.white,
-              ),
-              AppSpacing.horizontal(context, 0.01),
-              AppActionButton(
-                text: AppTexts.denied,
-                onPressed: () => onStatusUpdate(
-                  doc.candidateDocId,
-                  AppConstants.documentStatusDenied,
+                AppSpacing.horizontal(context, 0.01),
+                AppActionButton(
+                  text: AppTexts.approve,
+                  onPressed: () => onStatusUpdate(
+                    doc.candidateDocId,
+                    AppConstants.documentStatusApproved,
+                  ),
+                  backgroundColor: AppColors.success,
+                  foregroundColor: AppColors.white,
                 ),
-                backgroundColor: AppColors.error,
-                foregroundColor: AppColors.white,
-              ),
+                AppSpacing.horizontal(context, 0.01),
+                AppActionButton(
+                  text: AppTexts.deny,
+                  onPressed: () => onStatusUpdate(
+                    doc.candidateDocId,
+                    AppConstants.documentStatusDenied,
+                  ),
+                  backgroundColor: AppColors.error,
+                  foregroundColor: AppColors.white,
+                ),
+              ],
+              // Show request button only when document is denied
               if (isRejected) ...[
+                AppStatusChip(status: doc.status),
                 AppSpacing.horizontal(context, 0.01),
                 AppActionButton(
                   text: AppTexts.request,

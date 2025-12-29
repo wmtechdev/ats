@@ -6,12 +6,15 @@ import 'package:ats/domain/repositories/application_repository.dart';
 import 'package:ats/domain/repositories/job_repository.dart';
 import 'package:ats/domain/entities/application_entity.dart';
 import 'package:ats/domain/entities/job_entity.dart';
+import 'package:ats/domain/usecases/application/create_application_usecase.dart';
 
 class ApplicationsController extends GetxController {
   final ApplicationRepository applicationRepository;
   final CandidateAuthRepository authRepository;
 
   ApplicationsController(this.applicationRepository, this.authRepository);
+
+  final createApplicationUseCase = CreateApplicationUseCase(Get.find<ApplicationRepository>());
 
   final isLoading = false.obs;
   final errorMessage = ''.obs;
@@ -80,6 +83,61 @@ class ApplicationsController extends GetxController {
       default:
         return status;
     }
+  }
+
+  Future<void> reapplyToJob(String jobId) async {
+    isLoading.value = true;
+    errorMessage.value = '';
+
+    final currentUser = authRepository.getCurrentUser();
+    if (currentUser == null) {
+      errorMessage.value = 'User not authenticated';
+      isLoading.value = false;
+      Get.snackbar('Error', 'User not authenticated');
+      return;
+    }
+
+    // Find and delete the old denied application for this job
+    final deniedApp = applications.firstWhereOrNull(
+      (app) => app.jobId == jobId && app.status == AppConstants.applicationStatusDenied,
+    );
+
+    if (deniedApp != null) {
+      // Delete the old denied application from Firestore
+      try {
+        final deleteResult = await applicationRepository.deleteApplication(
+          applicationId: deniedApp.applicationId,
+        );
+        deleteResult.fold(
+          (failure) {
+            // Continue - deletion failure shouldn't block reapply
+          },
+          (_) {
+            // Successfully deleted
+          },
+        );
+      } catch (e) {
+        // Continue - deletion failure shouldn't block reapply
+      }
+    }
+
+    // Create new application
+    final result = await createApplicationUseCase(
+      candidateId: currentUser.userId,
+      jobId: jobId,
+    );
+
+    result.fold(
+      (failure) {
+        errorMessage.value = failure.message;
+        isLoading.value = false;
+        Get.snackbar('Error', failure.message);
+      },
+      (application) {
+        isLoading.value = false;
+        Get.snackbar('Success', 'Application submitted successfully');
+      },
+    );
   }
 }
 

@@ -24,5 +24,9 @@ abstract class ApplicationRepository {
     required String applicationId,
     required String status,
   });
+
+  Future<Either<Failure, void>> deleteApplication({
+    required String applicationId,
+  });
 }
 

@@ -5,6 +5,8 @@ import 'package:ats/presentation/candidate/controllers/applications_controller.d
 import 'package:ats/presentation/candidate/controllers/jobs_controller.dart';
 import 'package:ats/core/utils/app_texts/app_texts.dart';
 import 'package:ats/core/utils/app_spacing/app_spacing.dart';
+import 'package:ats/core/utils/app_colors/app_colors.dart';
+import 'package:ats/core/constants/app_constants.dart';
 import 'package:ats/core/widgets/app_widgets.dart';
 
 class MyApplicationsScreen extends StatelessWidget {
@@ -30,12 +32,32 @@ class MyApplicationsScreen extends StatelessWidget {
                 final job = jobsController.jobs.firstWhereOrNull(
                   (j) => j.jobId == app.jobId,
                 );
+                final isDenied = app.status == AppConstants.applicationStatusDenied;
 
                 return AppListCard(
                   title: job?.title ?? AppTexts.unknownJob,
                   subtitle: applicationsController.getStatusText(app.status),
                   icon: Iconsax.document,
-                  trailing: AppStatusChip(status: app.status),
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      AppStatusChip(status: app.status),
+                      // Show re-apply button only when application is denied
+                      if (isDenied) ...[
+                        AppSpacing.horizontal(context, 0.01),
+                        AppActionButton(
+                          text: AppTexts.reapply,
+                          onPressed: () {
+                            if (job != null) {
+                              applicationsController.reapplyToJob(app.jobId);
+                            }
+                          },
+                          backgroundColor: AppColors.warning,
+                          foregroundColor: AppColors.black,
+                        ),
+                      ],
+                    ],
+                  ),
                   onTap: null,
                 );
               },

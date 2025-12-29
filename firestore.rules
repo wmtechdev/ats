@@ -124,8 +124,12 @@ service cloud.firestore {
                        request.resource.data.candidateId == getUserId() &&
                        request.resource.data.keys().hasAll(['candidateId', 'jobId', 'status', 'appliedAt']);
       
-      // Admins can read and update all applications
-      allow read, update: if isAdmin();
+      // Candidates can delete their own applications
+      allow delete: if isAuthenticated() && 
+                       resource.data.candidateId == getUserId();
+      
+      // Admins can read, update, and delete all applications
+      allow read, update, delete: if isAdmin();
     }
     
     // Document Types Collection
@@ -154,8 +158,12 @@ service cloud.firestore {
                        !('status' in request.resource.data.diff(resource.data).changedKeys()) ||
                        resource.data.status == 'pending';
       
-      // Admins can read and update all candidate documents
-      allow read, update: if isAdmin();
+      // Candidates can delete their own documents
+      allow delete: if isAuthenticated() && 
+                       resource.data.candidateId == getUserId();
+      
+      // Admins can read, update, and delete all candidate documents
+      allow read, update, delete: if isAdmin();
     }
   }
 }

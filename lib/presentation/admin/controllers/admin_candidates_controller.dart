@@ -38,8 +38,8 @@ class AdminCandidatesController extends GetxController {
   final candidateDocuments = <CandidateDocumentEntity>[].obs;
   final applicationJobs = <String, JobEntity?>{}.obs;
 
-  final updateApplicationStatusUseCase = UpdateApplicationStatusUseCase(Get.find<ApplicationRepository>());
-  final updateDocumentStatusUseCase = UpdateDocumentStatusUseCase(Get.find<DocumentRepository>());
+  late final UpdateApplicationStatusUseCase updateApplicationStatusUseCase;
+  late final UpdateDocumentStatusUseCase updateDocumentStatusUseCase;
 
   // Stream subscriptions
   StreamSubscription<List<ApplicationEntity>>? _applicationsSubscription;
@@ -49,6 +49,9 @@ class AdminCandidatesController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    // Initialize use cases after repositories are registered
+    updateApplicationStatusUseCase = UpdateApplicationStatusUseCase(Get.find<ApplicationRepository>());
+    updateDocumentStatusUseCase = UpdateDocumentStatusUseCase(Get.find<DocumentRepository>());
     loadCandidates();
   }
 
@@ -192,24 +195,31 @@ class AdminCandidatesController extends GetxController {
     required String applicationId,
     required String status,
   }) async {
-    isLoading.value = true;
-    errorMessage.value = '';
+    try {
+      isLoading.value = true;
+      errorMessage.value = '';
 
-    final result = await updateApplicationStatusUseCase(
-      applicationId: applicationId,
-      status: status,
-    );
+      final result = await updateApplicationStatusUseCase(
+        applicationId: applicationId,
+        status: status,
+      );
 
-    result.fold(
-      (failure) {
-        errorMessage.value = failure.message;
-        isLoading.value = false;
-      },
-      (application) {
-        isLoading.value = false;
-        Get.snackbar('Success', 'Application status updated');
-      },
-    );
+      result.fold(
+        (failure) {
+          errorMessage.value = failure.message;
+          isLoading.value = false;
+          Get.snackbar('Error', failure.message);
+        },
+        (application) {
+          isLoading.value = false;
+          Get.snackbar('Success', 'Application status updated');
+        },
+      );
+    } catch (e) {
+      errorMessage.value = 'Failed to update application status: $e';
+      isLoading.value = false;
+      Get.snackbar('Error', 'Failed to update application status: $e');
+    }
   }
 
   // Helper methods

@@ -54,7 +54,7 @@ class ApplicationRepositoryImpl implements ApplicationRepository {
       );
       final apps = appsData.map((data) {
         return ApplicationModel(
-          applicationId: '', // This needs to be fixed
+          applicationId: data['applicationId'] ?? '',
           candidateId: data['candidateId'] ?? '',
           jobId: data['jobId'] ?? '',
           status: data['status'] ?? AppConstants.applicationStatusPending,
@@ -82,7 +82,7 @@ class ApplicationRepositoryImpl implements ApplicationRepository {
     ).map((appsData) {
       return appsData.map((data) {
         return ApplicationModel(
-          applicationId: '', // This needs to be fixed
+          applicationId: data['applicationId'] ?? '',
           candidateId: data['candidateId'] ?? '',
           jobId: data['jobId'] ?? '',
           status: data['status'] ?? AppConstants.applicationStatusPending,
@@ -113,6 +113,20 @@ class ApplicationRepositoryImpl implements ApplicationRepository {
       );
 
       return Right(app.toEntity());
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message));
+    } catch (e) {
+      return Left(ServerFailure('An unexpected error occurred: $e'));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> deleteApplication({
+    required String applicationId,
+  }) async {
+    try {
+      await firestoreDataSource.deleteApplication(applicationId);
+      return const Right(null);
     } on ServerException catch (e) {
       return Left(ServerFailure(e.message));
     } catch (e) {
