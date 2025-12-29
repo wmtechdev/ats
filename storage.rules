@@ -1,0 +1,39 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Helper function to check if user is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    // Helper function to check if user is admin
+    function isAdmin() {
+      return isAuthenticated() && 
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid)) &&
+        get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.isAdmin == true;
+    }
+    
+    // Helper function to check if user is the candidate
+    function isCandidate(candidateId) {
+      return isAuthenticated() && request.auth.uid == candidateId;
+    }
+    
+    // Documents storage path: documents/{candidateId}/{fileName}
+    match /documents/{candidateId}/{fileName} {
+      // Candidates can read, write, and delete their own documents
+      allow read, write, delete: if isAuthenticated() && isCandidate(candidateId);
+      
+      // Admins can read all documents
+      allow read: if isAuthenticated() && isAdmin();
+      
+      // Admins can delete documents (for moderation)
+      allow delete: if isAuthenticated() && isAdmin();
+    }
+    
+    // Deny all other paths
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}
+

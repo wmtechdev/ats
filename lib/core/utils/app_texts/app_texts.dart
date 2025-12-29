@@ -85,6 +85,7 @@ class AppTexts {
 
   // Documents
   static const String upload = "Upload";
+  static const String uploading = "Uploading...";
   static const String documentUploaded = "Document uploaded successfully";
   static const String noDocumentTypesAvailable = "No document types available";
   static const String documentStatusUpdated = "Document status updated";
@@ -176,6 +177,24 @@ class AppTexts {
   static const String value = "Value";
   static const String view = "View";
   static const String request = "Request";
+  static const String approve = "Approve";
+  static const String deny = "Deny";
   static const String documentsUploadedCount = "Documents Uploaded Count";
   static const String jobsAppliedCount = "Jobs Applied Count";
+  
+  // Document Viewer
+  static const String openInNewTab = "Open in New Tab";
+  static const String openInBrowser = "Open in Browser";
+  static const String download = "Download";
+  static const String pdfViewerNotAvailable = "PDF viewer not available on this platform. Please use the browser to view.";
+  static const String documentPreviewNotAvailable = "Document preview not available. Please download or open in browser.";
+  static const String documentTypeNotSupported = "This document type is not supported for preview. Please download to view.";
+  static const String failedToLoadImage = "Failed to load image";
+  static const String failedToLoadDocument = "Failed to load document";
+  
+  // Document Actions
+  static const String reupload = "Reupload";
+  static const String deleteDocument = "Delete Document";
+  static const String areYouSureDeleteDocument = "Are you sure you want to delete this document?";
+  static const String reapply = "Re-apply";
 }

@@ -5,6 +5,8 @@ import 'package:ats/domain/repositories/document_repository.dart';
 import 'package:ats/domain/entities/document_type_entity.dart';
 import 'package:ats/domain/entities/candidate_document_entity.dart';
 import 'package:ats/domain/usecases/document/upload_document_usecase.dart';
+import 'package:ats/core/utils/app_file_validator/app_file_validator.dart';
+import 'package:ats/data/repositories/document_repository_impl.dart';
 import 'package:file_picker/file_picker.dart';
 
 class DocumentsController extends GetxController {
@@ -14,6 +16,9 @@ class DocumentsController extends GetxController {
   DocumentsController(this.documentRepository, this.authRepository);
 
   final isLoading = false.obs;
+  final uploadProgress = 0.0.obs;
+  final isUploading = false.obs;
+  final uploadingDocTypeId = ''.obs; // Track which document type is being uploaded
   final errorMessage = ''.obs;
   final documentTypes = <DocumentTypeEntity>[].obs;
   final candidateDocuments = <CandidateDocumentEntity>[].obs;
@@ -24,6 +29,7 @@ class DocumentsController extends GetxController {
   // File selection for user document creation
   final selectedFile = Rxn<PlatformFile>();
   final selectedFileName = ''.obs;
+  final selectedFileSize = ''.obs;
 
   final uploadDocumentUseCase = UploadDocumentUseCase(
     Get.find<DocumentRepository>(),
@@ -48,6 +54,10 @@ class DocumentsController extends GetxController {
     _candidateDocumentsSubscription?.cancel();
     // Clear selected file when controller is disposed
     clearSelectedFile();
+    // Reset upload progress
+    uploadProgress.value = 0.0;
+    isUploading.value = false;
+    uploadingDocTypeId.value = '';
     super.onClose();
   }
 
@@ -153,7 +163,6 @@ class DocumentsController extends GetxController {
   }
 
   Future<void> uploadDocument(String docTypeId, String docTypeName) async {
-    isLoading.value = true;
     errorMessage.value = '';
 
     try {
@@ -163,46 +172,77 @@ class DocumentsController extends GetxController {
       );
 
       if (result == null || result.files.isEmpty) {
-        isLoading.value = false;
         return;
       }
 
       final file = result.files.first;
-      if (file.path == null) {
-        errorMessage.value = 'File path is null';
-        isLoading.value = false;
+
+      // Validate file
+      final validationError = AppFileValidator.validateFile(file);
+      if (validationError != null) {
+        errorMessage.value = validationError;
+        Get.snackbar('Validation Error', validationError);
         return;
       }
 
       final currentUser = authRepository.getCurrentUser();
       if (currentUser == null) {
         errorMessage.value = 'User not authenticated';
-        isLoading.value = false;
+        Get.snackbar('Error', 'User not authenticated');
         return;
       }
 
-      final documentName = '${currentUser.userId}_${docTypeName}_${file.name}';
+      // Sanitize document name
+      final sanitizedDocTypeName = AppFileValidator.sanitizeFileName(docTypeName);
+      final sanitizedFileName = AppFileValidator.sanitizeFileName(file.name);
+      final documentName = '${currentUser.userId}_${sanitizedDocTypeName}_$sanitizedFileName';
 
-      final uploadResult = await uploadDocumentUseCase(
+      // Reset progress and track which document is being uploaded
+      uploadProgress.value = 0.0;
+      isUploading.value = true;
+      isLoading.value = true;
+      uploadingDocTypeId.value = docTypeId;
+
+      // Use the repository implementation directly to access helper method
+      final repositoryImpl = documentRepository as DocumentRepositoryImpl;
+      
+      final uploadResult = await repositoryImpl.uploadDocumentWithFile(
         candidateId: currentUser.userId,
         docTypeId: docTypeId,
         documentName: documentName,
-        filePath: file.path!,
+        platformFile: file,
+        onProgress: (progress) {
+          uploadProgress.value = progress;
+        },
       );
 
       uploadResult.fold(
         (failure) {
           errorMessage.value = failure.message;
           isLoading.value = false;
+          isUploading.value = false;
+          uploadProgress.value = 0.0;
+          uploadingDocTypeId.value = '';
+          Get.snackbar('Upload Failed', failure.message);
         },
         (document) {
           isLoading.value = false;
+          isUploading.value = false;
+          uploadProgress.value = 1.0;
+          // Reset uploading doc type after a short delay to show completion
+          Future.delayed(const Duration(milliseconds: 500), () {
+            uploadingDocTypeId.value = '';
+            uploadProgress.value = 0.0;
+          });
           Get.snackbar('Success', 'Document uploaded successfully');
         },
       );
     } catch (e) {
-      errorMessage.value = 'Failed to pick file: $e';
+      errorMessage.value = 'Failed to upload file: $e';
       isLoading.value = false;
+      isUploading.value = false;
+      uploadProgress.value = 0.0;
+      Get.snackbar('Error', 'Failed to upload file: $e');
     }
   }
 
@@ -218,14 +258,18 @@ class DocumentsController extends GetxController {
       }
 
       final file = result.files.first;
-      if (file.path == null) {
-        errorMessage.value = 'File path is null';
-        Get.snackbar('Error', 'File path is null');
+
+      // Validate file
+      final validationError = AppFileValidator.validateFile(file);
+      if (validationError != null) {
+        errorMessage.value = validationError;
+        Get.snackbar('Validation Error', validationError);
         return;
       }
 
       selectedFile.value = file;
       selectedFileName.value = file.name;
+      selectedFileSize.value = AppFileValidator.formatFileSize(file.size);
       errorMessage.value = '';
     } catch (e) {
       errorMessage.value = 'Failed to pick file: $e';
@@ -236,6 +280,35 @@ class DocumentsController extends GetxController {
   void clearSelectedFile() {
     selectedFile.value = null;
     selectedFileName.value = '';
+    selectedFileSize.value = '';
+  }
+
+  Future<void> deleteDocument(String candidateDocId, String storageUrl) async {
+    isLoading.value = true;
+    errorMessage.value = '';
+
+    try {
+      final result = await documentRepository.deleteDocument(
+        candidateDocId: candidateDocId,
+        storageUrl: storageUrl,
+      );
+
+      result.fold(
+        (failure) {
+          errorMessage.value = failure.message;
+          isLoading.value = false;
+          Get.snackbar('Error', failure.message);
+        },
+        (_) {
+          isLoading.value = false;
+          Get.snackbar('Success', 'Document deleted successfully');
+        },
+      );
+    } catch (e) {
+      errorMessage.value = 'Failed to delete document: $e';
+      isLoading.value = false;
+      Get.snackbar('Error', 'Failed to delete document: $e');
+    }
   }
 
   Future<void> createUserDocument({
@@ -243,51 +316,83 @@ class DocumentsController extends GetxController {
     required String description,
   }) async {
     // Validate file is selected
-    if (selectedFile.value == null || selectedFile.value!.path == null) {
+    if (selectedFile.value == null) {
       errorMessage.value = 'Please select a document file';
       Get.snackbar('Error', 'Please select a document file');
       return;
     }
 
-    isLoading.value = true;
+    final file = selectedFile.value!;
+
+    // Validate file again (in case it was changed)
+    final validationError = AppFileValidator.validateFile(file);
+    if (validationError != null) {
+      errorMessage.value = validationError;
+      Get.snackbar('Validation Error', validationError);
+      return;
+    }
+
     errorMessage.value = '';
+    uploadProgress.value = 0.0;
+    isUploading.value = true;
+    isLoading.value = true;
 
     try {
-      final file = selectedFile.value!;
       final currentUser = authRepository.getCurrentUser();
       if (currentUser == null) {
         errorMessage.value = 'User not authenticated';
         isLoading.value = false;
+        isUploading.value = false;
+        uploadProgress.value = 0.0;
         Get.snackbar('Error', 'User not authenticated');
         return;
       }
 
-      final documentName = '${currentUser.userId}_${title}_${file.name}';
+      // Sanitize title and file name
+      final sanitizedTitle = AppFileValidator.sanitizeFileName(title);
+      final sanitizedFileName = AppFileValidator.sanitizeFileName(file.name);
+      final documentName = '${currentUser.userId}_${sanitizedTitle}_$sanitizedFileName';
 
-      final createResult = await documentRepository.createUserDocument(
+      // Use the repository implementation directly to access helper method
+      final repositoryImpl = documentRepository as DocumentRepositoryImpl;
+
+      final createResult = await repositoryImpl.createUserDocumentWithFile(
         candidateId: currentUser.userId,
         title: title,
         description: description,
         documentName: documentName,
-        filePath: file.path!,
+        platformFile: file,
+        onProgress: (progress) {
+          uploadProgress.value = progress;
+        },
       );
 
       createResult.fold(
         (failure) {
           errorMessage.value = failure.message;
           isLoading.value = false;
+          isUploading.value = false;
+          uploadProgress.value = 0.0;
           Get.snackbar('Error', failure.message);
         },
         (document) {
           isLoading.value = false;
+          isUploading.value = false;
+          uploadProgress.value = 1.0;
           clearSelectedFile();
           Get.snackbar('Success', 'Document created successfully');
+          // Reset progress after a short delay
+          Future.delayed(const Duration(seconds: 2), () {
+            uploadProgress.value = 0.0;
+          });
           Get.back();
         },
       );
     } catch (e) {
       errorMessage.value = 'Failed to create document: $e';
       isLoading.value = false;
+      isUploading.value = false;
+      uploadProgress.value = 0.0;
       Get.snackbar('Error', 'Failed to create document: $e');
     }
   }

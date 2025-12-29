@@ -104,6 +104,8 @@ abstract class FirestoreDataSource {
     required Map<String, dynamic> data,
   });
 
+  Future<void> deleteApplication(String applicationId);
+
   // Document Types
   Future<String> createDocumentType({
     required String name,
@@ -140,6 +142,8 @@ abstract class FirestoreDataSource {
     required String candidateDocId,
     required Map<String, dynamic> data,
   });
+
+  Future<void> deleteCandidateDocument(String candidateDocId);
 
   // Admin
   Future<List<Map<String, dynamic>>> getCandidates();
@@ -519,9 +523,11 @@ class FirestoreDataSourceImpl implements FirestoreDataSource {
         query = query.where('status', isEqualTo: status);
       }
       final querySnapshot = await query.get();
-      return querySnapshot.docs
-          .map((doc) => doc.data() as Map<String, dynamic>)
-          .toList();
+      return querySnapshot.docs.map((doc) {
+        final data = doc.data() as Map<String, dynamic>;
+        data['applicationId'] = doc.id;
+        return data;
+      }).toList();
     } catch (e) {
       throw ServerException('Failed to get applications: $e');
     }
@@ -543,9 +549,11 @@ class FirestoreDataSourceImpl implements FirestoreDataSource {
     if (status != null) {
       query = query.where('status', isEqualTo: status);
     }
-    return query.snapshots().map((snapshot) => snapshot.docs
-        .map((doc) => doc.data() as Map<String, dynamic>)
-        .toList());
+    return query.snapshots().map((snapshot) => snapshot.docs.map((doc) {
+          final data = doc.data() as Map<String, dynamic>;
+          data['applicationId'] = doc.id;
+          return data;
+        }).toList());
   }
 
   @override
@@ -560,6 +568,18 @@ class FirestoreDataSourceImpl implements FirestoreDataSource {
           .update(data);
     } catch (e) {
       throw ServerException('Failed to update application: $e');
+    }
+  }
+
+  @override
+  Future<void> deleteApplication(String applicationId) async {
+    try {
+      await firestore
+          .collection(AppConstants.applicationsCollection)
+          .doc(applicationId)
+          .delete();
+    } catch (e) {
+      throw ServerException('Failed to delete application: $e');
     }
   }
 
@@ -712,6 +732,18 @@ class FirestoreDataSourceImpl implements FirestoreDataSource {
           .update(data);
     } catch (e) {
       throw ServerException('Failed to update candidate document: $e');
+    }
+  }
+
+  @override
+  Future<void> deleteCandidateDocument(String candidateDocId) async {
+    try {
+      await firestore
+          .collection(AppConstants.candidateDocumentsCollection)
+          .doc(candidateDocId)
+          .delete();
+    } catch (e) {
+      throw ServerException('Failed to delete candidate document: $e');
     }
   }
 

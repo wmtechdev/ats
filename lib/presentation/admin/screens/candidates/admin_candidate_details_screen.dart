@@ -6,6 +6,7 @@ import 'package:iconsax/iconsax.dart';
 import 'package:ats/presentation/admin/controllers/admin_candidates_controller.dart';
 import 'package:ats/core/utils/app_texts/app_texts.dart';
 import 'package:ats/core/widgets/app_widgets.dart';
+import 'package:ats/core/widgets/documents/app_document_viewer.dart';
 
 class AdminCandidateDetailsScreen extends StatelessWidget {
   const AdminCandidateDetailsScreen({super.key});
@@ -79,10 +80,20 @@ class AdminCandidateDetailsScreen extends StatelessWidget {
                         );
                       },
                       onView: (storageUrl) {
-                        // TODO: Implement document viewing functionality
-                        Get.snackbar(
-                          AppTexts.info,
-                          'Document URL: $storageUrl',
+                        // Find the document name for display
+                        String? documentName;
+                        try {
+                          final document = controller.candidateDocuments.firstWhere(
+                            (doc) => doc.storageUrl == storageUrl,
+                          );
+                          documentName = document.title ?? document.documentName;
+                        } catch (e) {
+                          // Document not found, use default name
+                          documentName = null;
+                        }
+                        AppDocumentViewer.show(
+                          documentUrl: storageUrl,
+                          documentName: documentName,
                         );
                       },
                     ),
