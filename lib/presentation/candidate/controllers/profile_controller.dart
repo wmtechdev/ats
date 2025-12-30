@@ -7,6 +7,7 @@ import 'package:ats/domain/repositories/candidate_auth_repository.dart';
 import 'package:ats/domain/repositories/candidate_profile_repository.dart';
 import 'package:ats/domain/entities/candidate_profile_entity.dart';
 import 'package:ats/domain/usecases/candidate_profile/create_profile_usecase.dart';
+import 'package:ats/core/widgets/app_widgets.dart';
 
 class ProfileController extends GetxController {
   final CandidateProfileRepository profileRepository;
@@ -292,17 +293,15 @@ class ProfileController extends GetxController {
         
         // Verify profile is complete before navigating
         if (isProfileCompleted()) {
-          Get.snackbar('Success', 'Profile saved successfully');
+          AppSnackbar.success('Profile saved successfully');
           // Use a small delay to ensure the profile stream has updated
           Future.delayed(const Duration(milliseconds: 300), () {
             Get.offNamed(AppConstants.routeCandidateDashboard);
           });
         } else {
           // Profile saved but not complete - show message and stay on profile screen
-          Get.snackbar(
-            'Profile Saved',
-            'Please complete all required fields including work history',
-            snackPosition: SnackPosition.BOTTOM,
+          AppSnackbar.show(
+            message: 'Please complete all required fields including work history',
             duration: const Duration(seconds: 3),
           );
         }

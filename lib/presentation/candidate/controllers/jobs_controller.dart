@@ -8,6 +8,7 @@ import 'package:ats/domain/entities/job_entity.dart';
 import 'package:ats/domain/entities/application_entity.dart';
 import 'package:ats/domain/usecases/job/get_jobs_usecase.dart';
 import 'package:ats/domain/usecases/application/create_application_usecase.dart';
+import 'package:ats/core/widgets/app_widgets.dart';
 
 class JobsController extends GetxController {
   final JobRepository jobRepository;
@@ -112,7 +113,7 @@ class JobsController extends GetxController {
       },
       (application) {
         isLoading.value = false;
-        Get.snackbar('Success', 'Application submitted successfully');
+        AppSnackbar.success('Application submitted successfully');
       },
     );
   }

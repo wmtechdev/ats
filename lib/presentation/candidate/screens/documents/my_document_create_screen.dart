@@ -42,7 +42,7 @@ class _MyDocumentCreateScreenState extends State<MyDocumentCreateScreen> {
     if (!isValid) return false;
     
     if (controller.selectedFile.value == null) {
-      Get.snackbar('Error', AppTexts.documentFileRequired);
+      AppSnackbar.error(AppTexts.documentFileRequired);
       return false;
     }
     

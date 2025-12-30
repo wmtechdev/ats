@@ -8,6 +8,7 @@ import 'package:ats/domain/usecases/document/upload_document_usecase.dart';
 import 'package:ats/core/utils/app_file_validator/app_file_validator.dart';
 import 'package:ats/data/repositories/document_repository_impl.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:ats/core/widgets/app_widgets.dart';
 
 class DocumentsController extends GetxController {
   final DocumentRepository documentRepository;
@@ -181,14 +182,14 @@ class DocumentsController extends GetxController {
       final validationError = AppFileValidator.validateFile(file);
       if (validationError != null) {
         errorMessage.value = validationError;
-        Get.snackbar('Validation Error', validationError);
+        AppSnackbar.error(validationError);
         return;
       }
 
       final currentUser = authRepository.getCurrentUser();
       if (currentUser == null) {
         errorMessage.value = 'User not authenticated';
-        Get.snackbar('Error', 'User not authenticated');
+        AppSnackbar.error('User not authenticated');
         return;
       }
 
@@ -223,7 +224,7 @@ class DocumentsController extends GetxController {
           isUploading.value = false;
           uploadProgress.value = 0.0;
           uploadingDocTypeId.value = '';
-          Get.snackbar('Upload Failed', failure.message);
+          AppSnackbar.error(failure.message);
         },
         (document) {
           isLoading.value = false;
@@ -234,7 +235,7 @@ class DocumentsController extends GetxController {
             uploadingDocTypeId.value = '';
             uploadProgress.value = 0.0;
           });
-          Get.snackbar('Success', 'Document uploaded successfully');
+          AppSnackbar.success('Document uploaded successfully');
         },
       );
     } catch (e) {
@@ -242,7 +243,7 @@ class DocumentsController extends GetxController {
       isLoading.value = false;
       isUploading.value = false;
       uploadProgress.value = 0.0;
-      Get.snackbar('Error', 'Failed to upload file: $e');
+      AppSnackbar.error('Failed to upload file: $e');
     }
   }
 
@@ -263,7 +264,7 @@ class DocumentsController extends GetxController {
       final validationError = AppFileValidator.validateFile(file);
       if (validationError != null) {
         errorMessage.value = validationError;
-        Get.snackbar('Validation Error', validationError);
+        AppSnackbar.error(validationError);
         return;
       }
 
@@ -273,7 +274,7 @@ class DocumentsController extends GetxController {
       errorMessage.value = '';
     } catch (e) {
       errorMessage.value = 'Failed to pick file: $e';
-      Get.snackbar('Error', 'Failed to pick file: $e');
+      AppSnackbar.error('Failed to pick file: $e');
     }
   }
 
@@ -297,17 +298,17 @@ class DocumentsController extends GetxController {
         (failure) {
           errorMessage.value = failure.message;
           isLoading.value = false;
-          Get.snackbar('Error', failure.message);
+          AppSnackbar.error(failure.message);
         },
         (_) {
           isLoading.value = false;
-          Get.snackbar('Success', 'Document deleted successfully');
+          AppSnackbar.success('Document deleted successfully');
         },
       );
     } catch (e) {
       errorMessage.value = 'Failed to delete document: $e';
       isLoading.value = false;
-      Get.snackbar('Error', 'Failed to delete document: $e');
+      AppSnackbar.error('Failed to delete document: $e');
     }
   }
 
@@ -318,7 +319,7 @@ class DocumentsController extends GetxController {
     // Validate file is selected
     if (selectedFile.value == null) {
       errorMessage.value = 'Please select a document file';
-      Get.snackbar('Error', 'Please select a document file');
+      AppSnackbar.error('Please select a document file');
       return;
     }
 
@@ -328,7 +329,7 @@ class DocumentsController extends GetxController {
     final validationError = AppFileValidator.validateFile(file);
     if (validationError != null) {
       errorMessage.value = validationError;
-      Get.snackbar('Validation Error', validationError);
+      AppSnackbar.error(validationError);
       return;
     }
 
@@ -344,7 +345,7 @@ class DocumentsController extends GetxController {
         isLoading.value = false;
         isUploading.value = false;
         uploadProgress.value = 0.0;
-        Get.snackbar('Error', 'User not authenticated');
+        AppSnackbar.error('User not authenticated');
         return;
       }
 
@@ -373,14 +374,14 @@ class DocumentsController extends GetxController {
           isLoading.value = false;
           isUploading.value = false;
           uploadProgress.value = 0.0;
-          Get.snackbar('Error', failure.message);
+          AppSnackbar.error(failure.message);
         },
         (document) {
           isLoading.value = false;
           isUploading.value = false;
           uploadProgress.value = 1.0;
           clearSelectedFile();
-          Get.snackbar('Success', 'Document created successfully');
+          AppSnackbar.success('Document created successfully');
           // Reset progress after a short delay
           Future.delayed(const Duration(seconds: 2), () {
             uploadProgress.value = 0.0;
@@ -393,7 +394,7 @@ class DocumentsController extends GetxController {
       isLoading.value = false;
       isUploading.value = false;
       uploadProgress.value = 0.0;
-      Get.snackbar('Error', 'Failed to create document: $e');
+      AppSnackbar.error('Failed to create document: $e');
     }
   }
 }

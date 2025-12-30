@@ -7,6 +7,7 @@ import 'package:ats/core/utils/app_styles/app_text_styles.dart';
 import 'package:ats/core/utils/app_spacing/app_spacing.dart';
 import 'package:ats/core/utils/app_responsive/app_responsive.dart';
 import 'package:ats/core/utils/app_texts/app_texts.dart';
+import 'package:ats/core/widgets/app_widgets.dart';
 
 // Conditional imports for web - use stubs for WebAssembly builds  
 import 'package:ats/core/widgets/documents/html_stub.dart' as html
@@ -399,10 +400,7 @@ class AppDocumentViewer extends StatelessWidget {
     } else {
       // For mobile, you might want to use url_launcher package
       // For now, just show a message
-      Get.snackbar(
-        AppTexts.info,
-        'Please open the URL manually: $url',
-      );
+      AppSnackbar.info('Please open the URL manually: $url');
     }
   }
 
@@ -415,10 +413,7 @@ class AppDocumentViewer extends StatelessWidget {
       anchor.click();
       anchor.remove();
     } else {
-      Get.snackbar(
-        AppTexts.info,
-        'Download functionality not available on mobile. Please use the browser.',
-      );
+      AppSnackbar.info('Download functionality not available on mobile. Please use the browser.');
     }
   }
 }

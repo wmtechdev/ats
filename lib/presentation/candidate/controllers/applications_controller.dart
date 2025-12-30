@@ -7,6 +7,7 @@ import 'package:ats/domain/repositories/job_repository.dart';
 import 'package:ats/domain/entities/application_entity.dart';
 import 'package:ats/domain/entities/job_entity.dart';
 import 'package:ats/domain/usecases/application/create_application_usecase.dart';
+import 'package:ats/core/widgets/app_widgets.dart';
 
 class ApplicationsController extends GetxController {
   final ApplicationRepository applicationRepository;
@@ -93,7 +94,7 @@ class ApplicationsController extends GetxController {
     if (currentUser == null) {
       errorMessage.value = 'User not authenticated';
       isLoading.value = false;
-      Get.snackbar('Error', 'User not authenticated');
+      AppSnackbar.error('User not authenticated');
       return;
     }
 
@@ -131,11 +132,11 @@ class ApplicationsController extends GetxController {
       (failure) {
         errorMessage.value = failure.message;
         isLoading.value = false;
-        Get.snackbar('Error', failure.message);
+        AppSnackbar.error(failure.message);
       },
       (application) {
         isLoading.value = false;
-        Get.snackbar('Success', 'Application submitted successfully');
+        AppSnackbar.success('Application submitted successfully');
       },
     );
   }

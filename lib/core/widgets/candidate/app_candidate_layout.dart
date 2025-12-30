@@ -8,6 +8,7 @@ import 'package:ats/core/widgets/common/app_navigation_item_model.dart';
 import 'package:ats/presentation/candidate/controllers/candidate_auth_controller.dart';
 import 'package:ats/presentation/candidate/controllers/profile_controller.dart';
 import 'package:ats/domain/repositories/candidate_auth_repository.dart';
+import 'package:ats/core/widgets/app_widgets.dart';
 
 class AppCandidateLayout extends StatefulWidget {
   final Widget child;
@@ -48,10 +49,8 @@ class _AppCandidateLayoutState extends State<AppCandidateLayout> {
                 !profileController.isProfileCompleted() && 
                 Get.currentRoute != AppConstants.routeCandidateProfile) {
               Get.offNamed(AppConstants.routeCandidateProfile);
-              Get.snackbar(
-                'Profile Incomplete',
-                'Please complete your profile to access the app',
-                snackPosition: SnackPosition.BOTTOM,
+              AppSnackbar.show(
+                message: 'Please complete your profile to access the app',
                 duration: const Duration(seconds: 3),
               );
             }
@@ -67,10 +66,8 @@ class _AppCandidateLayoutState extends State<AppCandidateLayout> {
             !profileController.isProfileCompleted() && 
             Get.currentRoute != AppConstants.routeCandidateProfile) {
           Get.offNamed(AppConstants.routeCandidateProfile);
-          Get.snackbar(
-            'Profile Incomplete',
-            'Please complete your profile to access the app',
-            snackPosition: SnackPosition.BOTTOM,
+          AppSnackbar.show(
+            message: 'Please complete your profile to access the app',
             duration: const Duration(seconds: 3),
           );
         }

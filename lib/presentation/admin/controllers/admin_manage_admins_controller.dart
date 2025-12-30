@@ -4,6 +4,7 @@ import 'package:ats/core/utils/app_texts/app_texts.dart';
 import 'package:ats/domain/repositories/admin_repository.dart';
 import 'package:ats/domain/entities/admin_profile_entity.dart';
 import 'package:ats/presentation/admin/controllers/admin_auth_controller.dart';
+import 'package:ats/core/widgets/app_widgets.dart';
 
 class AdminManageAdminsController extends GetxController {
   final AdminRepository adminRepository;
@@ -76,10 +77,7 @@ class AdminManageAdminsController extends GetxController {
   Future<void> changeRole(AdminProfileEntity profile) async {
     // Don't allow changing own role
     if (isCurrentUser(profile)) {
-      Get.snackbar(
-        AppTexts.error,
-        'You cannot change your own role',
-      );
+      AppSnackbar.error('You cannot change your own role');
       return;
     }
 
@@ -99,10 +97,7 @@ class AdminManageAdminsController extends GetxController {
 
     result.fold(
       (failure) {
-        Get.snackbar(
-          AppTexts.error,
-          AppTexts.roleChangeFailed,
-        );
+        AppSnackbar.error(AppTexts.roleChangeFailed);
       },
       (updatedProfile) {
         // Update the profile in the list
@@ -113,10 +108,7 @@ class AdminManageAdminsController extends GetxController {
           adminProfiles[index] = updatedProfile;
           _applyFilters();
         }
-        Get.snackbar(
-          AppTexts.success,
-          AppTexts.roleChanged,
-        );
+        AppSnackbar.success(AppTexts.roleChanged);
       },
     );
   }
@@ -125,10 +117,7 @@ class AdminManageAdminsController extends GetxController {
   Future<void> deleteUser(AdminProfileEntity profile) async {
     // Don't allow deleting own account
     if (isCurrentUser(profile)) {
-      Get.snackbar(
-        AppTexts.error,
-        'You cannot delete your own account',
-      );
+      AppSnackbar.error('You cannot delete your own account');
       return;
     }
 
@@ -143,10 +132,7 @@ class AdminManageAdminsController extends GetxController {
 
     result.fold(
       (failure) {
-        Get.snackbar(
-          AppTexts.error,
-          failure.message,
-        );
+        AppSnackbar.error(failure.message);
       },
       (_) {
         // Remove the profile from the list
@@ -154,10 +140,7 @@ class AdminManageAdminsController extends GetxController {
           (p) => p.profileId == profile.profileId,
         );
         _applyFilters();
-        Get.snackbar(
-          AppTexts.success,
-          'User deleted successfully',
-        );
+        AppSnackbar.success('User deleted successfully');
       },
     );
   }

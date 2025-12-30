@@ -54,6 +54,7 @@ export 'documents/app_document_viewer.dart';
 
 // Common widgets (info messages)
 export 'common/app_info_message.dart';
+export 'common/app_snackbar.dart';
 
 // Jobs widgets (required documents)
 export 'jobs/app_required_documents_list.dart';

@@ -7,6 +7,7 @@ import 'package:ats/domain/entities/job_entity.dart';
 import 'package:ats/domain/usecases/job/create_job_usecase.dart';
 import 'package:ats/domain/usecases/job/update_job_usecase.dart';
 import 'package:ats/domain/usecases/job/delete_job_usecase.dart';
+import 'package:ats/core/widgets/app_widgets.dart';
 
 class AdminJobsController extends GetxController {
   final JobRepository jobRepository;
@@ -139,11 +140,11 @@ class AdminJobsController extends GetxController {
       (failure) {
         errorMessage.value = failure.message;
         isLoading.value = false;
-        Get.snackbar('Error', failure.message);
+        AppSnackbar.error(failure.message);
       },
       (job) {
         isLoading.value = false;
-        Get.snackbar('Success', 'Job created successfully');
+        AppSnackbar.success('Job created successfully');
         Get.offNamedUntil(
           AppConstants.routeAdminJobs,
           (route) => route.settings.name == AppConstants.routeAdminJobs,
@@ -186,11 +187,11 @@ class AdminJobsController extends GetxController {
       (failure) {
         errorMessage.value = failure.message;
         isLoading.value = false;
-        Get.snackbar('Error', failure.message);
+        AppSnackbar.error(failure.message);
       },
       (job) {
         isLoading.value = false;
-        Get.snackbar('Success', 'Job updated successfully');
+        AppSnackbar.success('Job updated successfully');
         Get.offNamedUntil(
           AppConstants.routeAdminJobs,
           (route) => route.settings.name == AppConstants.routeAdminJobs,
@@ -212,11 +213,11 @@ class AdminJobsController extends GetxController {
       (failure) {
         errorMessage.value = failure.message;
         isLoading.value = false;
-        Get.snackbar('Error', failure.message);
+        AppSnackbar.error(failure.message);
       },
       (job) {
         isLoading.value = false;
-        Get.snackbar('Success', 'Job status updated successfully');
+        AppSnackbar.success('Job status updated successfully');
       },
     );
   }
@@ -231,34 +232,34 @@ class AdminJobsController extends GetxController {
       (failure) {
         errorMessage.value = failure.message;
         isLoading.value = false;
-        Get.snackbar('Error', failure.message);
+        AppSnackbar.error(failure.message);
       },
       (_) {
         isLoading.value = false;
-        Get.snackbar('Success', 'Job deleted successfully');
+        AppSnackbar.success('Job deleted successfully');
       },
     );
   }
 
   bool _validateJob(String title, String description, String requirements) {
     if (title.trim().isEmpty) {
-      Get.snackbar('Error', 'Job title is required');
+      AppSnackbar.error('Job title is required');
       return false;
     }
     if (title.trim().length < 3) {
-      Get.snackbar('Error', 'Job title must be at least 3 characters');
+      AppSnackbar.error('Job title must be at least 3 characters');
       return false;
     }
     if (description.trim().isEmpty) {
-      Get.snackbar('Error', 'Job description is required');
+      AppSnackbar.error('Job description is required');
       return false;
     }
     if (description.trim().length < 10) {
-      Get.snackbar('Error', 'Job description must be at least 10 characters');
+      AppSnackbar.error('Job description must be at least 10 characters');
       return false;
     }
     if (requirements.trim().isEmpty) {
-      Get.snackbar('Error', 'Requirements are required');
+      AppSnackbar.error('Requirements are required');
       return false;
     }
     return true;

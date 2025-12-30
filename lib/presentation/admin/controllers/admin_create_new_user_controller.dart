@@ -5,6 +5,7 @@ import 'package:ats/core/constants/app_constants.dart';
 import 'package:ats/domain/repositories/admin_repository.dart';
 import 'package:ats/domain/usecases/admin/create_admin_usecase.dart';
 import 'package:ats/presentation/admin/controllers/admin_manage_admins_controller.dart';
+import 'package:ats/core/widgets/app_widgets.dart';
 
 class AdminCreateNewUserController extends GetxController {
   final AdminRepository adminRepository;
@@ -97,7 +98,7 @@ class AdminCreateNewUserController extends GetxController {
       (failure) {
         errorMessage.value = failure.message;
         isLoading.value = false;
-        Get.snackbar('Error', failure.message);
+        AppSnackbar.error(failure.message);
       },
       (adminProfile) {
         isLoading.value = false;
@@ -115,10 +116,7 @@ class AdminCreateNewUserController extends GetxController {
         passwordError.value = null;
         roleError.value = null;
         
-        Get.snackbar(
-          'Success',
-          '${roleValue.value == 'admin' ? 'Admin' : 'Recruiter'} created successfully',
-        );
+        AppSnackbar.success('${roleValue.value == 'admin' ? 'Admin' : 'Recruiter'} created successfully');
         // Navigate to AdminManageAdminsScreen instead of going back
         // Note: The repository will sign out the newly created user to prevent auto-login
         Get.offNamed(AppConstants.routeAdminManageAdmins);

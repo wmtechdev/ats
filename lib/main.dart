@@ -10,5 +10,5 @@ import 'package:ats/core/app/ats_app.dart';
 /// - `main_admin.dart` for admin-only app
 void main() async {
   await AppInitializer.initialize();
-  runApp(const ATSApp(appType: AppType.admin));
+  runApp(const ATSApp(appType: AppType.candidate));
 }

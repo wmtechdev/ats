@@ -13,6 +13,7 @@ import 'package:ats/domain/entities/job_entity.dart';
 import 'package:ats/domain/usecases/application/update_application_status_usecase.dart';
 import 'package:ats/domain/usecases/document/update_document_status_usecase.dart';
 import 'package:ats/core/constants/app_constants.dart';
+import 'package:ats/core/widgets/app_widgets.dart';
 
 class AdminCandidatesController extends GetxController {
   final AdminRepository adminRepository;
@@ -198,7 +199,7 @@ class AdminCandidatesController extends GetxController {
       },
       (document) {
         isLoading.value = false;
-        Get.snackbar('Success', 'Document status updated');
+        AppSnackbar.success('Document status updated');
       },
     );
   }
@@ -220,17 +221,17 @@ class AdminCandidatesController extends GetxController {
         (failure) {
           errorMessage.value = failure.message;
           isLoading.value = false;
-          Get.snackbar('Error', failure.message);
+          AppSnackbar.error(failure.message);
         },
         (application) {
           isLoading.value = false;
-          Get.snackbar('Success', 'Application status updated');
+          AppSnackbar.success('Application status updated');
         },
       );
     } catch (e) {
       errorMessage.value = 'Failed to update application status: $e';
       isLoading.value = false;
-      Get.snackbar('Error', 'Failed to update application status: $e');
+      AppSnackbar.error('Failed to update application status: $e');
     }
   }
 

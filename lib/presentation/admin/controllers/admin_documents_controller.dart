@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:ats/core/constants/app_constants.dart';
 import 'package:ats/domain/repositories/document_repository.dart';
 import 'package:ats/domain/entities/document_type_entity.dart';
+import 'package:ats/core/widgets/app_widgets.dart';
 
 class AdminDocumentsController extends GetxController {
   final DocumentRepository documentRepository;
@@ -86,7 +87,7 @@ class AdminDocumentsController extends GetxController {
       },
       (docType) {
         isLoading.value = false;
-        Get.snackbar('Success', 'Document type created successfully');
+        AppSnackbar.success('Document type created successfully');
         Get.offNamedUntil(
           AppConstants.routeAdminDocumentTypes,
           (route) => route.settings.name == AppConstants.routeAdminDocumentTypes,
@@ -118,7 +119,7 @@ class AdminDocumentsController extends GetxController {
       },
       (docType) {
         isLoading.value = false;
-        Get.snackbar('Success', 'Document type updated successfully');
+        AppSnackbar.success('Document type updated successfully');
         Get.offNamedUntil(
           AppConstants.routeAdminDocumentTypes,
           (route) => route.settings.name == AppConstants.routeAdminDocumentTypes,
@@ -140,7 +141,7 @@ class AdminDocumentsController extends GetxController {
       },
       (_) {
         isLoading.value = false;
-        Get.snackbar('Success', 'Document type deleted successfully');
+        AppSnackbar.success('Document type deleted successfully');
       },
     );
   }
