@@ -17,6 +17,14 @@ abstract class FirebaseFunctionsDataSource {
     required String userId,
     required String profileId,
   });
+
+  /// Sends a document denial email to a candidate
+  Future<void> sendDocumentDenialEmail({
+    required String candidateEmail,
+    required String candidateName,
+    required String documentName,
+    String? denialReason,
+  });
 }
 
 class FirebaseFunctionsDataSourceImpl implements FirebaseFunctionsDataSource {
@@ -62,6 +70,28 @@ class FirebaseFunctionsDataSourceImpl implements FirebaseFunctionsDataSource {
       });
     } on FirebaseFunctionsException catch (e) {
       throw ServerException('Failed to delete user: ${e.message}');
+    } catch (e) {
+      throw ServerException('An unexpected error occurred: $e');
+    }
+  }
+
+  @override
+  Future<void> sendDocumentDenialEmail({
+    required String candidateEmail,
+    required String candidateName,
+    required String documentName,
+    String? denialReason,
+  }) async {
+    try {
+      final callable = firebaseFunctions.httpsCallable('sendDocumentDenialEmail');
+      await callable.call({
+        'candidateEmail': candidateEmail,
+        'candidateName': candidateName,
+        'documentName': documentName,
+        'denialReason': denialReason,
+      });
+    } on FirebaseFunctionsException catch (e) {
+      throw ServerException('Failed to send email: ${e.message}');
     } catch (e) {
       throw ServerException('An unexpected error occurred: $e');
     }

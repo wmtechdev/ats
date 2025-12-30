@@ -204,4 +204,12 @@ class AppTexts {
   static const String deleteDocument = "Delete Document";
   static const String areYouSureDeleteDocument = "Are you sure you want to delete this document?";
   static const String reapply = "Re-apply";
+  static const String denyDocument = "Deny Document";
+  static const String denyDocumentConfirmation = "Are you sure you want to deny this document? An email will be sent to the candidate.";
+  static const String denialReason = "Denial Reason";
+  static const String denialReasonHint = "Enter the reason for denial (optional)";
+  static const String optional = "Optional";
+  static const String documentDenied = "Document denied successfully";
+  static const String emailSent = "Email sent successfully";
+  static const String emailFailed = "Failed to send email";
 }

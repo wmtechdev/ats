@@ -90,9 +90,18 @@ class AdminCandidateDetailsScreen extends StatelessWidget {
                     AppCandidateDocumentsList(
                       documents: controller.candidateDocuments,
                       onStatusUpdate: (candidateDocId, status) {
+                        // For approve, use regular status update
                         controller.updateDocumentStatus(
                           candidateDocId: candidateDocId,
                           status: status,
+                        );
+                      },
+                      onDeny: (candidateDocId, status, denialReason) {
+                        // For deny, use email sending flow
+                        controller.denyDocumentWithEmail(
+                          candidateDocId: candidateDocId,
+                          status: status,
+                          denialReason: denialReason,
                         );
                       },
                       onView: (storageUrl) {

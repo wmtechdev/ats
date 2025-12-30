@@ -13,12 +13,14 @@ import 'package:ats/data/repositories/document_repository_impl.dart';
 import 'package:ats/data/repositories/application_repository_impl.dart';
 import 'package:ats/data/repositories/admin_repository_impl.dart';
 import 'package:ats/data/repositories/candidate_profile_repository_impl.dart';
+import 'package:ats/data/repositories/email_repository_impl.dart';
 import 'package:ats/domain/repositories/admin_auth_repository.dart';
 import 'package:ats/domain/repositories/job_repository.dart';
 import 'package:ats/domain/repositories/document_repository.dart';
 import 'package:ats/domain/repositories/application_repository.dart';
 import 'package:ats/domain/repositories/admin_repository.dart';
 import 'package:ats/domain/repositories/candidate_profile_repository.dart';
+import 'package:ats/domain/repositories/email_repository.dart';
 import 'package:ats/presentation/admin/controllers/admin_auth_controller.dart';
 import 'package:ats/presentation/admin/controllers/admin_dashboard_controller.dart';
 import 'package:ats/presentation/admin/controllers/admin_jobs_controller.dart';
@@ -55,6 +57,7 @@ class AdminBindings extends Bindings {
       functionsDataSource: functionsDataSource, // Use Firebase Functions for admin operations
     );
     final candidateProfileRepo = CandidateProfileRepositoryImpl(firestoreDataSource);
+    final emailRepo = EmailRepositoryImpl(functionsDataSource: functionsDataSource);
 
     // Register repositories
     Get.lazyPut<AdminAuthRepository>(() => adminAuthRepo);
@@ -63,6 +66,7 @@ class AdminBindings extends Bindings {
     Get.lazyPut<ApplicationRepository>(() => applicationRepo);
     Get.lazyPut<AdminRepository>(() => adminRepo);
     Get.lazyPut<CandidateProfileRepository>(() => candidateProfileRepo);
+    Get.lazyPut<EmailRepository>(() => emailRepo);
 
     // Controllers
     Get.lazyPut(() => AdminAuthController(adminAuthRepo, adminRepo));

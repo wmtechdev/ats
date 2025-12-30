@@ -5,6 +5,7 @@ import 'package:ats/domain/repositories/application_repository.dart';
 import 'package:ats/domain/repositories/document_repository.dart';
 import 'package:ats/domain/repositories/candidate_profile_repository.dart';
 import 'package:ats/domain/repositories/job_repository.dart';
+import 'package:ats/domain/repositories/email_repository.dart';
 import 'package:ats/domain/entities/user_entity.dart';
 import 'package:ats/domain/entities/application_entity.dart';
 import 'package:ats/domain/entities/candidate_document_entity.dart';
@@ -13,8 +14,10 @@ import 'package:ats/domain/entities/job_entity.dart';
 import 'package:ats/domain/entities/admin_profile_entity.dart';
 import 'package:ats/domain/usecases/application/update_application_status_usecase.dart';
 import 'package:ats/domain/usecases/document/update_document_status_usecase.dart';
+import 'package:ats/domain/usecases/email/send_document_denial_email_usecase.dart';
 import 'package:ats/core/constants/app_constants.dart';
 import 'package:ats/core/widgets/app_widgets.dart';
+import 'package:ats/core/utils/app_texts/app_texts.dart';
 import 'package:ats/presentation/admin/controllers/admin_auth_controller.dart';
 
 class AdminCandidatesController extends GetxController {
@@ -49,6 +52,7 @@ class AdminCandidatesController extends GetxController {
 
   late final UpdateApplicationStatusUseCase updateApplicationStatusUseCase;
   late final UpdateDocumentStatusUseCase updateDocumentStatusUseCase;
+  late final SendDocumentDenialEmailUseCase sendDocumentDenialEmailUseCase;
 
   // Stream subscriptions
   StreamSubscription<List<ApplicationEntity>>? _applicationsSubscription;
@@ -62,6 +66,7 @@ class AdminCandidatesController extends GetxController {
     // Initialize use cases after repositories are registered
     updateApplicationStatusUseCase = UpdateApplicationStatusUseCase(Get.find<ApplicationRepository>());
     updateDocumentStatusUseCase = UpdateDocumentStatusUseCase(Get.find<DocumentRepository>());
+    sendDocumentDenialEmailUseCase = SendDocumentDenialEmailUseCase(Get.find<EmailRepository>());
     loadCandidates();
     loadAvailableAgents();
     
@@ -228,6 +233,82 @@ class AdminCandidatesController extends GetxController {
       (document) {
         isLoading.value = false;
         AppSnackbar.success('Document status updated');
+      },
+    );
+  }
+
+  /// Denies a document and sends email notification to the candidate
+  /// Blocks the deny operation if email sending fails
+  Future<void> denyDocumentWithEmail({
+    required String candidateDocId,
+    required String status,
+    String? denialReason,
+  }) async {
+    isLoading.value = true;
+    errorMessage.value = '';
+
+    // Get candidate and document information
+    final candidate = selectedCandidate.value;
+    final profile = selectedCandidateProfile.value;
+    
+    if (candidate == null) {
+      errorMessage.value = 'Candidate not selected';
+      isLoading.value = false;
+      AppSnackbar.error('Candidate not selected');
+      return;
+    }
+
+    // Find the document
+    final document = candidateDocuments.firstWhere(
+      (doc) => doc.candidateDocId == candidateDocId,
+      orElse: () => candidateDocuments.first, // Fallback, but should not happen
+    );
+
+    final documentName = document.title ?? document.documentName;
+    final candidateEmail = candidate.email;
+    final candidateName = profile != null
+        ? '${profile.firstName} ${profile.lastName}'.trim()
+        : candidateEmail;
+
+    // Step 1: Send email first (as per requirement: block if email fails)
+    final emailResult = await sendDocumentDenialEmailUseCase(
+      candidateEmail: candidateEmail,
+      candidateName: candidateName,
+      documentName: documentName,
+      denialReason: denialReason,
+    );
+
+    emailResult.fold(
+      (failure) {
+        // Email failed - block the deny operation
+        errorMessage.value = failure.message;
+        isLoading.value = false;
+        AppSnackbar.error('${AppTexts.emailFailed}: ${failure.message}');
+      },
+      (_) {
+        // Email sent successfully - proceed with status update
+        _updateDocumentStatusAfterEmail(candidateDocId, status);
+      },
+    );
+  }
+
+  /// Updates document status after email is sent successfully
+  void _updateDocumentStatusAfterEmail(String candidateDocId, String status) async {
+    final result = await updateDocumentStatusUseCase(
+      candidateDocId: candidateDocId,
+      status: status,
+    );
+
+    result.fold(
+      (failure) {
+        errorMessage.value = failure.message;
+        isLoading.value = false;
+        AppSnackbar.error('Failed to update document status: ${failure.message}');
+      },
+      (document) {
+        isLoading.value = false;
+        AppSnackbar.success(AppTexts.documentDenied);
+        AppSnackbar.success(AppTexts.emailSent);
       },
     );
   }

@@ -6,16 +6,19 @@ import 'package:ats/core/utils/app_spacing/app_spacing.dart';
 import 'package:ats/core/utils/app_colors/app_colors.dart';
 import 'package:ats/domain/entities/candidate_document_entity.dart';
 import 'package:ats/core/widgets/app_widgets.dart';
+import 'package:ats/core/widgets/candidates/app_document_denial_dialog.dart';
 
 class AppCandidateDocumentsList extends StatelessWidget {
   final List<CandidateDocumentEntity> documents;
   final Function(String candidateDocId, String status) onStatusUpdate;
+  final Function(String candidateDocId, String status, String? denialReason)? onDeny;
   final Function(String storageUrl)? onView;
 
   const AppCandidateDocumentsList({
     super.key,
     required this.documents,
     required this.onStatusUpdate,
+    this.onDeny,
     this.onView,
   });
 
@@ -72,10 +75,29 @@ class AppCandidateDocumentsList extends StatelessWidget {
                 AppSpacing.horizontal(context, 0.01),
                 AppActionButton(
                   text: AppTexts.deny,
-                  onPressed: () => onStatusUpdate(
-                    doc.candidateDocId,
-                    AppConstants.documentStatusDenied,
-                  ),
+                  onPressed: () {
+                    final documentName = doc.title ?? doc.documentName;
+                    AppDocumentDenialDialog.show(
+                      documentName: documentName,
+                      onConfirm: (reason) {
+                        if (onDeny != null) {
+                          onDeny!(
+                            doc.candidateDocId,
+                            AppConstants.documentStatusDenied,
+                            reason,
+                          );
+                        } else {
+                          onStatusUpdate(
+                            doc.candidateDocId,
+                            AppConstants.documentStatusDenied,
+                          );
+                        }
+                      },
+                      onCancel: () {
+                        // User cancelled, do nothing
+                      },
+                    );
+                  },
                   backgroundColor: AppColors.error,
                   foregroundColor: AppColors.white,
                 ),
