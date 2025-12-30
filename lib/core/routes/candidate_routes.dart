@@ -17,6 +17,15 @@ class CandidateRoutes {
   static const String initial = AppConstants.routeLogin;
 
   static List<GetPage> get routes => [
+    // Root route redirect
+    GetPage(
+      name: '/',
+      page: () => const CandidateLoginScreen(),
+      binding: CandidateBindings(),
+      middlewares: [AuthMiddleware()],
+      transition: Transition.fadeIn,
+      transitionDuration: const Duration(milliseconds: 300),
+    ),
     // Candidate Auth Routes
     GetPage(
       name: AppConstants.routeLogin,

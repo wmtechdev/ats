@@ -19,6 +19,15 @@ class AdminRoutes {
   static const String initial = AppConstants.routeAdminLogin;
 
   static List<GetPage> get routes => [
+    // Root route redirect
+    GetPage(
+      name: '/',
+      page: () => const AdminLoginScreen(),
+      binding: AdminBindings(),
+      middlewares: [AuthMiddleware()],
+      transition: Transition.fadeIn,
+      transitionDuration: const Duration(milliseconds: 300),
+    ),
     // Admin Auth Routes
     GetPage(
       name: AppConstants.routeAdminLogin,
