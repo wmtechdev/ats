@@ -44,7 +44,7 @@ class AppJobCard extends StatelessWidget {
 
   String _buildSubtitle(BuildContext context) {
     final description = job.description.length > 50
-        ? job.description.substring(0, 50) + '...'
+        ? '${job.description.substring(0, 50)}...'
         : job.description;
     return '$description\n${AppTexts.applications}: $applicationCount';
   }

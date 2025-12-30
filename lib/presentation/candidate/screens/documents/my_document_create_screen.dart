@@ -5,7 +5,6 @@ import 'package:ats/presentation/candidate/controllers/documents_controller.dart
 import 'package:ats/core/utils/app_texts/app_texts.dart';
 import 'package:ats/core/utils/app_spacing/app_spacing.dart';
 import 'package:ats/core/widgets/app_widgets.dart';
-import 'package:ats/core/widgets/documents/app_document_upload_widget.dart';
 
 class MyDocumentCreateScreen extends StatefulWidget {
   const MyDocumentCreateScreen({super.key});

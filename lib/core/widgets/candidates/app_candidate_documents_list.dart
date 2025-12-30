@@ -6,7 +6,6 @@ import 'package:ats/core/utils/app_spacing/app_spacing.dart';
 import 'package:ats/core/utils/app_colors/app_colors.dart';
 import 'package:ats/domain/entities/candidate_document_entity.dart';
 import 'package:ats/core/widgets/app_widgets.dart';
-import 'package:ats/core/widgets/candidates/app_document_denial_dialog.dart';
 
 class AppCandidateDocumentsList extends StatelessWidget {
   final List<CandidateDocumentEntity> documents;

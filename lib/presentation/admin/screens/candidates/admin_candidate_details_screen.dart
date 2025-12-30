@@ -6,7 +6,6 @@ import 'package:iconsax/iconsax.dart';
 import 'package:ats/presentation/admin/controllers/admin_candidates_controller.dart';
 import 'package:ats/core/utils/app_texts/app_texts.dart';
 import 'package:ats/core/widgets/app_widgets.dart';
-import 'package:ats/core/widgets/documents/app_document_viewer.dart';
 
 class AdminCandidateDetailsScreen extends StatelessWidget {
   const AdminCandidateDetailsScreen({super.key});

@@ -41,7 +41,7 @@ class AppCandidateProfileTable extends StatelessWidget {
         width: double.infinity,
         child: DataTable(
           columnSpacing: 20,
-          headingRowColor: MaterialStateProperty.all(AppColors.lightGrey),
+          headingRowColor: WidgetStateProperty.all(AppColors.lightGrey),
           columns: [
             DataColumn(
               label: Padding(
@@ -253,7 +253,7 @@ class AppCandidateProfileTable extends StatelessWidget {
           child: Text(
             'No agents available',
             style: AppTextStyles.bodyText(context).copyWith(
-              color: AppColors.secondary.withOpacity(0.5),
+              color: AppColors.secondary.withValues(alpha: 0.5),
               fontStyle: FontStyle.italic,
             ),
             overflow: TextOverflow.ellipsis,

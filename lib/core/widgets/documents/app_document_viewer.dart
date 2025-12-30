@@ -9,10 +9,13 @@ import 'package:ats/core/utils/app_responsive/app_responsive.dart';
 import 'package:ats/core/utils/app_texts/app_texts.dart';
 import 'package:ats/core/widgets/app_widgets.dart';
 
-// Conditional imports for web - use stubs for WebAssembly builds  
-import 'package:ats/core/widgets/documents/html_stub.dart' as html
-    if (dart.library.html) 'dart:html' show window, AnchorElement, IFrameElement, document;
-import 'package:ats/core/widgets/documents/ui_web_stub.dart' as ui_web
+// Conditional imports for web - use stubs for WebAssembly builds
+import 'package:ats/core/widgets/documents/html_stub.dart'
+    as html
+    if (dart.library.html) 'dart:html'
+    show window, AnchorElement, IFrameElement, document;
+import 'package:ats/core/widgets/documents/ui_web_stub.dart'
+    as ui_web
     if (dart.library.html) 'dart:ui_web';
 
 class AppDocumentViewer extends StatelessWidget {
@@ -26,15 +29,9 @@ class AppDocumentViewer extends StatelessWidget {
   });
 
   /// Shows the document viewer in a dialog
-  static void show({
-    required String documentUrl,
-    String? documentName,
-  }) {
+  static void show({required String documentUrl, String? documentName}) {
     Get.dialog(
-      AppDocumentViewer(
-        documentUrl: documentUrl,
-        documentName: documentName,
-      ),
+      AppDocumentViewer(documentUrl: documentUrl, documentName: documentName),
       barrierDismissible: true,
       barrierColor: Colors.black54,
     );
@@ -47,7 +44,9 @@ class AppDocumentViewer extends StatelessWidget {
     if (lowerUrl.contains('.jpg') || lowerUrl.contains('.jpeg')) return 'image';
     if (lowerUrl.contains('.png')) return 'image';
     if (lowerUrl.contains('.gif')) return 'image';
-    if (lowerUrl.contains('.doc') || lowerUrl.contains('.docx')) return 'document';
+    if (lowerUrl.contains('.doc') || lowerUrl.contains('.docx')) {
+      return 'document';
+    }
     if (lowerUrl.contains('.txt')) return 'text';
     return 'unknown';
   }
@@ -59,7 +58,9 @@ class AppDocumentViewer extends StatelessWidget {
     return Dialog(
       backgroundColor: AppColors.secondary,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(AppResponsive.radius(context, factor: 1.5)),
+        borderRadius: BorderRadius.circular(
+          AppResponsive.radius(context, factor: 1.5),
+        ),
       ),
       child: Container(
         width: AppResponsive.isMobile(context)
@@ -98,9 +99,7 @@ class AppDocumentViewer extends StatelessWidget {
             ),
             AppSpacing.vertical(context, 0.02),
             // Document content
-            Expanded(
-              child: _buildDocumentContent(context, fileType),
-            ),
+            Expanded(child: _buildDocumentContent(context, fileType)),
             AppSpacing.vertical(context, 0.02),
             // Footer actions
             Wrap(
@@ -117,9 +116,9 @@ class AppDocumentViewer extends StatelessWidget {
                   ),
                   label: Text(
                     AppTexts.openInNewTab,
-                    style: AppTextStyles.bodyText(context).copyWith(
-                      color: AppColors.primary,
-                    ),
+                    style: AppTextStyles.bodyText(
+                      context,
+                    ).copyWith(color: AppColors.primary),
                   ),
                 ),
                 TextButton.icon(
@@ -131,9 +130,9 @@ class AppDocumentViewer extends StatelessWidget {
                   ),
                   label: Text(
                     AppTexts.download,
-                    style: AppTextStyles.bodyText(context).copyWith(
-                      color: AppColors.primary,
-                    ),
+                    style: AppTextStyles.bodyText(
+                      context,
+                    ).copyWith(color: AppColors.primary),
                   ),
                 ),
               ],
@@ -163,25 +162,22 @@ class AppDocumentViewer extends StatelessWidget {
     if (kIsWeb) {
       // Use iframe for web PDF viewing
       final iframeId = 'pdf-viewer-${DateTime.now().millisecondsSinceEpoch}';
-      
+
       // Register the iframe
-      ui_web.platformViewRegistry.registerViewFactory(
-        iframeId,
-        (int viewId) {
-          final iframe = html.IFrameElement()
-            ..src = documentUrl
-            ..style.border = 'none'
-            ..style.width = '100%'
-            ..style.height = '100%';
-          return iframe;
-        },
-      );
+      ui_web.platformViewRegistry.registerViewFactory(iframeId, (int viewId) {
+        final iframe = html.IFrameElement()
+          ..src = documentUrl
+          ..style.border = 'none'
+          ..style.width = '100%'
+          ..style.height = '100%';
+        return iframe;
+      });
 
       return Container(
         decoration: BoxDecoration(
           color: AppColors.white,
           borderRadius: BorderRadius.circular(AppResponsive.radius(context)),
-          border: Border.all(color: AppColors.grey.withOpacity(0.3)),
+          border: Border.all(color: AppColors.grey.withValues(alpha: 0.3)),
         ),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(AppResponsive.radius(context)),
@@ -202,9 +198,9 @@ class AppDocumentViewer extends StatelessWidget {
             AppSpacing.vertical(context, 0.02),
             Text(
               AppTexts.pdfViewerNotAvailable,
-              style: AppTextStyles.bodyText(context).copyWith(
-                color: AppColors.white,
-              ),
+              style: AppTextStyles.bodyText(
+                context,
+              ).copyWith(color: AppColors.white),
               textAlign: TextAlign.center,
             ),
             AppSpacing.vertical(context, 0.02),
@@ -224,7 +220,7 @@ class AppDocumentViewer extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.white,
         borderRadius: BorderRadius.circular(AppResponsive.radius(context)),
-        border: Border.all(color: AppColors.grey.withOpacity(0.3)),
+        border: Border.all(color: AppColors.grey.withValues(alpha: 0.3)),
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(AppResponsive.radius(context)),
@@ -240,7 +236,7 @@ class AppDocumentViewer extends StatelessWidget {
                 child: CircularProgressIndicator(
                   value: loadingProgress.expectedTotalBytes != null
                       ? loadingProgress.cumulativeBytesLoaded /
-                          loadingProgress.expectedTotalBytes!
+                            loadingProgress.expectedTotalBytes!
                       : null,
                   color: AppColors.primary,
                 ),
@@ -259,9 +255,9 @@ class AppDocumentViewer extends StatelessWidget {
                     AppSpacing.vertical(context, 0.01),
                     Text(
                       AppTexts.failedToLoadImage,
-                      style: AppTextStyles.bodyText(context).copyWith(
-                        color: AppColors.error,
-                      ),
+                      style: AppTextStyles.bodyText(
+                        context,
+                      ).copyWith(color: AppColors.error),
                     ),
                   ],
                 ),
@@ -295,9 +291,9 @@ class AppDocumentViewer extends StatelessWidget {
                 AppSpacing.vertical(context, 0.01),
                 Text(
                   AppTexts.failedToLoadDocument,
-                  style: AppTextStyles.bodyText(context).copyWith(
-                    color: AppColors.error,
-                  ),
+                  style: AppTextStyles.bodyText(
+                    context,
+                  ).copyWith(color: AppColors.error),
                 ),
               ],
             ),
@@ -307,16 +303,15 @@ class AppDocumentViewer extends StatelessWidget {
           decoration: BoxDecoration(
             color: AppColors.white,
             borderRadius: BorderRadius.circular(AppResponsive.radius(context)),
-            border: Border.all(color: AppColors.grey.withOpacity(0.3)),
+            border: Border.all(color: AppColors.grey.withValues(alpha: 0.3)),
           ),
           padding: AppSpacing.all(context),
           child: SingleChildScrollView(
             child: Text(
               snapshot.data ?? '',
-              style: AppTextStyles.bodyText(context).copyWith(
-                color: AppColors.black,
-                fontFamily: 'monospace',
-              ),
+              style: AppTextStyles.bodyText(
+                context,
+              ).copyWith(color: AppColors.black, fontFamily: 'monospace'),
             ),
           ),
         );
@@ -337,9 +332,9 @@ class AppDocumentViewer extends StatelessWidget {
           AppSpacing.vertical(context, 0.02),
           Text(
             AppTexts.documentPreviewNotAvailable,
-            style: AppTextStyles.bodyText(context).copyWith(
-              color: AppColors.white,
-            ),
+            style: AppTextStyles.bodyText(
+              context,
+            ).copyWith(color: AppColors.white),
             textAlign: TextAlign.center,
           ),
           AppSpacing.vertical(context, 0.02),
@@ -366,9 +361,9 @@ class AppDocumentViewer extends StatelessWidget {
           AppSpacing.vertical(context, 0.02),
           Text(
             AppTexts.documentTypeNotSupported,
-            style: AppTextStyles.bodyText(context).copyWith(
-              color: AppColors.white,
-            ),
+            style: AppTextStyles.bodyText(
+              context,
+            ).copyWith(color: AppColors.white),
             textAlign: TextAlign.center,
           ),
           AppSpacing.vertical(context, 0.02),
@@ -413,8 +408,9 @@ class AppDocumentViewer extends StatelessWidget {
       anchor.click();
       anchor.remove();
     } else {
-      AppSnackbar.info('Download functionality not available on mobile. Please use the browser.');
+      AppSnackbar.info(
+        'Download functionality not available on mobile. Please use the browser.',
+      );
     }
   }
 }
-

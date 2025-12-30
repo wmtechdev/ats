@@ -35,12 +35,12 @@ class AnchorElement {
 
 class IFrameElement {
   String? src;
-  final _Style style = _Style();
+  final Style style = Style();
   
   IFrameElement();
 }
 
-class _Style {
+class Style {
   String? border;
   String? width;
   String? height;

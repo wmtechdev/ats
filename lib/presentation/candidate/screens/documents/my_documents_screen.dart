@@ -109,7 +109,7 @@ class MyDocumentsScreen extends StatelessWidget {
                                       children: [
                                         LinearProgressIndicator(
                                           value: currentProgress,
-                                          backgroundColor: AppColors.grey.withOpacity(0.2),
+                                          backgroundColor: AppColors.grey.withValues(alpha: 0.2),
                                           valueColor: AlwaysStoppedAnimation<Color>(
                                             AppColors.primary,
                                           ),

@@ -91,7 +91,7 @@ class AppDocumentUploadWidget extends StatelessWidget {
                       AppSpacing.vertical(context, 0.01),
                       LinearProgressIndicator(
                         value: uploadProgress,
-                        backgroundColor: AppColors.grey.withOpacity(0.2),
+                        backgroundColor: AppColors.grey.withValues(alpha: 0.2),
                         valueColor: AlwaysStoppedAnimation<Color>(
                             AppColors.primary),
                         minHeight: 6,

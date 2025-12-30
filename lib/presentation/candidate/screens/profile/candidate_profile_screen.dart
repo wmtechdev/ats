@@ -62,7 +62,9 @@ class _CandidateProfileScreenState extends State<CandidateProfileScreen> {
               workHistoryControllers.length != profile.workHistory!.length) {
             // Clear existing and rebuild
             for (var entry in workHistoryControllers) {
-              entry.values.forEach((controller) => controller.dispose());
+              for (var controller in entry.values) {
+                controller.dispose();
+              }
             }
             workHistoryControllers.clear();
 
@@ -75,7 +77,9 @@ class _CandidateProfileScreenState extends State<CandidateProfileScreen> {
         } else if (workHistoryControllers.isNotEmpty) {
           // If profile has no work history but controllers exist, clear them
           for (var entry in workHistoryControllers) {
-            entry.values.forEach((controller) => controller.dispose());
+            for (var controller in entry.values) {
+              controller.dispose();
+            }
           }
           workHistoryControllers.clear();
           if (mounted) setState(() {});
@@ -87,13 +91,18 @@ class _CandidateProfileScreenState extends State<CandidateProfileScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (controller.profile.value != null && mounted) {
         final profile = controller.profile.value!;
-        if (firstNameController.text.isEmpty)
+        if (firstNameController.text.isEmpty) {
           firstNameController.text = profile.firstName;
-        if (lastNameController.text.isEmpty)
+        }
+        if (lastNameController.text.isEmpty) {
           lastNameController.text = profile.lastName;
-        if (phoneController.text.isEmpty) phoneController.text = profile.phone;
-        if (addressController.text.isEmpty)
+        }
+        if (phoneController.text.isEmpty) {
+          phoneController.text = profile.phone;
+        }
+        if (addressController.text.isEmpty) {
           addressController.text = profile.address;
+        }
 
         // Load work history if available and controllers are empty
         if (profile.workHistory != null &&
@@ -116,7 +125,9 @@ class _CandidateProfileScreenState extends State<CandidateProfileScreen> {
     phoneController.dispose();
     addressController.dispose();
     for (var entry in workHistoryControllers) {
-      entry.values.forEach((controller) => controller.dispose());
+      for (var controller in entry.values) {
+        controller.dispose();
+      }
     }
     super.dispose();
   }
@@ -133,9 +144,9 @@ class _CandidateProfileScreenState extends State<CandidateProfileScreen> {
 
   void _removeWorkHistoryEntry(int index) {
     setState(() {
-      workHistoryControllers[index].values.forEach(
-        (controller) => controller.dispose(),
-      );
+      for (var controller in workHistoryControllers[index].values) {
+        controller.dispose();
+      }
       workHistoryControllers.removeAt(index);
       // Clear validation errors for this entry
       controller.clearWorkHistoryEntryErrors(index);
