@@ -10,6 +10,7 @@ class CandidateProfileModel extends CandidateProfileEntity {
     required super.phone,
     required super.address,
     super.workHistory,
+    super.assignedAgentId,
   });
 
   factory CandidateProfileModel.fromFirestore(DocumentSnapshot doc) {
@@ -24,6 +25,7 @@ class CandidateProfileModel extends CandidateProfileEntity {
       workHistory: data['workHistory'] != null
           ? List<Map<String, dynamic>>.from(data['workHistory'])
           : null,
+      assignedAgentId: data['assignedAgentId'] as String?,
     );
   }
 
@@ -35,6 +37,7 @@ class CandidateProfileModel extends CandidateProfileEntity {
       'phone': phone,
       'address': address,
       if (workHistory != null) 'workHistory': workHistory,
+      if (assignedAgentId != null) 'assignedAgentId': assignedAgentId,
     };
   }
 
@@ -47,6 +50,7 @@ class CandidateProfileModel extends CandidateProfileEntity {
       phone: phone,
       address: address,
       workHistory: workHistory,
+      assignedAgentId: assignedAgentId,
     );
   }
 }

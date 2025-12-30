@@ -116,6 +116,7 @@ class AppTexts {
   static const String searchCandidates = "Search candidates by name, email, company, or position...";
   static const String role = "Role";
   static const String applicationStatusUpdated = "Application status updated";
+  static const String agent = "Agent";
 
   // Admins
   static const String manageAdmins = "Manage Admins";

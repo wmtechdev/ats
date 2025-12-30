@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:ats/core/constants/app_constants.dart';
 import 'package:ats/presentation/admin/controllers/admin_candidates_controller.dart';
+import 'package:ats/presentation/admin/controllers/admin_auth_controller.dart';
 import 'package:ats/core/utils/app_texts/app_texts.dart';
 import 'package:ats/core/widgets/app_widgets.dart';
 
@@ -27,6 +28,14 @@ class AdminCandidatesListScreen extends StatelessWidget {
           // Candidates List
           Expanded(
             child: Obx(() {
+              // Observe admin profile to rebuild when it loads (for role-based filtering)
+              try {
+                final authController = Get.find<AdminAuthController>();
+                authController.currentAdminProfile.value;
+              } catch (e) {
+                // AdminAuthController not found, continue
+              }
+
               if (controller.candidates.isEmpty) {
                 return AppEmptyState(
                   message: AppTexts.noCandidatesAvailable,
@@ -48,12 +57,23 @@ class AdminCandidatesListScreen extends StatelessWidget {
                 controller.candidateDocumentsMap[candidate.userId];
               }
 
+              // Observe availableAgents to rebuild when agents load
+              final agents = controller.availableAgents.toList();
+
               return AppCandidatesTable(
                 candidates: controller.filteredCandidates,
                 getName: (userId) => controller.getCandidateName(userId),
                 getCompany: (userId) => controller.getCandidateCompany(userId),
                 getPosition: (userId) => controller.getCandidatePosition(userId),
                 getStatus: (userId) => controller.getCandidateStatus(userId),
+                getAgentName: (userId) => controller.getCandidateAgentName(userId),
+                getAssignedAgentProfileId: (userId) => controller.getAssignedAgentProfileId(userId),
+                isSuperAdmin: controller.isSuperAdmin,
+                availableAgents: agents,
+                onAgentChanged: (userId, agentId) => controller.updateCandidateAgent(
+                  userId: userId,
+                  agentId: agentId,
+                ),
                 onCandidateTap: (candidate) {
                   controller.selectCandidate(candidate);
                   Get.toNamed(AppConstants.routeAdminCandidateDetails);

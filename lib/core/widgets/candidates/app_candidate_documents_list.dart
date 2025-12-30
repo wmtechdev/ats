@@ -46,9 +46,7 @@ class AppCandidateDocumentsList extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               // Show only status chip when document is approved
-              if (isApproved) ...[
-                AppStatusChip(status: doc.status),
-              ],
+              if (isApproved) ...[AppStatusChip(status: doc.status)],
               // Show view/approve/deny buttons only when document is pending
               if (isPending) ...[
                 AppActionButton(
@@ -103,4 +101,3 @@ class AppCandidateDocumentsList extends StatelessWidget {
     );
   }
 }
-

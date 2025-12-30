@@ -19,6 +19,7 @@ abstract class CandidateProfileRepository {
     String? phone,
     String? address,
     List<Map<String, dynamic>>? workHistory,
+    String? assignedAgentId,
   });
 
   Future<Either<Failure, CandidateProfileEntity>> getProfile(String userId);

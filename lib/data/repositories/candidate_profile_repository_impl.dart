@@ -59,6 +59,7 @@ class CandidateProfileRepositoryImpl implements CandidateProfileRepository {
         phone: profileData['phone'] ?? phone,
         address: profileData['address'] ?? address,
         workHistory: _parseWorkHistory(profileData['workHistory']),
+        assignedAgentId: profileData['assignedAgentId'] as String?,
       );
 
       return Right(profileModel.toEntity());
@@ -77,6 +78,7 @@ class CandidateProfileRepositoryImpl implements CandidateProfileRepository {
     String? phone,
     String? address,
     List<Map<String, dynamic>>? workHistory,
+    String? assignedAgentId,
   }) async {
     try {
       final updateData = <String, dynamic>{};
@@ -85,6 +87,11 @@ class CandidateProfileRepositoryImpl implements CandidateProfileRepository {
       if (phone != null) updateData['phone'] = phone;
       if (address != null) updateData['address'] = address;
       if (workHistory != null) updateData['workHistory'] = workHistory;
+      // Handle assignedAgentId: if provided (not null), include it in update
+      // Empty string means unassign (set to null), otherwise use the value
+      if (assignedAgentId != null) {
+        updateData['assignedAgentId'] = assignedAgentId.isEmpty ? null : assignedAgentId;
+      }
 
       await firestoreDataSource.updateCandidateProfile(
         profileId: profileId,
@@ -104,6 +111,7 @@ class CandidateProfileRepositoryImpl implements CandidateProfileRepository {
         phone: profileData['phone'] ?? '',
         address: profileData['address'] ?? '',
         workHistory: _parseWorkHistory(profileData['workHistory']),
+        assignedAgentId: profileData['assignedAgentId'] as String?,
       );
 
       return Right(profileModel.toEntity());
@@ -137,6 +145,7 @@ class CandidateProfileRepositoryImpl implements CandidateProfileRepository {
         phone: profileData['phone'] ?? '',
         address: profileData['address'] ?? '',
         workHistory: _parseWorkHistory(profileData['workHistory']),
+        assignedAgentId: profileData['assignedAgentId'] as String?,
       );
 
       return Right(profileModel.toEntity());
@@ -159,6 +168,7 @@ class CandidateProfileRepositoryImpl implements CandidateProfileRepository {
         phone: data['phone'] ?? '',
         address: data['address'] ?? '',
         workHistory: _parseWorkHistory(data['workHistory']),
+        assignedAgentId: data['assignedAgentId'] as String?,
       ).toEntity();
     });
   }

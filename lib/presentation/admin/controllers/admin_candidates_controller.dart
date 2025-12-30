@@ -10,10 +10,12 @@ import 'package:ats/domain/entities/application_entity.dart';
 import 'package:ats/domain/entities/candidate_document_entity.dart';
 import 'package:ats/domain/entities/candidate_profile_entity.dart';
 import 'package:ats/domain/entities/job_entity.dart';
+import 'package:ats/domain/entities/admin_profile_entity.dart';
 import 'package:ats/domain/usecases/application/update_application_status_usecase.dart';
 import 'package:ats/domain/usecases/document/update_document_status_usecase.dart';
 import 'package:ats/core/constants/app_constants.dart';
 import 'package:ats/core/widgets/app_widgets.dart';
+import 'package:ats/presentation/admin/controllers/admin_auth_controller.dart';
 
 class AdminCandidatesController extends GetxController {
   final AdminRepository adminRepository;
@@ -42,6 +44,8 @@ class AdminCandidatesController extends GetxController {
   final candidateApplications = <ApplicationEntity>[].obs;
   final candidateDocuments = <CandidateDocumentEntity>[].obs;
   final applicationJobs = <String, JobEntity?>{}.obs;
+  final availableAgents = <AdminProfileEntity>[].obs;
+  final candidateProfileStreams = <String, StreamSubscription<CandidateProfileEntity?>>{};
 
   late final UpdateApplicationStatusUseCase updateApplicationStatusUseCase;
   late final UpdateDocumentStatusUseCase updateDocumentStatusUseCase;
@@ -59,6 +63,18 @@ class AdminCandidatesController extends GetxController {
     updateApplicationStatusUseCase = UpdateApplicationStatusUseCase(Get.find<ApplicationRepository>());
     updateDocumentStatusUseCase = UpdateDocumentStatusUseCase(Get.find<DocumentRepository>());
     loadCandidates();
+    loadAvailableAgents();
+    
+    // Observe admin profile changes to re-apply filters when profile loads
+    try {
+      final authController = Get.find<AdminAuthController>();
+      ever(authController.currentAdminProfile, (_) {
+        // Re-apply filters when admin profile loads/changes
+        _applyFilters();
+      });
+    } catch (e) {
+      // AdminAuthController not found, continue
+    }
   }
 
   @override
@@ -70,7 +86,11 @@ class AdminCandidatesController extends GetxController {
     for (var subscription in _candidateDocumentsSubscriptions.values) {
       subscription.cancel();
     }
+    for (var subscription in candidateProfileStreams.values) {
+      subscription.cancel();
+    }
     _candidateDocumentsSubscriptions.clear();
+    candidateProfileStreams.clear();
     super.onClose();
   }
 
@@ -103,18 +123,26 @@ class AdminCandidatesController extends GetxController {
   }
 
   void loadCandidateProfile(String userId) {
-    candidateProfileRepository.getProfile(userId).then((result) {
-      result.fold(
-        (failure) => null,
-        (profile) {
+    // Cancel existing subscription if any
+    candidateProfileStreams[userId]?.cancel();
+    
+    // Use stream to get profile with profileId
+    final subscription = candidateProfileRepository
+        .streamProfile(userId)
+        .listen(
+      (profile) {
+        if (profile != null) {
           candidateProfiles[userId] = profile;
           candidateProfiles.refresh(); // Trigger reactivity
           _applyFilters(); // Re-apply filters when profile loads
-        },
-      );
-    }).catchError((error) {
-      // Silently handle errors
-    });
+        }
+      },
+      onError: (error) {
+        // Silently handle errors
+      },
+    );
+    
+    candidateProfileStreams[userId] = subscription;
   }
 
   void selectCandidate(UserEntity candidate) {
@@ -338,6 +366,24 @@ class AdminCandidatesController extends GetxController {
   void _applyFilters() {
     var filtered = List<UserEntity>.from(candidates);
 
+    // Apply role-based filtering
+    // Recruiters only see candidates assigned to them, admins see all candidates
+    if (!isSuperAdmin) {
+      // User is a recruiter - only show candidates assigned to this recruiter
+      final recruiterProfileId = currentUserProfileId;
+      if (recruiterProfileId != null && recruiterProfileId.isNotEmpty) {
+        filtered = filtered.where((candidate) {
+          final profile = candidateProfiles[candidate.userId];
+          // Show candidate if assignedAgentId matches recruiter's profileId
+          return profile?.assignedAgentId == recruiterProfileId;
+        }).toList();
+      } else {
+        // If profileId not available, show no candidates for recruiter
+        filtered = [];
+      }
+    }
+    // If super_admin, show all candidates (no filtering by agent)
+
     // Apply search filter
     if (searchQuery.value.isNotEmpty) {
       final query = searchQuery.value.toLowerCase();
@@ -370,6 +416,135 @@ class AdminCandidatesController extends GetxController {
     }
 
     filteredCandidates.value = filtered;
+  }
+
+  // Agent assignment methods
+  /// Loads all admin profiles (both super_admin and recruiter) from Firestore
+  /// These profiles are used to populate the agent dropdown in the candidates table.
+  /// Source: adminProfilesCollection in Firestore
+  /// Each profile contains: userId, name (firstName + lastName), accessLevel, email
+  void loadAvailableAgents() {
+    adminRepository.getAllAdminProfiles().then((result) {
+      result.fold(
+        (failure) {
+          AppSnackbar.error('Failed to load agents: ${failure.message}');
+        },
+        (profiles) {
+          availableAgents.value = profiles;
+        },
+      );
+    }).catchError((error) {
+      AppSnackbar.error('Failed to load agents: $error');
+    });
+  }
+
+  /// Get list of available agent names (for debugging/info purposes)
+  List<String> getAvailableAgentNames() {
+    return availableAgents.map((agent) => agent.name).toList();
+  }
+
+  bool get isSuperAdmin {
+    try {
+      final authController = Get.find<AdminAuthController>();
+      return authController.isSuperAdmin;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  /// Get current user's admin profile ID (document ID from adminProfiles collection)
+  String? get currentUserProfileId {
+    try {
+      final authController = Get.find<AdminAuthController>();
+      return authController.currentAdminProfile.value?.profileId;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  /// Get agent name by admin profile document ID (profileId)
+  /// assignedAgentId stores the profileId from adminProfiles collection
+  String? getAgentName(String? agentProfileId) {
+    if (agentProfileId == null || agentProfileId.isEmpty) return null;
+    try {
+      final agent = availableAgents.firstWhere(
+        (a) => a.profileId == agentProfileId,
+        orElse: () => AdminProfileEntity(
+          profileId: '',
+          userId: '',
+          name: '',
+          accessLevel: '',
+          email: '',
+        ),
+      );
+      return agent.name.isNotEmpty ? agent.name : null;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  String getCandidateAgentName(String userId) {
+    final profile = candidateProfiles[userId];
+    if (profile?.assignedAgentId == null || profile!.assignedAgentId!.isEmpty) {
+      return 'N/A';
+    }
+    return getAgentName(profile.assignedAgentId) ?? 'N/A';
+  }
+
+  /// Get the assigned agent profile ID (document ID from adminProfiles collection) for a candidate
+  String? getAssignedAgentProfileId(String userId) {
+    final profile = candidateProfiles[userId];
+    if (profile?.assignedAgentId == null || profile!.assignedAgentId!.isEmpty) {
+      return null;
+    }
+    return profile.assignedAgentId;
+  }
+
+  /// Update the assigned agent for a candidate
+  /// agentId should be the profileId (document ID) from adminProfiles collection
+  Future<void> updateCandidateAgent({
+    required String userId,
+    required String? agentId, // This is the profileId from adminProfiles collection
+  }) async {
+    final profile = candidateProfiles[userId];
+    if (profile == null) {
+      AppSnackbar.error('Candidate profile not found');
+      return;
+    }
+
+    // Get profileId - use from profile if available, otherwise try to get it
+    String profileId = profile.profileId;
+    if (profileId.isEmpty) {
+      // Try to get profileId from stream data
+      // For now, we'll need to query it or use a different approach
+      AppSnackbar.error('Unable to update agent: Profile ID not found');
+      return;
+    }
+
+    isLoading.value = true;
+    errorMessage.value = '';
+
+    // Convert null to empty string to represent unassign
+    final agentIdToUpdate = agentId ?? '';
+    
+    final result = await candidateProfileRepository.updateProfile(
+      profileId: profileId,
+      assignedAgentId: agentIdToUpdate,
+    );
+
+    result.fold(
+      (failure) {
+        errorMessage.value = failure.message;
+        isLoading.value = false;
+        AppSnackbar.error('Failed to update agent: ${failure.message}');
+      },
+      (updatedProfile) {
+        candidateProfiles[userId] = updatedProfile;
+        candidateProfiles.refresh();
+        isLoading.value = false;
+        AppSnackbar.success('Agent updated successfully');
+      },
+    );
   }
 }
 

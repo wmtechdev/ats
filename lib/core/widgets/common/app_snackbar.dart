@@ -38,7 +38,7 @@ class AppSnackbar {
             : AppResponsive.screenWidth(context) * 0.25,
         vertical: 16,
       ),
-      borderRadius: AppResponsive.radius(context),
+      borderRadius: AppResponsive.radius(context, factor: 5),
       padding: AppSpacing.symmetric(context, h: 0.02, v: 0.01),
       isDismissible: true,
       dismissDirection: DismissDirection.horizontal,

@@ -26,6 +26,9 @@ class AdminCandidateDetailsScreen extends StatelessWidget {
           );
         }
 
+        // Observe availableAgents to rebuild when they load
+        final availableAgents = controller.availableAgents.toList();
+
         final profile = controller.selectedCandidateProfile.value;
         final name = profile != null
             ? '${profile.firstName} ${profile.lastName}'.trim()
@@ -34,6 +37,8 @@ class AdminCandidateDetailsScreen extends StatelessWidget {
         final workHistory = controller.getWorkHistoryText();
         final documentsCount = controller.getDocumentsCount();
         final applicationsCount = controller.getApplicationsCount();
+        final agentName = controller.getCandidateAgentName(candidate.userId);
+        final assignedAgentProfileId = controller.getAssignedAgentProfileId(candidate.userId);
 
         final jobTitles = <String, String>{};
         for (var app in controller.candidateApplications) {
@@ -70,6 +75,17 @@ class AdminCandidateDetailsScreen extends StatelessWidget {
                       workHistory: workHistory,
                       documentsCount: documentsCount,
                       applicationsCount: applicationsCount,
+                      agentName: agentName,
+                      isSuperAdmin: controller.isSuperAdmin,
+                      availableAgents: availableAgents,
+                      assignedAgentProfileId: assignedAgentProfileId,
+                      onAgentChanged: controller.isSuperAdmin
+                          ? (agentProfileId) => controller.updateCandidateAgent(
+                                userId: candidate.userId,
+                                agentId: agentProfileId,
+                              )
+                          : null,
+                      userId: candidate.userId,
                     ),
                     AppCandidateDocumentsList(
                       documents: controller.candidateDocuments,

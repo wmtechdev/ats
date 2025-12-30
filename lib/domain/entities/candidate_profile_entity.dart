@@ -6,6 +6,7 @@ class CandidateProfileEntity {
   final String phone;
   final String address;
   final List<Map<String, dynamic>>? workHistory;
+  final String? assignedAgentId;
 
   CandidateProfileEntity({
     required this.profileId,
@@ -15,6 +16,7 @@ class CandidateProfileEntity {
     required this.phone,
     required this.address,
     this.workHistory,
+    this.assignedAgentId,
   });
 }
 
