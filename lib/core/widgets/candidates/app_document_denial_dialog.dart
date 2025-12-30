@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:iconsax/iconsax.dart';
 import 'package:ats/core/utils/app_colors/app_colors.dart';
 import 'package:ats/core/utils/app_styles/app_text_styles.dart';
 import 'package:ats/core/utils/app_spacing/app_spacing.dart';
 import 'package:ats/core/utils/app_responsive/app_responsive.dart';
+import 'package:ats/core/utils/app_images/app_images.dart';
 import 'package:ats/core/utils/app_texts/app_texts.dart';
 import 'package:ats/core/widgets/common/app_text_field.dart';
 import 'package:ats/core/widgets/common/app_action_button.dart';
@@ -37,7 +37,8 @@ class AppDocumentDenialDialog extends StatefulWidget {
   }
 
   @override
-  State<AppDocumentDenialDialog> createState() => _AppDocumentDenialDialogState();
+  State<AppDocumentDenialDialog> createState() =>
+      _AppDocumentDenialDialogState();
 }
 
 class _AppDocumentDenialDialogState extends State<AppDocumentDenialDialog> {
@@ -60,84 +61,58 @@ class _AppDocumentDenialDialogState extends State<AppDocumentDenialDialog> {
       ),
       child: Container(
         padding: AppSpacing.all(context, factor: 1.5),
-        constraints: BoxConstraints(
-          maxWidth: AppResponsive.isMobile(context)
-              ? MediaQuery.of(context).size.width * 0.9
-              : 500,
-        ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // Header
-            Row(
-              children: [
-                Icon(
-                  Iconsax.warning_2,
-                  color: AppColors.error,
-                  size: AppResponsive.iconSize(context) * 1.5,
-                ),
-                AppSpacing.horizontal(context, 0.02),
-                Expanded(
-                  child: Text(
-                    AppTexts.denyDocument,
-                    style: AppTextStyles.bodyText(context).copyWith(
-                      fontWeight: FontWeight.w700,
-                      color: AppColors.white,
-                    ),
-                  ),
-                ),
-                IconButton(
-                  icon: Icon(
-                    Iconsax.close_circle,
-                    color: AppColors.white,
-                    size: AppResponsive.iconSize(context) * 1.2,
-                  ),
-                  onPressed: () {
-                    Get.back();
-                    widget.onCancel();
-                  },
-                ),
-              ],
+            // Logo
+            Image.asset(
+              AppImages.appLogo,
+              height: AppResponsive.screenHeight(context) * 0.08,
+              fit: BoxFit.contain,
+              errorBuilder: (context, error, stackTrace) => Icon(
+                Icons.business_center,
+                size: AppResponsive.screenHeight(context) * 0.06,
+                color: AppColors.primary,
+              ),
             ),
             AppSpacing.vertical(context, 0.02),
-            // Document name
+            // Title
             Text(
-              '${AppTexts.documentName}: ${widget.documentName}',
-              style: AppTextStyles.bodyText(context).copyWith(
-                color: AppColors.white,
-                fontWeight: FontWeight.w600,
-              ),
+              AppTexts.denyDocument,
+              style: AppTextStyles.heading(
+                context,
+              ).copyWith(fontWeight: FontWeight.w700, color: AppColors.white),
+              textAlign: TextAlign.center,
             ),
             AppSpacing.vertical(context, 0.015),
-            // Message
+            // Subtitle with document name
             Text(
-              AppTexts.denyDocumentConfirmation,
-              style: AppTextStyles.bodyText(context).copyWith(
-                color: AppColors.white,
-              ),
+              '${AppTexts.documentName}: ${widget.documentName}\n\n${AppTexts.denyDocumentConfirmation}',
+              style: AppTextStyles.bodyText(
+                context,
+              ).copyWith(fontWeight: FontWeight.w500, color: AppColors.white),
+              textAlign: TextAlign.center,
             ),
             AppSpacing.vertical(context, 0.02),
             // Reason field (optional)
             Text(
               '${AppTexts.denialReason} (${AppTexts.optional})',
-              style: AppTextStyles.bodyText(context).copyWith(
-                color: AppColors.white,
-                fontWeight: FontWeight.w500,
-              ),
+              style: AppTextStyles.bodyText(
+                context,
+              ).copyWith(color: AppColors.white, fontWeight: FontWeight.w500),
+              textAlign: TextAlign.center,
             ),
             AppSpacing.vertical(context, 0.01),
             AppTextField(
               controller: _reasonController,
               hintText: AppTexts.denialReasonHint,
-              minLines: 3,
               maxLines: 5,
               keyboardType: TextInputType.multiline,
             ),
             AppSpacing.vertical(context, 0.02),
             // Buttons
             Row(
-              mainAxisAlignment: MainAxisAlignment.end,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 AppActionButton(
                   text: AppTexts.cancel,
@@ -167,4 +142,3 @@ class _AppDocumentDenialDialogState extends State<AppDocumentDenialDialog> {
     );
   }
 }
-
