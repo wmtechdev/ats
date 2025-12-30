@@ -108,6 +108,7 @@ class AppTexts {
   static const String goToDocuments = "Go to Documents";
 
   // Candidates
+  static const String candidate = "Candidate";
   static const String candidates = "Candidates";
   static const String candidateDetails = "Candidate Details";
   static const String noCandidatesAvailable = "No candidates available";

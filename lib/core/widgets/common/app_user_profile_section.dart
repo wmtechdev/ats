@@ -10,39 +10,118 @@ import 'package:ats/core/constants/app_constants.dart';
 import 'package:ats/domain/repositories/candidate_auth_repository.dart';
 import 'package:ats/domain/repositories/admin_auth_repository.dart';
 import 'package:ats/domain/entities/user_entity.dart';
+import 'package:ats/presentation/admin/controllers/admin_auth_controller.dart';
+import 'package:ats/presentation/candidate/controllers/profile_controller.dart';
 
 class AppUserProfileSection extends StatelessWidget {
   final VoidCallback onLogout;
 
   const AppUserProfileSection({super.key, required this.onLogout});
 
+  /// Get user name based on role
+  String _getUserName() {
+    // Try admin/recruiter first
+    if (Get.isRegistered<AdminAuthController>()) {
+      try {
+        final adminController = Get.find<AdminAuthController>();
+        final adminProfile = adminController.currentAdminProfile.value;
+        if (adminProfile != null && adminProfile.name.isNotEmpty) {
+          return adminProfile.name;
+        }
+      } catch (e) {
+        // Controller not found or not initialized, continue to candidate check
+      }
+    }
+
+    // Try candidate
+    if (Get.isRegistered<ProfileController>()) {
+      try {
+        final profileController = Get.find<ProfileController>();
+        final candidateProfile = profileController.profile.value;
+        if (candidateProfile != null) {
+          final firstName = candidateProfile.firstName.trim();
+          final lastName = candidateProfile.lastName.trim();
+          if (firstName.isNotEmpty || lastName.isNotEmpty) {
+            return '$firstName $lastName'.trim();
+          }
+        }
+      } catch (e) {
+        // Controller not found, continue to fallback
+      }
+    }
+
+    // Fallback: try to get from auth repository
+    UserEntity? currentUser;
+    if (Get.isRegistered<CandidateAuthRepository>()) {
+      try {
+        final authRepo = Get.find<CandidateAuthRepository>();
+        currentUser = authRepo.getCurrentUser();
+      } catch (e) {
+        // Repository not found
+      }
+    } else if (Get.isRegistered<AdminAuthRepository>()) {
+      try {
+        final authRepo = Get.find<AdminAuthRepository>();
+        currentUser = authRepo.getCurrentUser();
+      } catch (e) {
+        // Repository not found
+      }
+    }
+
+    if (currentUser != null && currentUser.email.isNotEmpty) {
+      return currentUser.email.split('@').first;
+    }
+
+    return AppTexts.admin; // Final fallback
+  }
+
+  /// Get user role display text
+  String _getUserRole() {
+    // Check if admin/recruiter
+    if (Get.isRegistered<AdminAuthController>()) {
+      try {
+        final adminController = Get.find<AdminAuthController>();
+        final adminProfile = adminController.currentAdminProfile.value;
+        if (adminProfile != null) {
+          // Map access level to display role
+          if (adminProfile.accessLevel == AppConstants.accessLevelSuperAdmin) {
+            return AppTexts.admin;
+          } else if (adminProfile.accessLevel == AppConstants.accessLevelRecruiter) {
+            return AppTexts.recruiter;
+          }
+        }
+      } catch (e) {
+        // Controller not found, continue to candidate check
+      }
+    }
+
+    // Check if candidate
+    if (Get.isRegistered<CandidateAuthRepository>()) {
+      try {
+        final authRepo = Get.find<CandidateAuthRepository>();
+        final currentUser = authRepo.getCurrentUser();
+        if (currentUser != null && currentUser.role == AppConstants.roleCandidate) {
+          return AppTexts.candidate;
+        }
+      } catch (e) {
+        // Repository not found
+      }
+    }
+
+    // Fallback
+    return AppTexts.admin;
+  }
+
   @override
   Widget build(BuildContext context) {
     final isMobile = AppResponsive.isMobile(context);
 
-    // Get current user - try candidate first, then admin
-    UserEntity? currentUser;
-    if (Get.isRegistered<CandidateAuthRepository>()) {
-      final authRepo = Get.find<CandidateAuthRepository>();
-      currentUser = authRepo.getCurrentUser();
-    } else if (Get.isRegistered<AdminAuthRepository>()) {
-      final authRepo = Get.find<AdminAuthRepository>();
-      currentUser = authRepo.getCurrentUser();
-    }
+    // Use Obx to make it reactive to profile changes
+    return Obx(() {
+      final userName = _getUserName();
+      final userRole = _getUserRole();
 
-    // For now, we'll use placeholder data until profile is loaded
-    String userName = AppTexts.admin;
-    String userRole = AppTexts.admin;
-
-    if (currentUser != null) {
-      // Use user email as fallback
-      userName = currentUser.email.split('@').first;
-      userRole = currentUser.role == AppConstants.roleAdmin
-          ? AppTexts.administrator
-          : AppTexts.admin;
-    }
-
-    if (isMobile) {
+      if (isMobile) {
       // Mobile: Profile section at bottom of drawer
       return Container(
         padding: AppSpacing.all(context, factor: 1),
@@ -135,6 +214,7 @@ class AppUserProfileSection extends StatelessWidget {
           ),
         ],
       );
-    }
+      }
+    });
   }
 }
