@@ -3,8 +3,6 @@ import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:ats/core/utils/app_texts/app_texts.dart';
 import 'package:ats/core/constants/app_constants.dart';
-import 'package:ats/core/widgets/common/layout/app_side_layout.dart';
-import 'package:ats/core/widgets/common/navigation/app_navigation_item_model.dart';
 import 'package:ats/presentation/candidate/controllers/candidate_auth_controller.dart';
 import 'package:ats/presentation/candidate/controllers/profile_controller.dart';
 import 'package:ats/domain/repositories/candidate_auth_repository.dart';

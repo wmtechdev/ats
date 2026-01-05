@@ -9,16 +9,11 @@ import 'package:ats/core/utils/app_responsive/app_responsive.dart';
 import 'package:ats/core/utils/app_texts/app_texts.dart';
 import 'package:ats/core/widgets/app_widgets.dart';
 
-// Conditional imports for web - use stubs for WebAssembly builds
-import 'package:ats/core/widgets/documents/html_stub.dart'
-    as html
-    if (dart.library.html) 'dart:html'
-    show window, AnchorElement, IFrameElement, document;
-import 'package:ats/core/widgets/documents/ui_web_stub.dart'
-    as ui_web
-    if (dart.library.html) 'dart:ui_web';
+// Direct imports - no stubs needed, conditional imports handle it
+import 'dart:html' as html if (dart.library.html) 'dart:html';
+import 'dart:ui_web' as ui_web if (dart.library.ui_web) 'dart:ui_web';
 
-class AppDocumentViewer extends StatelessWidget {
+class AppDocumentViewer extends StatefulWidget {
   final String documentUrl;
   final String? documentName;
 
@@ -37,24 +32,51 @@ class AppDocumentViewer extends StatelessWidget {
     );
   }
 
-  /// Determines the file type from URL
-  String _getFileType(String url) {
-    final lowerUrl = url.toLowerCase();
-    if (lowerUrl.contains('.pdf')) return 'pdf';
-    if (lowerUrl.contains('.jpg') || lowerUrl.contains('.jpeg')) return 'image';
-    if (lowerUrl.contains('.png')) return 'image';
-    if (lowerUrl.contains('.gif')) return 'image';
-    if (lowerUrl.contains('.doc') || lowerUrl.contains('.docx')) {
-      return 'document';
+  @override
+  State<AppDocumentViewer> createState() => _AppDocumentViewerState();
+}
+
+class _AppDocumentViewerState extends State<AppDocumentViewer> {
+  String? _iframeViewId;
+  bool _uiWebAvailable = false;
+
+  @override
+  void initState() {
+    super.initState();
+    if (kIsWeb) {
+      _createIframe();
     }
-    if (lowerUrl.contains('.txt')) return 'text';
-    return 'unknown';
+  }
+
+  void _createIframe() {
+    if (!kIsWeb) return;
+
+    _iframeViewId = 'pdf-viewer-${DateTime.now().millisecondsSinceEpoch}';
+    
+    try {
+      // Try to register with ui_web
+      ui_web.platformViewRegistry.registerViewFactory(
+        _iframeViewId!,
+        (int viewId) {
+          final iframe = html.IFrameElement()
+            ..src = widget.documentUrl
+            ..style.border = 'none'
+            ..style.width = '100%'
+            ..style.height = '100%'
+            ..allowFullscreen = true;
+          return iframe;
+        },
+      );
+      _uiWebAvailable = true;
+    } catch (e) {
+      // ui_web not available (WebAssembly)
+      _uiWebAvailable = false;
+      _iframeViewId = null;
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    final fileType = _getFileType(documentUrl);
-
     return Dialog(
       backgroundColor: AppColors.secondary,
       shape: RoundedRectangleBorder(
@@ -78,7 +100,7 @@ class AppDocumentViewer extends StatelessWidget {
               children: [
                 Expanded(
                   child: Text(
-                    documentName ?? AppTexts.documentFile,
+                    widget.documentName ?? AppTexts.documentFile,
                     style: AppTextStyles.bodyText(context).copyWith(
                       color: AppColors.white,
                       fontWeight: FontWeight.w700,
@@ -98,8 +120,8 @@ class AppDocumentViewer extends StatelessWidget {
               ],
             ),
             AppSpacing.vertical(context, 0.02),
-            // Document content
-            Expanded(child: _buildDocumentContent(context, fileType)),
+            // PDF content
+            Expanded(child: _buildPdfViewer(context)),
             AppSpacing.vertical(context, 0.02),
             // Footer actions
             Wrap(
@@ -108,7 +130,7 @@ class AppDocumentViewer extends StatelessWidget {
               runSpacing: 8.0,
               children: [
                 TextButton.icon(
-                  onPressed: () => _openInNewTab(documentUrl),
+                  onPressed: () => _openInNewTab(widget.documentUrl),
                   icon: Icon(
                     Iconsax.export,
                     color: AppColors.primary,
@@ -122,7 +144,7 @@ class AppDocumentViewer extends StatelessWidget {
                   ),
                 ),
                 TextButton.icon(
-                  onPressed: () => _downloadDocument(documentUrl, documentName),
+                  onPressed: () => _downloadDocument(widget.documentUrl, widget.documentName),
                   icon: Icon(
                     Iconsax.document_download,
                     color: AppColors.primary,
@@ -143,49 +165,9 @@ class AppDocumentViewer extends StatelessWidget {
     );
   }
 
-  Widget _buildDocumentContent(BuildContext context, String fileType) {
-    switch (fileType) {
-      case 'pdf':
-        return _buildPdfViewer(context);
-      case 'image':
-        return _buildImageViewer(context);
-      case 'text':
-        return _buildTextViewer(context);
-      case 'document':
-        return _buildDocumentViewer(context);
-      default:
-        return _buildUnsupportedViewer(context);
-    }
-  }
-
   Widget _buildPdfViewer(BuildContext context) {
-    if (kIsWeb) {
-      // Use iframe for web PDF viewing
-      final iframeId = 'pdf-viewer-${DateTime.now().millisecondsSinceEpoch}';
-
-      // Register the iframe
-      ui_web.platformViewRegistry.registerViewFactory(iframeId, (int viewId) {
-        final iframe = html.IFrameElement()
-          ..src = documentUrl
-          ..style.border = 'none'
-          ..style.width = '100%'
-          ..style.height = '100%';
-        return iframe;
-      });
-
-      return Container(
-        decoration: BoxDecoration(
-          color: AppColors.white,
-          borderRadius: BorderRadius.circular(AppResponsive.radius(context)),
-          border: Border.all(color: AppColors.grey.withValues(alpha: 0.3)),
-        ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(AppResponsive.radius(context)),
-          child: HtmlElementView(viewType: iframeId),
-        ),
-      );
-    } else {
-      // For mobile, show a message with link
+    if (!kIsWeb) {
+      // For mobile, show option to open in browser
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -205,7 +187,7 @@ class AppDocumentViewer extends StatelessWidget {
             ),
             AppSpacing.vertical(context, 0.02),
             ElevatedButton.icon(
-              onPressed: () => _openInNewTab(documentUrl),
+              onPressed: () => _openInNewTab(widget.documentUrl),
               icon: Icon(Iconsax.export),
               label: Text(AppTexts.openInBrowser),
             ),
@@ -213,200 +195,81 @@ class AppDocumentViewer extends StatelessWidget {
         ),
       );
     }
-  }
 
-  Widget _buildImageViewer(BuildContext context) {
+    // For web: show PDF in iframe if ui_web is available
+    if (_uiWebAvailable && _iframeViewId != null) {
+      return Container(
+        decoration: BoxDecoration(
+          color: AppColors.white,
+          borderRadius: BorderRadius.circular(AppResponsive.radius(context)),
+          border: Border.all(color: AppColors.grey.withValues(alpha: 0.3)),
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(AppResponsive.radius(context)),
+          child: HtmlElementView(viewType: _iframeViewId!),
+        ),
+      );
+    }
+
+    // WebAssembly or ui_web not available - auto-open in new tab
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _openInNewTab(widget.documentUrl);
+    });
+
     return Container(
       decoration: BoxDecoration(
         color: AppColors.white,
         borderRadius: BorderRadius.circular(AppResponsive.radius(context)),
         border: Border.all(color: AppColors.grey.withValues(alpha: 0.3)),
       ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(AppResponsive.radius(context)),
-        child: InteractiveViewer(
-          minScale: 0.5,
-          maxScale: 4.0,
-          child: Image.network(
-            documentUrl,
-            fit: BoxFit.contain,
-            loadingBuilder: (context, child, loadingProgress) {
-              if (loadingProgress == null) return child;
-              return Center(
-                child: CircularProgressIndicator(
-                  value: loadingProgress.expectedTotalBytes != null
-                      ? loadingProgress.cumulativeBytesLoaded /
-                            loadingProgress.expectedTotalBytes!
-                      : null,
-                  color: AppColors.primary,
-                ),
-              );
-            },
-            errorBuilder: (context, error, stackTrace) {
-              return Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Iconsax.danger,
-                      size: AppResponsive.iconSize(context) * 2,
-                      color: AppColors.error,
-                    ),
-                    AppSpacing.vertical(context, 0.01),
-                    Text(
-                      AppTexts.failedToLoadImage,
-                      style: AppTextStyles.bodyText(
-                        context,
-                      ).copyWith(color: AppColors.error),
-                    ),
-                  ],
-                ),
-              );
-            },
-          ),
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Iconsax.document_text,
+              size: 48,
+              color: AppColors.primary,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Opening PDF in new tab...',
+              style: TextStyle(
+                color: AppColors.black,
+                fontSize: 16,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
         ),
       ),
     );
   }
 
-  Widget _buildTextViewer(BuildContext context) {
-    return FutureBuilder<String>(
-      future: _fetchTextContent(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return Center(
-            child: CircularProgressIndicator(color: AppColors.primary),
-          );
-        }
-        if (snapshot.hasError) {
-          return Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  Iconsax.danger,
-                  size: AppResponsive.iconSize(context) * 2,
-                  color: AppColors.error,
-                ),
-                AppSpacing.vertical(context, 0.01),
-                Text(
-                  AppTexts.failedToLoadDocument,
-                  style: AppTextStyles.bodyText(
-                    context,
-                  ).copyWith(color: AppColors.error),
-                ),
-              ],
-            ),
-          );
-        }
-        return Container(
-          decoration: BoxDecoration(
-            color: AppColors.white,
-            borderRadius: BorderRadius.circular(AppResponsive.radius(context)),
-            border: Border.all(color: AppColors.grey.withValues(alpha: 0.3)),
-          ),
-          padding: AppSpacing.all(context),
-          child: SingleChildScrollView(
-            child: Text(
-              snapshot.data ?? '',
-              style: AppTextStyles.bodyText(
-                context,
-              ).copyWith(color: AppColors.black, fontFamily: 'monospace'),
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _buildDocumentViewer(BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Iconsax.document_text,
-            size: AppResponsive.iconSize(context) * 3,
-            color: AppColors.primary,
-          ),
-          AppSpacing.vertical(context, 0.02),
-          Text(
-            AppTexts.documentPreviewNotAvailable,
-            style: AppTextStyles.bodyText(
-              context,
-            ).copyWith(color: AppColors.white),
-            textAlign: TextAlign.center,
-          ),
-          AppSpacing.vertical(context, 0.02),
-          ElevatedButton.icon(
-            onPressed: () => _openInNewTab(documentUrl),
-            icon: Icon(Iconsax.export),
-            label: Text(AppTexts.openInBrowser),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildUnsupportedViewer(BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Iconsax.document_text,
-            size: AppResponsive.iconSize(context) * 3,
-            color: AppColors.primary,
-          ),
-          AppSpacing.vertical(context, 0.02),
-          Text(
-            AppTexts.documentTypeNotSupported,
-            style: AppTextStyles.bodyText(
-              context,
-            ).copyWith(color: AppColors.white),
-            textAlign: TextAlign.center,
-          ),
-          AppSpacing.vertical(context, 0.02),
-          ElevatedButton.icon(
-            onPressed: () => _downloadDocument(documentUrl, documentName),
-            icon: Icon(Iconsax.document_download),
-            label: Text(AppTexts.download),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Future<String> _fetchTextContent() async {
-    if (!kIsWeb) {
-      throw UnsupportedError('Text fetching not supported on mobile');
-    }
-    try {
-      final response = await html.window.fetch(documentUrl);
-      return await response.text();
-    } catch (e) {
-      throw Exception('Failed to fetch text content: $e');
-    }
-  }
-
   void _openInNewTab(String url) {
     if (kIsWeb) {
-      html.window.open(url, '_blank');
+      try {
+        html.window.open(url, '_blank');
+      } catch (e) {
+        AppSnackbar.info('Please open the URL manually: $url');
+      }
     } else {
-      // For mobile, you might want to use url_launcher package
-      // For now, just show a message
       AppSnackbar.info('Please open the URL manually: $url');
     }
   }
 
   void _downloadDocument(String url, String? fileName) {
     if (kIsWeb) {
-      final anchor = html.AnchorElement(href: url)
-        ..target = '_blank'
-        ..download = fileName ?? 'document';
-      html.document.body?.append(anchor);
-      anchor.click();
-      anchor.remove();
+      try {
+        final anchor = html.AnchorElement(href: url)
+          ..target = '_blank'
+          ..download = fileName ?? 'document.pdf';
+        html.document.body?.append(anchor);
+        anchor.click();
+        anchor.remove();
+      } catch (e) {
+        _openInNewTab(url);
+      }
     } else {
       AppSnackbar.info(
         'Download functionality not available on mobile. Please use the browser.',
