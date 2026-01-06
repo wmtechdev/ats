@@ -29,6 +29,9 @@ class AppTexts {
   static const String myDocuments = "My Documents";
   static const String pendingApplications = "Pending Applications";
   static const String openJobs = "Open Jobs";
+  static const String pendingDocuments = "Pending Documents";
+  static const String approvedDocuments = "Approved Documents";
+  static const String rejectedDocuments = "Rejected Documents";
 
   // Profile
   static const String saveProfile = "Save Profile";
