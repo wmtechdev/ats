@@ -59,6 +59,7 @@ class CandidateBindings extends Bindings {
           candidateAuthRepo,
           applicationRepo,
           jobRepo,
+          documentRepo,
         ));
     Get.lazyPut(() => ProfileController(profileRepo, candidateAuthRepo));
     Get.lazyPut(() => JobsController(jobRepo, applicationRepo, candidateAuthRepo));

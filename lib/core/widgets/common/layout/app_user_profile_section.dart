@@ -176,30 +176,39 @@ class AppUserProfileSection extends StatelessWidget {
     } else {
       // Desktop: Profile section at top right
       return Row(
+        mainAxisSize: MainAxisSize.min,
         children: [
           // Name and Role
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                userName,
-                style: AppTextStyles.bodyText(
-                  context,
-                ).copyWith(fontWeight: FontWeight.w600, color: AppColors.white),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-              Text(
-                userRole,
-                style: AppTextStyles.hintText(context).copyWith(
-                  fontSize: AppResponsive.screenWidth(context) * 0.01,
-                  color: AppColors.white.withValues(alpha: 0.8),
+          Flexible(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Text(
+                  userName,
+                  style: AppTextStyles.bodyText(
+                    context,
+                  ).copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.white,
+                    height: 1.0,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ],
+                Text(
+                  userRole,
+                  style: AppTextStyles.hintText(context).copyWith(
+                    fontSize: AppResponsive.screenWidth(context) * 0.01,
+                    color: AppColors.white.withValues(alpha: 0.8),
+                    height: 1.0,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
           ),
           AppSpacing.horizontal(context, 0.01),
           // Logout Button
