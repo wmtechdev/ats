@@ -47,9 +47,7 @@ class AppCandidateDocumentsList extends StatelessWidget {
           trailing: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              // Show only status chip when document is approved
-              if (isApproved) ...[AppStatusChip(status: doc.status)],
-              // Show view/approve/deny buttons only when document is pending
+              // Show view/approve/deny buttons when document is pending
               if (isPending) ...[
                 AppActionButton(
                   text: AppTexts.view,
@@ -101,8 +99,75 @@ class AppCandidateDocumentsList extends StatelessWidget {
                   foregroundColor: AppColors.white,
                 ),
               ],
-              // Show status chip when document is denied
-              if (isRejected) ...[AppStatusChip(status: doc.status)],
+              // Show view button and deny button when document is approved
+              if (isApproved) ...[
+                AppActionButton(
+                  text: AppTexts.view,
+                  onPressed: () {
+                    if (doc.storageUrl.isNotEmpty && onView != null) {
+                      onView!(doc.storageUrl);
+                    }
+                  },
+                  backgroundColor: AppColors.information,
+                  foregroundColor: AppColors.white,
+                ),
+                AppSpacing.horizontal(context, 0.01),
+                AppStatusChip(status: doc.status),
+                AppSpacing.horizontal(context, 0.01),
+                AppActionButton(
+                  text: AppTexts.deny,
+                  onPressed: () {
+                    final documentName = doc.title ?? doc.documentName;
+                    AppDocumentDenialDialog.show(
+                      documentName: documentName,
+                      onConfirm: (reason) {
+                        if (onDeny != null) {
+                          onDeny!(
+                            doc.candidateDocId,
+                            AppConstants.documentStatusDenied,
+                            reason,
+                          );
+                        } else {
+                          onStatusUpdate(
+                            doc.candidateDocId,
+                            AppConstants.documentStatusDenied,
+                          );
+                        }
+                      },
+                      onCancel: () {
+                        // User cancelled, do nothing
+                      },
+                    );
+                  },
+                  backgroundColor: AppColors.error,
+                  foregroundColor: AppColors.white,
+                ),
+              ],
+              // Show view button and approve button when document is denied
+              if (isRejected) ...[
+                AppActionButton(
+                  text: AppTexts.view,
+                  onPressed: () {
+                    if (doc.storageUrl.isNotEmpty && onView != null) {
+                      onView!(doc.storageUrl);
+                    }
+                  },
+                  backgroundColor: AppColors.information,
+                  foregroundColor: AppColors.white,
+                ),
+                AppSpacing.horizontal(context, 0.01),
+                AppStatusChip(status: doc.status),
+                AppSpacing.horizontal(context, 0.01),
+                AppActionButton(
+                  text: AppTexts.approve,
+                  onPressed: () => onStatusUpdate(
+                    doc.candidateDocId,
+                    AppConstants.documentStatusApproved,
+                  ),
+                  backgroundColor: AppColors.success,
+                  foregroundColor: AppColors.white,
+                ),
+              ],
             ],
           ),
           onTap: null,
