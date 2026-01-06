@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:ats/presentation/admin/controllers/admin_candidates_controller.dart';
 import 'package:ats/core/utils/app_texts/app_texts.dart';
+import 'package:ats/core/utils/app_file_validator/app_file_validator.dart';
 import 'package:ats/core/widgets/app_widgets.dart';
 import 'package:ats/core/constants/app_constants.dart';
 
@@ -163,7 +164,7 @@ class AdminCandidateDetailsScreen extends StatelessWidget {
                           final document = controller.candidateDocuments.firstWhere(
                             (doc) => doc.storageUrl == storageUrl,
                           );
-                          documentName = document.title ?? document.documentName;
+                          documentName = document.title ?? AppFileValidator.extractOriginalFileName(document.documentName);
                         } catch (e) {
                           // Document not found, use default name
                           documentName = null;

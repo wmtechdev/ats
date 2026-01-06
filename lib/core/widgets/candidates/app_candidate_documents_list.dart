@@ -4,6 +4,7 @@ import 'package:ats/core/constants/app_constants.dart';
 import 'package:ats/core/utils/app_texts/app_texts.dart';
 import 'package:ats/core/utils/app_spacing/app_spacing.dart';
 import 'package:ats/core/utils/app_colors/app_colors.dart';
+import 'package:ats/core/utils/app_file_validator/app_file_validator.dart';
 import 'package:ats/domain/entities/candidate_document_entity.dart';
 import 'package:ats/core/widgets/app_widgets.dart';
 
@@ -41,7 +42,7 @@ class AppCandidateDocumentsList extends StatelessWidget {
 
         return AppListCard(
           key: ValueKey('document_${doc.candidateDocId}'),
-          title: doc.title ?? doc.documentName,
+          title: doc.title ?? AppFileValidator.extractOriginalFileName(doc.documentName),
           subtitle: '${AppTexts.status}: ${doc.status}',
           icon: Iconsax.document_text,
           trailing: Row(
@@ -73,7 +74,7 @@ class AppCandidateDocumentsList extends StatelessWidget {
                 AppActionButton(
                   text: AppTexts.deny,
                   onPressed: () {
-                    final documentName = doc.title ?? doc.documentName;
+                    final documentName = doc.title ?? AppFileValidator.extractOriginalFileName(doc.documentName);
                     AppDocumentDenialDialog.show(
                       documentName: documentName,
                       onConfirm: (reason) {
@@ -117,7 +118,7 @@ class AppCandidateDocumentsList extends StatelessWidget {
                 AppActionButton(
                   text: AppTexts.deny,
                   onPressed: () {
-                    final documentName = doc.title ?? doc.documentName;
+                    final documentName = doc.title ?? AppFileValidator.extractOriginalFileName(doc.documentName);
                     AppDocumentDenialDialog.show(
                       documentName: documentName,
                       onConfirm: (reason) {

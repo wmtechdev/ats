@@ -17,6 +17,7 @@ import 'package:ats/domain/usecases/document/update_document_status_usecase.dart
 import 'package:ats/domain/usecases/email/send_document_denial_email_usecase.dart';
 import 'package:ats/domain/usecases/admin/delete_candidate_usecase.dart';
 import 'package:ats/core/constants/app_constants.dart';
+import 'package:ats/core/utils/app_file_validator/app_file_validator.dart';
 import 'package:ats/core/widgets/app_widgets.dart';
 import 'package:ats/core/utils/app_texts/app_texts.dart';
 import 'package:ats/presentation/admin/controllers/admin_auth_controller.dart';
@@ -267,7 +268,7 @@ class AdminCandidatesController extends GetxController {
       orElse: () => candidateDocuments.first, // Fallback, but should not happen
     );
 
-    final documentName = document.title ?? document.documentName;
+    final documentName = document.title ?? AppFileValidator.extractOriginalFileName(document.documentName);
     final candidateEmail = candidate.email;
     final candidateName = profile != null
         ? '${profile.firstName} ${profile.lastName}'.trim()

@@ -7,6 +7,7 @@ import 'package:ats/presentation/candidate/controllers/documents_controller.dart
 import 'package:ats/core/utils/app_texts/app_texts.dart';
 import 'package:ats/core/utils/app_spacing/app_spacing.dart';
 import 'package:ats/core/utils/app_styles/app_text_styles.dart';
+import 'package:ats/core/utils/app_file_validator/app_file_validator.dart';
 import 'package:ats/core/widgets/app_widgets.dart';
 
 class MyDocumentsScreen extends StatelessWidget {
@@ -215,7 +216,7 @@ class MyDocumentsScreen extends StatelessWidget {
                       final hasStorageUrl = userDoc.storageUrl.isNotEmpty;
 
                       return AppListCard(
-                        title: userDoc.title ?? userDoc.documentName,
+                        title: userDoc.title ?? AppFileValidator.extractOriginalFileName(userDoc.documentName),
                         subtitle: userDoc.description ?? '',
                         icon: Iconsax.document_text,
                         trailing: Row(
@@ -230,7 +231,7 @@ class MyDocumentsScreen extends StatelessWidget {
                                 onPressed: () {
                                   AppDocumentViewer.show(
                                     documentUrl: userDoc.storageUrl,
-                                    documentName: userDoc.title ?? userDoc.documentName,
+                                    documentName: userDoc.title ?? AppFileValidator.extractOriginalFileName(userDoc.documentName),
                                   );
                                 },
                                 backgroundColor: AppColors.information,
@@ -247,7 +248,7 @@ class MyDocumentsScreen extends StatelessWidget {
                                   controller,
                                   userDoc.candidateDocId,
                                   userDoc.storageUrl,
-                                  userDoc.title ?? userDoc.documentName,
+                                  userDoc.title ?? AppFileValidator.extractOriginalFileName(userDoc.documentName),
                                 ),
                                 backgroundColor: AppColors.error,
                                 foregroundColor: AppColors.white,

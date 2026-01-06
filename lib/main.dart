@@ -14,5 +14,5 @@ void main() async {
   setUrlStrategy(PathUrlStrategy());
   
   await AppInitializer.initialize();
-  runApp(const ATSApp(appType: AppType.candidate));
+  runApp(const ATSApp(appType: AppType.admin));
 }

@@ -131,5 +131,27 @@ class AppFileValidator {
       return '${(bytes / (1024 * 1024)).toStringAsFixed(1)} MB';
     }
   }
+
+  /// Extracts the original filename from a document name that may contain Firebase ID prefix
+  /// Document names are stored as: ${userId}_${restOfTheName}
+  /// Example: 2eToQufVj4WNXjbV4AuTJ2D41CH3_Resume_Muhammad_Mubeen_Bhatti_Resume_Flutter_Developer.pdf
+  /// Returns: Resume_Muhammad_Mubeen_Bhatti_Resume_Flutter_Developer.pdf
+  /// This function removes only the userId (first segment), keeping the rest
+  static String extractOriginalFileName(String documentName) {
+    if (documentName.isEmpty) {
+      return documentName;
+    }
+
+    // Split by underscore
+    final parts = documentName.split('_');
+    
+    // If there's only one part or empty, return as is
+    if (parts.length <= 1) {
+      return documentName;
+    }
+    
+    // Remove the first segment (userId) and join the rest
+    return parts.sublist(1).join('_');
+  }
 }
 
