@@ -15,6 +15,7 @@ class AppTextField extends StatefulWidget {
   final TextInputType? keyboardType;
   final String? Function(String?)? validator;
   final void Function(String)? onChanged;
+  final bool showLabelAbove;
 
   const AppTextField({
     super.key,
@@ -28,6 +29,7 @@ class AppTextField extends StatefulWidget {
     this.keyboardType,
     this.validator,
     this.onChanged,
+    this.showLabelAbove = false,
   });
 
   @override
@@ -132,7 +134,15 @@ class _AppTextFieldState extends State<AppTextField> {
       }
     }
 
-    return TextField(
+    final defaultPadding = AppSpacing.symmetric(context, h: 0.04, v: 0.02);
+    final contentPadding = widget.prefixIcon == null
+        ? EdgeInsets.only(
+            left: defaultPadding.horizontal * 0.1,
+            right: defaultPadding.horizontal,
+          )
+        : defaultPadding;
+
+    final textField = TextField(
       controller: _internalController,
       obscureText: widget.obscureText,
       minLines: widget.minLines,
@@ -154,12 +164,9 @@ class _AppTextFieldState extends State<AppTextField> {
         widget.onChanged?.call(value);
       },
       decoration: InputDecoration(
-        labelText: widget.labelText,
         hintText: widget.hintText,
-        floatingLabelBehavior: FloatingLabelBehavior.never,
         filled: true,
         fillColor: AppColors.white,
-        labelStyle: AppTextStyles.hintText(context),
         hintStyle: AppTextStyles.hintText(context),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(
@@ -186,8 +193,29 @@ class _AppTextFieldState extends State<AppTextField> {
                 color: AppColors.primary,
               )
             : null,
-        contentPadding: AppSpacing.symmetric(context, h: 0.04, v: 0.02),
+        contentPadding: contentPadding,
       ),
     );
+
+    // If labelText is provided and showLabelAbove is true, show it above the text field
+    if (widget.showLabelAbove &&
+        widget.labelText != null &&
+        widget.labelText!.isNotEmpty) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            widget.labelText!,
+            style: AppTextStyles.bodyText(
+              context,
+            ).copyWith(fontWeight: FontWeight.w500),
+          ),
+          textField,
+        ],
+      );
+    }
+
+    return textField;
   }
 }

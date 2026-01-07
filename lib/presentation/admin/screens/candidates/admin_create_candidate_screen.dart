@@ -25,7 +25,7 @@ class AdminCreateCandidateScreen extends StatelessWidget {
             AppTextField(
               controller: controller.firstNameController,
               labelText: AppTexts.firstName,
-              prefixIcon: Iconsax.user,
+              showLabelAbove: true,
               onChanged: (value) {
                 controller.validateFirstName(value);
               },
@@ -48,7 +48,7 @@ class AdminCreateCandidateScreen extends StatelessWidget {
             AppTextField(
               controller: controller.lastNameController,
               labelText: AppTexts.lastName,
-              prefixIcon: Iconsax.user,
+              showLabelAbove: true,
               onChanged: (value) {
                 controller.validateLastName(value);
               },
@@ -71,7 +71,7 @@ class AdminCreateCandidateScreen extends StatelessWidget {
             AppTextField(
               controller: controller.emailController,
               labelText: AppTexts.email,
-              prefixIcon: Iconsax.sms,
+              showLabelAbove: true,
               keyboardType: TextInputType.emailAddress,
               onChanged: (value) {
                 controller.validateEmail(value);
@@ -95,7 +95,7 @@ class AdminCreateCandidateScreen extends StatelessWidget {
             AppTextField(
               controller: controller.passwordController,
               labelText: AppTexts.password,
-              prefixIcon: Iconsax.lock,
+              showLabelAbove: true,
               obscureText: true,
               onChanged: (value) {
                 controller.validatePassword(value);
@@ -119,7 +119,7 @@ class AdminCreateCandidateScreen extends StatelessWidget {
             AppTextField(
               controller: controller.phoneController,
               labelText: AppTexts.phone,
-              prefixIcon: Iconsax.call,
+
               keyboardType: TextInputType.phone,
               onChanged: (value) {
                 controller.validatePhone(value);
@@ -143,7 +143,7 @@ class AdminCreateCandidateScreen extends StatelessWidget {
             AppTextField(
               controller: controller.addressController,
               labelText: AppTexts.address,
-              prefixIcon: Iconsax.location,
+              showLabelAbove: true,
               maxLines: 3,
               onChanged: (value) {
                 controller.validateAddress(value);

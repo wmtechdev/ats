@@ -205,7 +205,7 @@ class _AdminEditCandidateScreenState extends State<AdminEditCandidateScreen> {
               AppTextField(
                 controller: firstNameController,
                 labelText: AppTexts.firstName,
-                prefixIcon: Iconsax.user,
+                showLabelAbove: true,
               ),
               AppSpacing.vertical(context, 0.02),
 
@@ -213,7 +213,7 @@ class _AdminEditCandidateScreenState extends State<AdminEditCandidateScreen> {
               AppTextField(
                 controller: lastNameController,
                 labelText: AppTexts.lastName,
-                prefixIcon: Iconsax.user,
+                showLabelAbove: true,
               ),
               AppSpacing.vertical(context, 0.02),
 
@@ -221,7 +221,7 @@ class _AdminEditCandidateScreenState extends State<AdminEditCandidateScreen> {
               AppTextField(
                 controller: phoneController,
                 labelText: AppTexts.phone,
-                prefixIcon: Iconsax.call,
+                showLabelAbove: true,
                 keyboardType: TextInputType.phone,
               ),
               AppSpacing.vertical(context, 0.02),
@@ -230,7 +230,7 @@ class _AdminEditCandidateScreenState extends State<AdminEditCandidateScreen> {
               AppTextField(
                 controller: addressController,
                 labelText: AppTexts.address,
-                prefixIcon: Iconsax.location,
+                showLabelAbove: true,
                 maxLines: 3,
               ),
               AppSpacing.vertical(context, 0.03),
@@ -288,19 +288,19 @@ class _AdminEditCandidateScreenState extends State<AdminEditCandidateScreen> {
                       AppTextField(
                         controller: controllers['company']!,
                         labelText: AppTexts.company,
-                        prefixIcon: Iconsax.building,
+                        showLabelAbove: true,
                       ),
                       AppSpacing.vertical(context, 0.01),
                       AppTextField(
                         controller: controllers['position']!,
                         labelText: AppTexts.position,
-                        prefixIcon: Iconsax.briefcase,
+                        showLabelAbove: true,
                       ),
                       AppSpacing.vertical(context, 0.01),
                       AppTextField(
                         controller: controllers['description']!,
                         labelText: AppTexts.description,
-                        prefixIcon: Iconsax.document_text,
+                        showLabelAbove: true,
                         maxLines: 3,
                       ),
                     ],

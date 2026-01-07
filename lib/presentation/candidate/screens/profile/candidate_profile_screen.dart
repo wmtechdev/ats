@@ -171,7 +171,7 @@ class _CandidateProfileScreenState extends State<CandidateProfileScreen> {
             AppTextField(
               controller: firstNameController,
               labelText: AppTexts.firstName,
-              prefixIcon: Iconsax.user,
+              showLabelAbove: true,
               onChanged: (value) => controller.validateFirstName(value),
             ),
             Obx(
@@ -193,7 +193,7 @@ class _CandidateProfileScreenState extends State<CandidateProfileScreen> {
             AppTextField(
               controller: lastNameController,
               labelText: AppTexts.lastName,
-              prefixIcon: Iconsax.user,
+              showLabelAbove: true,
               onChanged: (value) => controller.validateLastName(value),
             ),
             Obx(
@@ -215,7 +215,7 @@ class _CandidateProfileScreenState extends State<CandidateProfileScreen> {
             AppTextField(
               controller: phoneController,
               labelText: AppTexts.phone,
-              prefixIcon: Iconsax.call,
+              showLabelAbove: true,
               keyboardType: TextInputType.phone,
               onChanged: (value) => controller.validatePhone(value),
             ),
@@ -238,7 +238,7 @@ class _CandidateProfileScreenState extends State<CandidateProfileScreen> {
             AppTextField(
               controller: addressController,
               labelText: AppTexts.address,
-              prefixIcon: Iconsax.location,
+              showLabelAbove: true,
               maxLines: 3,
               onChanged: (value) => controller.validateAddress(value),
             ),
@@ -310,7 +310,7 @@ class _CandidateProfileScreenState extends State<CandidateProfileScreen> {
                     AppTextField(
                       controller: controllers['company']!,
                       labelText: AppTexts.company,
-                      prefixIcon: Iconsax.building,
+                      showLabelAbove: true,
                       onChanged: (value) => controller.validateWorkHistoryField(
                         index,
                         'company',
@@ -342,7 +342,7 @@ class _CandidateProfileScreenState extends State<CandidateProfileScreen> {
                     AppTextField(
                       controller: controllers['position']!,
                       labelText: AppTexts.position,
-                      prefixIcon: Iconsax.briefcase,
+                      showLabelAbove: true,
                       onChanged: (value) => controller.validateWorkHistoryField(
                         index,
                         'position',
@@ -374,7 +374,7 @@ class _CandidateProfileScreenState extends State<CandidateProfileScreen> {
                     AppTextField(
                       controller: controllers['description']!,
                       labelText: AppTexts.description,
-                      prefixIcon: Iconsax.document_text,
+                      showLabelAbove: true,
                       maxLines: 3,
                     ),
                   ],
