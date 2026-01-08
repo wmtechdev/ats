@@ -86,9 +86,9 @@ class BackgroundHistorySection extends StatelessWidget {
       children: [
         Text(
           question,
-          style: AppTextStyles.bodyText(context).copyWith(
-            fontWeight: FontWeight.w500,
-          ),
+          style: AppTextStyles.bodyText(
+            context,
+          ).copyWith(fontWeight: FontWeight.w500),
         ),
         AppSpacing.vertical(context, 0.01),
         AppDropDownField<String>(
@@ -96,8 +96,14 @@ class BackgroundHistorySection extends StatelessWidget {
           labelText: AppTexts.select,
           showLabelAbove: true,
           items: [
-            DropdownMenuItem<String>(value: AppTexts.yes, child: Text(AppTexts.yes)),
-            DropdownMenuItem<String>(value: AppTexts.no, child: Text(AppTexts.no)),
+            DropdownMenuItem<String>(
+              value: AppTexts.yes,
+              child: Text(AppTexts.yes),
+            ),
+            DropdownMenuItem<String>(
+              value: AppTexts.no,
+              child: Text(AppTexts.no),
+            ),
           ],
           onChanged: onChanged ?? (value) {},
         ),

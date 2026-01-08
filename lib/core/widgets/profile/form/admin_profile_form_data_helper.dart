@@ -5,9 +5,15 @@ import 'package:ats/core/widgets/profile/form/profile_form_data_helper.dart';
 class AdminProfileFormDataHelper {
   static Map<String, dynamic> getProfileData(AdminProfileFormState formState) {
     final phones = ProfileFormDataHelper.getPhonesData(formState.phoneEntries);
-    final education = ProfileFormDataHelper.getEducationData(formState.educationEntries);
-    final certifications = ProfileFormDataHelper.getCertificationsData(formState.certificationEntries);
-    final workHistory = ProfileFormDataHelper.getWorkHistoryData(formState.workHistoryEntries);
+    final education = ProfileFormDataHelper.getEducationData(
+      formState.educationEntries,
+    );
+    final certifications = ProfileFormDataHelper.getCertificationsData(
+      formState.certificationEntries,
+    );
+    final workHistory = ProfileFormDataHelper.getWorkHistoryData(
+      formState.workHistoryEntries,
+    );
 
     return {
       'firstName': formState.firstNameController.text.trim(),

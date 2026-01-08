@@ -45,8 +45,7 @@ class CertificationsSection extends StatelessWidget {
         children: [
           Align(
             alignment: Alignment.centerLeft,
-            child: 
-            AppTextButton(
+            child: AppTextButton(
               text: AppTexts.addCertification,
               icon: Iconsax.add,
               onPressed: onAddCertification,
@@ -66,7 +65,9 @@ class CertificationsSection extends StatelessWidget {
                   borderRadius: BorderRadius.circular(
                     AppResponsive.radius(context, factor: 1.5),
                   ),
-                  border: Border.all(color: AppColors.primary.withValues(alpha: 0.5)),
+                  border: Border.all(
+                    color: AppColors.primary.withValues(alpha: 0.5),
+                  ),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -76,9 +77,9 @@ class CertificationsSection extends StatelessWidget {
                       children: [
                         Text(
                           '${AppTexts.certifications} ${index + 1}',
-                          style: AppTextStyles.bodyText(context).copyWith(
-                            fontWeight: FontWeight.w600,
-                          ),
+                          style: AppTextStyles.bodyText(
+                            context,
+                          ).copyWith(fontWeight: FontWeight.w600),
                         ),
                         IconButton(
                           icon: const Icon(
@@ -116,11 +117,11 @@ class CertificationsSection extends StatelessWidget {
                     // Expiry
                     if (!certification.hasNoExpiry) ...[
                       AppSpacing.vertical(context, 0.01),
-                    AppDatePicker(
-                      controller: certification.expiryController,
-                      labelText: AppTexts.expiry,
-                      showLabelAbove: true,
-                      hintText: 'MM/YYYY',
+                      AppDatePicker(
+                        controller: certification.expiryController,
+                        labelText: AppTexts.expiry,
+                        showLabelAbove: true,
+                        hintText: 'MM/YYYY',
                         monthYearOnly: true,
                       ),
                     ],

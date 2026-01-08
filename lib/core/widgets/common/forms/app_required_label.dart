@@ -7,17 +7,13 @@ class AppRequiredLabel extends StatelessWidget {
   final String text;
   final TextStyle? style;
 
-  const AppRequiredLabel({
-    super.key,
-    required this.text,
-    this.style,
-  });
+  const AppRequiredLabel({super.key, required this.text, this.style});
 
   @override
   Widget build(BuildContext context) {
-    final baseStyle = style ?? AppTextStyles.bodyText(context).copyWith(
-          fontWeight: FontWeight.w500,
-        );
+    final baseStyle =
+        style ??
+        AppTextStyles.bodyText(context).copyWith(fontWeight: FontWeight.w500);
 
     return RichText(
       text: TextSpan(

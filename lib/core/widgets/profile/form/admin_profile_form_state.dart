@@ -82,14 +82,16 @@ class AdminProfileFormState {
     phoneEntries.clear();
     if (profile.phones != null && profile.phones!.isNotEmpty) {
       for (var phone in profile.phones) {
-        phoneEntries.add(PhoneEntry(
-          countryCodeController: TextEditingController(
-            text: phone['countryCode']?.toString() ?? '+1',
+        phoneEntries.add(
+          PhoneEntry(
+            countryCodeController: TextEditingController(
+              text: phone['countryCode']?.toString() ?? '+1',
+            ),
+            numberController: TextEditingController(
+              text: phone['number']?.toString() ?? '',
+            ),
           ),
-          numberController: TextEditingController(
-            text: phone['number']?.toString() ?? '',
-          ),
-        ));
+        );
       }
     }
 
@@ -126,21 +128,23 @@ class AdminProfileFormState {
     educationEntries.clear();
     if (profile.education != null && profile.education!.isNotEmpty) {
       for (var edu in profile.education) {
-        educationEntries.add(EducationEntry(
-          institutionController: TextEditingController(
-            text: edu['institutionName']?.toString() ?? '',
+        educationEntries.add(
+          EducationEntry(
+            institutionController: TextEditingController(
+              text: edu['institutionName']?.toString() ?? '',
+            ),
+            degreeController: TextEditingController(
+              text: edu['degree']?.toString() ?? '',
+            ),
+            fromDateController: TextEditingController(
+              text: edu['fromDate']?.toString() ?? '',
+            ),
+            toDateController: TextEditingController(
+              text: edu['toDate']?.toString() ?? '',
+            ),
+            isOngoing: edu['isOngoing'] == true,
           ),
-          degreeController: TextEditingController(
-            text: edu['degree']?.toString() ?? '',
-          ),
-          fromDateController: TextEditingController(
-            text: edu['fromDate']?.toString() ?? '',
-          ),
-          toDateController: TextEditingController(
-            text: edu['toDate']?.toString() ?? '',
-          ),
-          isOngoing: edu['isOngoing'] == true,
-        ));
+        );
       }
     }
 
@@ -152,15 +156,17 @@ class AdminProfileFormState {
     certificationEntries.clear();
     if (profile.certifications != null && profile.certifications!.isNotEmpty) {
       for (var cert in profile.certifications) {
-        certificationEntries.add(CertificationEntry(
-          nameController: TextEditingController(
-            text: cert['name']?.toString() ?? '',
+        certificationEntries.add(
+          CertificationEntry(
+            nameController: TextEditingController(
+              text: cert['name']?.toString() ?? '',
+            ),
+            expiryController: TextEditingController(
+              text: cert['expiry']?.toString() ?? '',
+            ),
+            hasNoExpiry: cert['hasNoExpiry'] == true,
           ),
-          expiryController: TextEditingController(
-            text: cert['expiry']?.toString() ?? '',
-          ),
-          hasNoExpiry: cert['hasNoExpiry'] == true,
-        ));
+        );
       }
     }
 
@@ -175,34 +181,38 @@ class AdminProfileFormState {
     workHistoryEntries.clear();
     if (profile.workHistory != null && profile.workHistory!.isNotEmpty) {
       for (var work in profile.workHistory) {
-        workHistoryEntries.add(WorkHistoryEntry(
-          companyController: TextEditingController(
-            text: work['company']?.toString() ?? '',
+        workHistoryEntries.add(
+          WorkHistoryEntry(
+            companyController: TextEditingController(
+              text: work['company']?.toString() ?? '',
+            ),
+            positionController: TextEditingController(
+              text: work['position']?.toString() ?? '',
+            ),
+            descriptionController: TextEditingController(
+              text: work['description']?.toString() ?? '',
+            ),
+            fromDateController: TextEditingController(
+              text: work['fromDate']?.toString() ?? '',
+            ),
+            toDateController: TextEditingController(
+              text: work['toDate']?.toString() ?? '',
+            ),
+            isOngoing: work['isOngoing'] == true,
           ),
-          positionController: TextEditingController(
-            text: work['position']?.toString() ?? '',
-          ),
-          descriptionController: TextEditingController(
-            text: work['description']?.toString() ?? '',
-          ),
-          fromDateController: TextEditingController(
-            text: work['fromDate']?.toString() ?? '',
-          ),
-          toDateController: TextEditingController(
-            text: work['toDate']?.toString() ?? '',
-          ),
-          isOngoing: work['isOngoing'] == true,
-        ));
+        );
       }
     }
   }
 
   void addPhone() {
     if (phoneEntries.length < 2) {
-      phoneEntries.add(PhoneEntry(
-        countryCodeController: TextEditingController(text: '+1'),
-        numberController: TextEditingController(),
-      ));
+      phoneEntries.add(
+        PhoneEntry(
+          countryCodeController: TextEditingController(text: '+1'),
+          numberController: TextEditingController(),
+        ),
+      );
     }
   }
 
@@ -213,12 +223,14 @@ class AdminProfileFormState {
   }
 
   void addEducation() {
-    educationEntries.add(EducationEntry(
-      institutionController: TextEditingController(),
-      degreeController: TextEditingController(),
-      fromDateController: TextEditingController(),
-      toDateController: TextEditingController(),
-    ));
+    educationEntries.add(
+      EducationEntry(
+        institutionController: TextEditingController(),
+        degreeController: TextEditingController(),
+        fromDateController: TextEditingController(),
+        toDateController: TextEditingController(),
+      ),
+    );
   }
 
   void removeEducation(int index) {
@@ -230,10 +242,12 @@ class AdminProfileFormState {
   }
 
   void addCertification() {
-    certificationEntries.add(CertificationEntry(
-      nameController: TextEditingController(),
-      expiryController: TextEditingController(),
-    ));
+    certificationEntries.add(
+      CertificationEntry(
+        nameController: TextEditingController(),
+        expiryController: TextEditingController(),
+      ),
+    );
   }
 
   void removeCertification(int index) {
@@ -243,13 +257,15 @@ class AdminProfileFormState {
   }
 
   void addWorkHistoryEntry() {
-    workHistoryEntries.add(WorkHistoryEntry(
-      companyController: TextEditingController(),
-      positionController: TextEditingController(),
-      descriptionController: TextEditingController(),
-      fromDateController: TextEditingController(),
-      toDateController: TextEditingController(),
-    ));
+    workHistoryEntries.add(
+      WorkHistoryEntry(
+        companyController: TextEditingController(),
+        positionController: TextEditingController(),
+        descriptionController: TextEditingController(),
+        fromDateController: TextEditingController(),
+        toDateController: TextEditingController(),
+      ),
+    );
   }
 
   void removeWorkHistoryEntry(int index) {

@@ -61,7 +61,8 @@ class ProfileConstants {
   // Note: Using comprehensive worldwide list from WorldCountries
   // Each entry has a unique 'id' to avoid duplicate values in dropdown
   // The 'code' is the actual phone country code, 'name' is the country name
-  static List<Map<String, String>> get countryCodes => WorldCountries.allCountries;
+  static List<Map<String, String>> get countryCodes =>
+      WorldCountries.allCountries;
 
   // Professions (can be changed later as per user requirement)
   static const List<String> professions = [

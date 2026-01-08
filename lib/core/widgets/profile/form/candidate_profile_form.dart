@@ -67,7 +67,8 @@ class _CandidateProfileFormState extends State<CandidateProfileForm> {
             emailController: formState.emailController,
             passwordController: formState.passwordController,
             emailEnabled: false, // Email is read-only for candidates
-            passwordEnabled: false, // Password is read-only for candidates (prefilled with email)
+            passwordEnabled:
+                false, // Password is read-only for candidates (prefilled with email)
             address1Controller: formState.address1Controller,
             address2Controller: formState.address2Controller,
             cityController: formState.cityController,
@@ -109,7 +110,8 @@ class _CandidateProfileFormState extends State<CandidateProfileForm> {
             cityError: controller.cityError,
             stateError: controller.stateError,
             zipError: controller.zipError,
-            hasError: controller.firstNameError.value != null ||
+            hasError:
+                controller.firstNameError.value != null ||
                 controller.lastNameError.value != null ||
                 controller.emailError.value != null ||
                 controller.address1Error.value != null ||
@@ -148,7 +150,8 @@ class _CandidateProfileFormState extends State<CandidateProfileForm> {
                 formState.removePhone(index);
               });
             },
-            hasError: _hasPhonesErrors() || controller.phonesError.value != null,
+            hasError:
+                _hasPhonesErrors() || controller.phonesError.value != null,
           ),
         ),
         AppSpacing.vertical(context, 0.02),
@@ -175,7 +178,8 @@ class _CandidateProfileFormState extends State<CandidateProfileForm> {
             },
             professionError: controller.professionError,
             specialtiesError: controller.specialtiesError,
-            hasError: controller.professionError.value != null ||
+            hasError:
+                controller.professionError.value != null ||
                 controller.specialtiesError.value != null,
           ),
         ),
@@ -247,7 +251,11 @@ class _CandidateProfileFormState extends State<CandidateProfileForm> {
               });
             },
             onInstitutionChanged: (index, institution) {
-              controller.validateEducationField(index, 'institutionName', institution);
+              controller.validateEducationField(
+                index,
+                'institutionName',
+                institution,
+              );
             },
             onDegreeChanged: (index, degree) {
               controller.validateEducationField(index, 'degree', degree);
@@ -268,7 +276,8 @@ class _CandidateProfileFormState extends State<CandidateProfileForm> {
                 formState.removeEducation(index);
               });
             },
-            getFieldError: (index, fieldName) => controller.getEducationFieldError(index, fieldName),
+            getFieldError: (index, fieldName) =>
+                controller.getEducationFieldError(index, fieldName),
             generalError: controller.educationError,
             hasError: controller.educationError.value != null,
           ),
@@ -281,8 +290,10 @@ class _CandidateProfileFormState extends State<CandidateProfileForm> {
           onNoExpiryChanged: (index, hasNoExpiry) {
             setState(() {
               formState.certificationEntries[index] = CertificationEntry(
-                nameController: formState.certificationEntries[index].nameController,
-                expiryController: formState.certificationEntries[index].expiryController,
+                nameController:
+                    formState.certificationEntries[index].nameController,
+                expiryController:
+                    formState.certificationEntries[index].expiryController,
                 hasNoExpiry: hasNoExpiry,
               );
             });
@@ -307,11 +318,16 @@ class _CandidateProfileFormState extends State<CandidateProfileForm> {
             onOngoingChanged: (index, isOngoing) {
               setState(() {
                 formState.workHistoryEntries[index] = WorkHistoryEntry(
-                  companyController: formState.workHistoryEntries[index].companyController,
-                  positionController: formState.workHistoryEntries[index].positionController,
-                  descriptionController: formState.workHistoryEntries[index].descriptionController,
-                  fromDateController: formState.workHistoryEntries[index].fromDateController,
-                  toDateController: formState.workHistoryEntries[index].toDateController,
+                  companyController:
+                      formState.workHistoryEntries[index].companyController,
+                  positionController:
+                      formState.workHistoryEntries[index].positionController,
+                  descriptionController:
+                      formState.workHistoryEntries[index].descriptionController,
+                  fromDateController:
+                      formState.workHistoryEntries[index].fromDateController,
+                  toDateController:
+                      formState.workHistoryEntries[index].toDateController,
                   isOngoing: isOngoing,
                 );
               });

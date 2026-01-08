@@ -9,10 +9,12 @@ class ProfileFormDataHelper {
     List<PhoneEntry> phoneEntries,
   ) {
     return phoneEntries
-        .map((phone) => <String, dynamic>{
-              'countryCode': phone.countryCodeController.text.trim(),
-              'number': phone.numberController.text.trim(),
-            })
+        .map(
+          (phone) => <String, dynamic>{
+            'countryCode': phone.countryCodeController.text.trim(),
+            'number': phone.numberController.text.trim(),
+          },
+        )
         .where((phone) => (phone['number'] as String).isNotEmpty)
         .toList();
   }
@@ -21,16 +23,20 @@ class ProfileFormDataHelper {
     List<EducationEntry> educationEntries,
   ) {
     return educationEntries
-        .map((edu) => <String, dynamic>{
-              'institutionName': edu.institutionController.text.trim(),
-              'degree': edu.degreeController.text.trim(),
-              'fromDate': edu.fromDateController.text.trim(),
-              'toDate': edu.toDateController.text.trim(),
-              'isOngoing': edu.isOngoing,
-            })
-        .where((edu) =>
-            (edu['institutionName'] as String).isNotEmpty ||
-            (edu['degree'] as String).isNotEmpty)
+        .map(
+          (edu) => <String, dynamic>{
+            'institutionName': edu.institutionController.text.trim(),
+            'degree': edu.degreeController.text.trim(),
+            'fromDate': edu.fromDateController.text.trim(),
+            'toDate': edu.toDateController.text.trim(),
+            'isOngoing': edu.isOngoing,
+          },
+        )
+        .where(
+          (edu) =>
+              (edu['institutionName'] as String).isNotEmpty ||
+              (edu['degree'] as String).isNotEmpty,
+        )
         .toList();
   }
 
@@ -38,11 +44,15 @@ class ProfileFormDataHelper {
     List<CertificationEntry> certificationEntries,
   ) {
     return certificationEntries
-        .map((cert) => <String, dynamic>{
-              'name': cert.nameController.text.trim(),
-              'expiry': cert.hasNoExpiry ? null : cert.expiryController.text.trim(),
-              'hasNoExpiry': cert.hasNoExpiry,
-            })
+        .map(
+          (cert) => <String, dynamic>{
+            'name': cert.nameController.text.trim(),
+            'expiry': cert.hasNoExpiry
+                ? null
+                : cert.expiryController.text.trim(),
+            'hasNoExpiry': cert.hasNoExpiry,
+          },
+        )
         .where((cert) => (cert['name'] as String).isNotEmpty)
         .toList();
   }
@@ -51,17 +61,21 @@ class ProfileFormDataHelper {
     List<WorkHistoryEntry> workHistoryEntries,
   ) {
     return workHistoryEntries
-        .map((work) => <String, dynamic>{
-              'company': work.companyController.text.trim(),
-              'position': work.positionController.text.trim(),
-              'description': work.descriptionController.text.trim(),
-              'fromDate': work.fromDateController.text.trim(),
-              'toDate': work.toDateController.text.trim(),
-              'isOngoing': work.isOngoing,
-            })
-        .where((work) =>
-            (work['company'] as String).isNotEmpty ||
-            (work['position'] as String).isNotEmpty)
+        .map(
+          (work) => <String, dynamic>{
+            'company': work.companyController.text.trim(),
+            'position': work.positionController.text.trim(),
+            'description': work.descriptionController.text.trim(),
+            'fromDate': work.fromDateController.text.trim(),
+            'toDate': work.toDateController.text.trim(),
+            'isOngoing': work.isOngoing,
+          },
+        )
+        .where(
+          (work) =>
+              (work['company'] as String).isNotEmpty ||
+              (work['position'] as String).isNotEmpty,
+        )
         .toList();
   }
 
@@ -71,7 +85,9 @@ class ProfileFormDataHelper {
   ) {
     final phones = getPhonesData(formState.phoneEntries);
     final education = getEducationData(formState.educationEntries);
-    final certifications = getCertificationsData(formState.certificationEntries);
+    final certifications = getCertificationsData(
+      formState.certificationEntries,
+    );
     final workHistory = getWorkHistoryData(formState.workHistoryEntries);
 
     // Get email from user account (always use this, not form field)
@@ -102,7 +118,9 @@ class ProfileFormDataHelper {
       middleName: formState.middleNameController.text.trim().isEmpty
           ? null
           : formState.middleNameController.text.trim(),
-      email: userEmail.isNotEmpty ? userEmail : null, // Always use account email
+      email: userEmail.isNotEmpty
+          ? userEmail
+          : null, // Always use account email
       address1: formState.address1Controller.text.trim().isEmpty
           ? null
           : formState.address1Controller.text.trim(),

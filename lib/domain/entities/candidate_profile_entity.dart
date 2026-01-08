@@ -5,7 +5,7 @@ class CandidateProfileEntity {
   final String lastName;
   final List<Map<String, dynamic>>? workHistory;
   final String? assignedAgentId;
-  
+
   // Profile fields
   final String? middleName;
   final String? email;

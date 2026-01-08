@@ -16,13 +16,15 @@ class CandidateProfileSection extends StatelessWidget {
   final TextEditingController stateController;
   final TextEditingController zipController;
   final TextEditingController ssnController;
-  final TextEditingController? passwordController; // Optional, for admin side or candidate side
+  final TextEditingController?
+  passwordController; // Optional, for admin side or candidate side
   final bool emailEnabled; // Controls if email field is editable
   final bool passwordEnabled; // Controls if password field is editable
   final String? Function(String?)? onFirstNameChanged;
   final String? Function(String?)? onLastNameChanged;
   final String? Function(String?)? onEmailChanged;
-  final String? Function(String?)? onPasswordChanged; // Optional, for admin side or candidate side
+  final String? Function(String?)?
+  onPasswordChanged; // Optional, for admin side or candidate side
   final String? Function(String?)? onAddress1Changed;
   final String? Function(String?)? onCityChanged;
   final String? Function(String?)? onStateChanged;

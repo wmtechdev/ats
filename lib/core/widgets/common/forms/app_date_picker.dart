@@ -44,12 +44,14 @@ class AppDatePicker extends StatelessWidget {
     final DateTime now = DateTime.now();
     final DateTime first = firstDate ?? DateTime(1900);
     final DateTime last = lastDate ?? DateTime(now.year + 100);
-    
+
     // Parse initial date from controller if available
     DateTime initial = initialDate ?? now;
     if (controller != null && controller!.text.isNotEmpty) {
       try {
-        final format = dateFormat ?? (monthYearOnly ? DateFormat('MM/yyyy') : DateFormat('yyyy-MM-dd'));
+        final format =
+            dateFormat ??
+            (monthYearOnly ? DateFormat('MM/yyyy') : DateFormat('yyyy-MM-dd'));
         initial = format.parse(controller!.text);
       } catch (e) {
         // Invalid date, use now
@@ -78,7 +80,9 @@ class AppDatePicker extends StatelessWidget {
     }
 
     if (picked != null && controller != null) {
-      final format = dateFormat ?? (monthYearOnly ? DateFormat('MM/yyyy') : DateFormat('yyyy-MM-dd'));
+      final format =
+          dateFormat ??
+          (monthYearOnly ? DateFormat('MM/yyyy') : DateFormat('yyyy-MM-dd'));
       final formattedDate = format.format(picked);
       controller!.text = formattedDate;
       onChanged?.call(formattedDate);
@@ -132,9 +136,9 @@ class AppDatePicker extends StatelessWidget {
                       children: [
                         Text(
                           'Select Year',
-                          style: AppTextStyles.heading(context).copyWith(
-                            fontWeight: FontWeight.w600,
-                          ),
+                          style: AppTextStyles.heading(
+                            context,
+                          ).copyWith(fontWeight: FontWeight.w600),
                         ),
                         IconButton(
                           icon: Icon(
@@ -147,7 +151,7 @@ class AppDatePicker extends StatelessWidget {
                       ],
                     ),
                     AppSpacing.vertical(context, 0.015),
-                    
+
                     // Year grid
                     Flexible(
                       child: GridView.builder(
@@ -180,7 +184,9 @@ class AppDatePicker extends StatelessWidget {
                                 border: Border.all(
                                   color: isSelected
                                       ? AppColors.primary
-                                      : AppColors.primary.withValues(alpha: 0.3),
+                                      : AppColors.primary.withValues(
+                                          alpha: 0.3,
+                                        ),
                                   width: AppResponsive.scaleSize(
                                     context,
                                     isSelected ? 2 : 1,
@@ -190,15 +196,19 @@ class AppDatePicker extends StatelessWidget {
                               child: Center(
                                 child: Text(
                                   '$year',
-                                  style: AppTextStyles.bodyText(context).copyWith(
-                                    fontSize: AppResponsive.scaleSize(context, 14),
-                                    fontWeight: isSelected
-                                        ? FontWeight.bold
-                                        : FontWeight.normal,
-                                    color: isSelected
-                                        ? AppColors.white
-                                        : AppColors.black,
-                                  ),
+                                  style: AppTextStyles.bodyText(context)
+                                      .copyWith(
+                                        fontSize: AppResponsive.scaleSize(
+                                          context,
+                                          14,
+                                        ),
+                                        fontWeight: isSelected
+                                            ? FontWeight.bold
+                                            : FontWeight.normal,
+                                        color: isSelected
+                                            ? AppColors.white
+                                            : AppColors.black,
+                                      ),
                                 ),
                               ),
                             ),
@@ -206,9 +216,9 @@ class AppDatePicker extends StatelessWidget {
                         },
                       ),
                     ),
-                    
+
                     AppSpacing.vertical(context, 0.015),
-                    
+
                     // Action buttons
                     Row(
                       mainAxisAlignment: MainAxisAlignment.end,
@@ -224,9 +234,9 @@ class AppDatePicker extends StatelessWidget {
                           ),
                           child: Text(
                             'Cancel',
-                            style: AppTextStyles.bodyText(context).copyWith(
-                              color: AppColors.grey,
-                            ),
+                            style: AppTextStyles.bodyText(
+                              context,
+                            ).copyWith(color: AppColors.grey),
                           ),
                         ),
                         AppSpacing.horizontal(context, 0.012),
@@ -286,14 +296,27 @@ class AppDatePicker extends StatelessWidget {
         return StatefulBuilder(
           builder: (context, setState) {
             // Get first day of month and calculate offset
-            final firstDayOfMonth = DateTime(currentMonth.year, currentMonth.month, 1);
-            final firstDayWeekday = firstDayOfMonth.weekday; // 1 = Monday, 7 = Sunday
-            final daysInMonth = DateTime(currentMonth.year, currentMonth.month + 1, 0).day;
-            
+            final firstDayOfMonth = DateTime(
+              currentMonth.year,
+              currentMonth.month,
+              1,
+            );
+            final firstDayWeekday =
+                firstDayOfMonth.weekday; // 1 = Monday, 7 = Sunday
+            final daysInMonth = DateTime(
+              currentMonth.year,
+              currentMonth.month + 1,
+              0,
+            ).day;
+
             // Calculate days from previous month to show
             final daysFromPrevMonth = (firstDayWeekday - 1) % 7;
             final prevMonth = currentMonth.subtract(const Duration(days: 1));
-            final daysInPrevMonth = DateTime(prevMonth.year, prevMonth.month + 1, 0).day;
+            final daysInPrevMonth = DateTime(
+              prevMonth.year,
+              prevMonth.month + 1,
+              0,
+            ).day;
 
             return Dialog(
               shape: RoundedRectangleBorder(
@@ -303,10 +326,7 @@ class AppDatePicker extends StatelessWidget {
               ),
               child: Container(
                 width: AppResponsive.screenWidth(context) * 0.85,
-                constraints: BoxConstraints(
-                  maxWidth: 400,
-                  minWidth: 300,
-                ),
+                constraints: BoxConstraints(maxWidth: 400, minWidth: 300),
                 padding: AppSpacing.all(context, factor: 1.2),
                 decoration: BoxDecoration(
                   color: AppColors.white,
@@ -374,7 +394,10 @@ class AppDatePicker extends StatelessWidget {
                               AppSpacing.horizontal(context, 0.005),
                               Icon(
                                 Iconsax.arrow_down_2,
-                                size: AppResponsive.iconSize(context, factor: 0.6),
+                                size: AppResponsive.iconSize(
+                                  context,
+                                  factor: 0.6,
+                                ),
                                 color: AppColors.primary,
                               ),
                             ],
@@ -398,47 +421,68 @@ class AppDatePicker extends StatelessWidget {
                       ],
                     ),
                     AppSpacing.vertical(context, 0.015),
-                    
+
                     // Days of week header
                     Row(
                       children: ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su']
-                          .map((day) => Expanded(
-                                child: Center(
-                                  child: Text(
-                                    day,
-                                    style: AppTextStyles.bodyText(context).copyWith(
-                                      fontSize: AppResponsive.scaleSize(context, 12),
-                                      fontWeight: FontWeight.w500,
-                                      color: AppColors.black.withValues(alpha: 0.6),
-                                    ),
-                                  ),
+                          .map(
+                            (day) => Expanded(
+                              child: Center(
+                                child: Text(
+                                  day,
+                                  style: AppTextStyles.bodyText(context)
+                                      .copyWith(
+                                        fontSize: AppResponsive.scaleSize(
+                                          context,
+                                          12,
+                                        ),
+                                        fontWeight: FontWeight.w500,
+                                        color: AppColors.black.withValues(
+                                          alpha: 0.6,
+                                        ),
+                                      ),
                                 ),
-                              ))
+                              ),
+                            ),
+                          )
                           .toList(),
                     ),
                     AppSpacing.vertical(context, 0.01),
-                    
+
                     // Calendar grid
                     ...List.generate(6, (weekIndex) {
                       return Row(
                         children: List.generate(7, (dayIndex) {
                           final cellIndex = weekIndex * 7 + dayIndex;
                           final dateIndex = cellIndex - daysFromPrevMonth;
-                          
+
                           DateTime cellDate;
                           bool isCurrentMonth = false;
                           bool isSelected = false;
-                          
+
                           if (cellIndex < daysFromPrevMonth) {
                             // Previous month
-                            final day = daysInPrevMonth - daysFromPrevMonth + cellIndex + 1;
-                            cellDate = DateTime(prevMonth.year, prevMonth.month, day);
+                            final day =
+                                daysInPrevMonth -
+                                daysFromPrevMonth +
+                                cellIndex +
+                                1;
+                            cellDate = DateTime(
+                              prevMonth.year,
+                              prevMonth.month,
+                              day,
+                            );
                           } else if (dateIndex < daysInMonth) {
                             // Current month
                             final day = dateIndex + 1;
-                            cellDate = DateTime(currentMonth.year, currentMonth.month, day);
+                            cellDate = DateTime(
+                              currentMonth.year,
+                              currentMonth.month,
+                              day,
+                            );
                             isCurrentMonth = true;
-                            isSelected = selectedDate.year == cellDate.year &&
+                            isSelected =
+                                selectedDate.year == cellDate.year &&
                                 selectedDate.month == cellDate.month &&
                                 selectedDate.day == cellDate.day;
                           } else {
@@ -450,10 +494,15 @@ class AppDatePicker extends StatelessWidget {
                               day,
                             );
                           }
-                          
-                          final isSelectable = cellDate.isAfter(firstDate.subtract(const Duration(days: 1))) &&
-                              cellDate.isBefore(lastDate.add(const Duration(days: 1)));
-                          
+
+                          final isSelectable =
+                              cellDate.isAfter(
+                                firstDate.subtract(const Duration(days: 1)),
+                              ) &&
+                              cellDate.isBefore(
+                                lastDate.add(const Duration(days: 1)),
+                              );
+
                           return Expanded(
                             child: GestureDetector(
                               onTap: isSelectable && isCurrentMonth
@@ -475,17 +524,24 @@ class AppDatePicker extends StatelessWidget {
                                 child: Center(
                                   child: Text(
                                     '${cellDate.day}',
-                                    style: AppTextStyles.bodyText(context).copyWith(
-                                      fontSize: AppResponsive.scaleSize(context, 14),
-                                      fontWeight: isSelected
-                                          ? FontWeight.w600
-                                          : FontWeight.normal,
-                                      color: isSelected
-                                          ? AppColors.white
-                                          : (isCurrentMonth
-                                              ? AppColors.black
-                                              : AppColors.black.withValues(alpha: 0.3)),
-                                    ),
+                                    style: AppTextStyles.bodyText(context)
+                                        .copyWith(
+                                          fontSize: AppResponsive.scaleSize(
+                                            context,
+                                            14,
+                                          ),
+                                          fontWeight: isSelected
+                                              ? FontWeight.w600
+                                              : FontWeight.normal,
+                                          color: isSelected
+                                              ? AppColors.white
+                                              : (isCurrentMonth
+                                                    ? AppColors.black
+                                                    : AppColors.black
+                                                          .withValues(
+                                                            alpha: 0.3,
+                                                          )),
+                                        ),
                                   ),
                                 ),
                               ),
@@ -494,9 +550,9 @@ class AppDatePicker extends StatelessWidget {
                         }),
                       );
                     }),
-                    
+
                     AppSpacing.vertical(context, 0.015),
-                    
+
                     // Selected date display and Set Date button
                     Row(
                       children: [
@@ -584,10 +640,7 @@ class AppDatePicker extends StatelessWidget {
               ),
               content: Container(
                 width: AppResponsive.screenWidth(context) * 0.8,
-                constraints: BoxConstraints(
-                  maxWidth: 350,
-                  minWidth: 280,
-                ),
+                constraints: BoxConstraints(maxWidth: 350, minWidth: 280),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -611,9 +664,9 @@ class AppDatePicker extends StatelessWidget {
                         ),
                         Text(
                           '${selectedDate.year}',
-                          style: AppTextStyles.heading(context).copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
+                          style: AppTextStyles.heading(
+                            context,
+                          ).copyWith(fontWeight: FontWeight.bold),
                         ),
                         IconButton(
                           icon: Icon(
@@ -648,10 +701,7 @@ class AppDatePicker extends StatelessWidget {
                         return InkWell(
                           onTap: () {
                             setState(() {
-                              selectedDate = DateTime(
-                                selectedDate.year,
-                                month,
-                              );
+                              selectedDate = DateTime(selectedDate.year, month);
                             });
                           },
                           child: Container(
@@ -692,15 +742,16 @@ class AppDatePicker extends StatelessWidget {
               actions: [
                 TextButton(
                   onPressed: () => Navigator.of(context).pop(),
-                  child: Text(
-                    'Cancel',
-                    style: AppTextStyles.bodyText(context),
-                  ),
+                  child: Text('Cancel', style: AppTextStyles.bodyText(context)),
                 ),
                 TextButton(
                   onPressed: () {
                     // Set to first day of selected month
-                    final result = DateTime(selectedDate.year, selectedDate.month, 1);
+                    final result = DateTime(
+                      selectedDate.year,
+                      selectedDate.month,
+                      1,
+                    );
                     Navigator.of(context).pop(result);
                   },
                   child: Text(
@@ -727,7 +778,6 @@ class AppDatePicker extends StatelessWidget {
       right: defaultPadding.horizontal,
     );
 
-
     final textField = TextField(
       controller: controller,
       enabled: false, // Always disabled to force using picker
@@ -736,7 +786,9 @@ class AppDatePicker extends StatelessWidget {
       decoration: InputDecoration(
         hintText: hintText ?? (monthYearOnly ? 'MM/YYYY' : 'YYYY-MM-DD'),
         filled: true,
-        fillColor: enabled ? AppColors.white : AppColors.white.withValues(alpha: 0.5),
+        fillColor: enabled
+            ? AppColors.white
+            : AppColors.white.withValues(alpha: 0.5),
         hintStyle: AppTextStyles.hintText(context),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(
@@ -762,7 +814,9 @@ class AppDatePicker extends StatelessWidget {
         suffixIcon: Icon(
           Iconsax.calendar,
           size: AppResponsive.iconSize(context),
-          color: enabled ? AppColors.primary : AppColors.primary.withValues(alpha: 0.5),
+          color: enabled
+              ? AppColors.primary
+              : AppColors.primary.withValues(alpha: 0.5),
         ),
         contentPadding: contentPadding,
       ),
@@ -770,9 +824,7 @@ class AppDatePicker extends StatelessWidget {
 
     final datePickerWidget = GestureDetector(
       onTap: enabled ? () => _selectDate(context) : null,
-      child: AbsorbPointer(
-        child: textField,
-      ),
+      child: AbsorbPointer(child: textField),
     );
 
     // If labelText is provided and showLabelAbove is true, show it above the text field
@@ -790,9 +842,9 @@ class AppDatePicker extends StatelessWidget {
               ? AppRequiredLabel(text: cleanLabelText)
               : Text(
                   cleanLabelText,
-                  style: AppTextStyles.bodyText(context).copyWith(
-                    fontWeight: FontWeight.w500,
-                  ),
+                  style: AppTextStyles.bodyText(
+                    context,
+                  ).copyWith(fontWeight: FontWeight.w500),
                 ),
           datePickerWidget,
         ],

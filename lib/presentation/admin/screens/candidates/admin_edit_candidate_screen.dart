@@ -47,7 +47,7 @@ class _AdminEditCandidateScreenState extends State<AdminEditCandidateScreen> {
   void initState() {
     super.initState();
     formState = AdminProfileFormState();
-    
+
     // Set password field to masked placeholder (read-only in edit mode)
     passwordController.text = '••••••••';
 
@@ -97,11 +97,13 @@ class _AdminEditCandidateScreenState extends State<AdminEditCandidateScreen> {
       liabilityAction: profileData['liabilityAction'] as String?,
       licenseAction: profileData['licenseAction'] as String?,
       previouslyTraveled: profileData['previouslyTraveled'] as String?,
-      terminatedFromAssignment: profileData['terminatedFromAssignment'] as String?,
+      terminatedFromAssignment:
+          profileData['terminatedFromAssignment'] as String?,
       licensureState: profileData['licensureState'] as String?,
       npi: profileData['npi'] as String?,
       education: profileData['education'] as List<Map<String, dynamic>>?,
-      certifications: profileData['certifications'] as List<Map<String, dynamic>>?,
+      certifications:
+          profileData['certifications'] as List<Map<String, dynamic>>?,
       workHistory: profileData['workHistory'] as List<Map<String, dynamic>>?,
     );
   }
@@ -159,7 +161,8 @@ class _AdminEditCandidateScreenState extends State<AdminEditCandidateScreen> {
                   onCityChanged: (_) => null,
                   onStateChanged: (_) => null,
                   onZipChanged: (_) => null,
-                  hasError: firstNameError.value != null ||
+                  hasError:
+                      firstNameError.value != null ||
                       lastNameError.value != null ||
                       address1Error.value != null ||
                       cityError.value != null ||
@@ -172,7 +175,9 @@ class _AdminEditCandidateScreenState extends State<AdminEditCandidateScreen> {
               // Phones Section
               Obx(
                 () => PhonesSection(
-                  phoneEntries: formState.phoneEntries.asMap().entries.map((entry) {
+                  phoneEntries: formState.phoneEntries.asMap().entries.map((
+                    entry,
+                  ) {
                     final index = entry.key;
                     final phone = entry.value;
                     return PhoneEntry(
@@ -193,7 +198,8 @@ class _AdminEditCandidateScreenState extends State<AdminEditCandidateScreen> {
                       formState.removePhone(index);
                     });
                   },
-                  hasError: phonesError.value != null ||
+                  hasError:
+                      phonesError.value != null ||
                       phoneErrors.values.any((e) => e.value != null),
                 ),
               ),
@@ -217,7 +223,8 @@ class _AdminEditCandidateScreenState extends State<AdminEditCandidateScreen> {
                       formState.selectedSpecialties.addAll(specialties);
                     });
                   },
-                  hasError: professionError.value != null ||
+                  hasError:
+                      professionError.value != null ||
                       specialtiesError.value != null,
                 ),
               ),
@@ -275,10 +282,16 @@ class _AdminEditCandidateScreenState extends State<AdminEditCandidateScreen> {
                   onOngoingChanged: (index, isOngoing) {
                     setState(() {
                       formState.educationEntries[index] = EducationEntry(
-                        institutionController: formState.educationEntries[index].institutionController,
-                        degreeController: formState.educationEntries[index].degreeController,
-                        fromDateController: formState.educationEntries[index].fromDateController,
-                        toDateController: formState.educationEntries[index].toDateController,
+                        institutionController: formState
+                            .educationEntries[index]
+                            .institutionController,
+                        degreeController:
+                            formState.educationEntries[index].degreeController,
+                        fromDateController: formState
+                            .educationEntries[index]
+                            .fromDateController,
+                        toDateController:
+                            formState.educationEntries[index].toDateController,
                         isOngoing: isOngoing,
                       );
                     });
@@ -309,8 +322,11 @@ class _AdminEditCandidateScreenState extends State<AdminEditCandidateScreen> {
                 onNoExpiryChanged: (index, hasNoExpiry) {
                   setState(() {
                     formState.certificationEntries[index] = CertificationEntry(
-                      nameController: formState.certificationEntries[index].nameController,
-                      expiryController: formState.certificationEntries[index].expiryController,
+                      nameController:
+                          formState.certificationEntries[index].nameController,
+                      expiryController: formState
+                          .certificationEntries[index]
+                          .expiryController,
                       hasNoExpiry: hasNoExpiry,
                     );
                   });
@@ -335,11 +351,21 @@ class _AdminEditCandidateScreenState extends State<AdminEditCandidateScreen> {
                   onOngoingChanged: (index, isOngoing) {
                     setState(() {
                       formState.workHistoryEntries[index] = WorkHistoryEntry(
-                        companyController: formState.workHistoryEntries[index].companyController,
-                        positionController: formState.workHistoryEntries[index].positionController,
-                        descriptionController: formState.workHistoryEntries[index].descriptionController,
-                        fromDateController: formState.workHistoryEntries[index].fromDateController,
-                        toDateController: formState.workHistoryEntries[index].toDateController,
+                        companyController: formState
+                            .workHistoryEntries[index]
+                            .companyController,
+                        positionController: formState
+                            .workHistoryEntries[index]
+                            .positionController,
+                        descriptionController: formState
+                            .workHistoryEntries[index]
+                            .descriptionController,
+                        fromDateController: formState
+                            .workHistoryEntries[index]
+                            .fromDateController,
+                        toDateController: formState
+                            .workHistoryEntries[index]
+                            .toDateController,
                         isOngoing: isOngoing,
                       );
                     });

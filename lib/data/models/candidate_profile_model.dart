@@ -90,7 +90,8 @@ class CandidateProfileModel extends CandidateProfileEntity {
       if (liabilityAction != null) 'liabilityAction': liabilityAction,
       if (licenseAction != null) 'licenseAction': licenseAction,
       if (previouslyTraveled != null) 'previouslyTraveled': previouslyTraveled,
-      if (terminatedFromAssignment != null) 'terminatedFromAssignment': terminatedFromAssignment,
+      if (terminatedFromAssignment != null)
+        'terminatedFromAssignment': terminatedFromAssignment,
       if (licensureState != null) 'licensureState': licensureState,
       if (npi != null) 'npi': npi,
       if (education != null) 'education': education,

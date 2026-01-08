@@ -254,25 +254,39 @@ class AdminRepositoryImpl implements AdminRepository {
 
         // Update profile with all additional fields
         final updateData = <String, dynamic>{};
-        if (middleName != null && middleName.isNotEmpty) updateData['middleName'] = middleName;
-        if (address1 != null && address1.isNotEmpty) updateData['address1'] = address1;
-        if (address2 != null && address2.isNotEmpty) updateData['address2'] = address2;
+        if (middleName != null && middleName.isNotEmpty)
+          updateData['middleName'] = middleName;
+        if (address1 != null && address1.isNotEmpty)
+          updateData['address1'] = address1;
+        if (address2 != null && address2.isNotEmpty)
+          updateData['address2'] = address2;
         if (city != null && city.isNotEmpty) updateData['city'] = city;
         if (state != null && state.isNotEmpty) updateData['state'] = state;
         if (zip != null && zip.isNotEmpty) updateData['zip'] = zip;
         if (ssn != null && ssn.isNotEmpty) updateData['ssn'] = ssn;
         if (phones != null && phones.isNotEmpty) updateData['phones'] = phones;
-        if (profession != null && profession.isNotEmpty) updateData['profession'] = profession;
-        if (specialties != null && specialties.isNotEmpty) updateData['specialties'] = specialties;
-        if (liabilityAction != null && liabilityAction.isNotEmpty) updateData['liabilityAction'] = liabilityAction;
-        if (licenseAction != null && licenseAction.isNotEmpty) updateData['licenseAction'] = licenseAction;
-        if (previouslyTraveled != null && previouslyTraveled.isNotEmpty) updateData['previouslyTraveled'] = previouslyTraveled;
-        if (terminatedFromAssignment != null && terminatedFromAssignment.isNotEmpty) updateData['terminatedFromAssignment'] = terminatedFromAssignment;
-        if (licensureState != null && licensureState.isNotEmpty) updateData['licensureState'] = licensureState;
+        if (profession != null && profession.isNotEmpty)
+          updateData['profession'] = profession;
+        if (specialties != null && specialties.isNotEmpty)
+          updateData['specialties'] = specialties;
+        if (liabilityAction != null && liabilityAction.isNotEmpty)
+          updateData['liabilityAction'] = liabilityAction;
+        if (licenseAction != null && licenseAction.isNotEmpty)
+          updateData['licenseAction'] = licenseAction;
+        if (previouslyTraveled != null && previouslyTraveled.isNotEmpty)
+          updateData['previouslyTraveled'] = previouslyTraveled;
+        if (terminatedFromAssignment != null &&
+            terminatedFromAssignment.isNotEmpty)
+          updateData['terminatedFromAssignment'] = terminatedFromAssignment;
+        if (licensureState != null && licensureState.isNotEmpty)
+          updateData['licensureState'] = licensureState;
         if (npi != null && npi.isNotEmpty) updateData['npi'] = npi;
-        if (education != null && education.isNotEmpty) updateData['education'] = education;
-        if (certifications != null && certifications.isNotEmpty) updateData['certifications'] = certifications;
-        if (workHistory != null && workHistory.isNotEmpty) updateData['workHistory'] = workHistory;
+        if (education != null && education.isNotEmpty)
+          updateData['education'] = education;
+        if (certifications != null && certifications.isNotEmpty)
+          updateData['certifications'] = certifications;
+        if (workHistory != null && workHistory.isNotEmpty)
+          updateData['workHistory'] = workHistory;
         if (email.isNotEmpty) updateData['email'] = email;
 
         if (updateData.isNotEmpty) {
@@ -291,7 +305,11 @@ class AdminRepositoryImpl implements AdminRepository {
           );
         }
 
-        final profileModel = _createProfileModelFromData(profileData, profileId, userId);
+        final profileModel = _createProfileModelFromData(
+          profileData,
+          profileId,
+          userId,
+        );
         return Right(profileModel.toEntity());
       } else {
         // Fallback to direct Firebase (legacy approach)
@@ -328,25 +346,39 @@ class AdminRepositoryImpl implements AdminRepository {
 
         // Update profile with all additional fields
         final updateData = <String, dynamic>{};
-        if (middleName != null && middleName.isNotEmpty) updateData['middleName'] = middleName;
-        if (address1 != null && address1.isNotEmpty) updateData['address1'] = address1;
-        if (address2 != null && address2.isNotEmpty) updateData['address2'] = address2;
+        if (middleName != null && middleName.isNotEmpty)
+          updateData['middleName'] = middleName;
+        if (address1 != null && address1.isNotEmpty)
+          updateData['address1'] = address1;
+        if (address2 != null && address2.isNotEmpty)
+          updateData['address2'] = address2;
         if (city != null && city.isNotEmpty) updateData['city'] = city;
         if (state != null && state.isNotEmpty) updateData['state'] = state;
         if (zip != null && zip.isNotEmpty) updateData['zip'] = zip;
         if (ssn != null && ssn.isNotEmpty) updateData['ssn'] = ssn;
         if (phones != null && phones.isNotEmpty) updateData['phones'] = phones;
-        if (profession != null && profession.isNotEmpty) updateData['profession'] = profession;
-        if (specialties != null && specialties.isNotEmpty) updateData['specialties'] = specialties;
-        if (liabilityAction != null && liabilityAction.isNotEmpty) updateData['liabilityAction'] = liabilityAction;
-        if (licenseAction != null && licenseAction.isNotEmpty) updateData['licenseAction'] = licenseAction;
-        if (previouslyTraveled != null && previouslyTraveled.isNotEmpty) updateData['previouslyTraveled'] = previouslyTraveled;
-        if (terminatedFromAssignment != null && terminatedFromAssignment.isNotEmpty) updateData['terminatedFromAssignment'] = terminatedFromAssignment;
-        if (licensureState != null && licensureState.isNotEmpty) updateData['licensureState'] = licensureState;
+        if (profession != null && profession.isNotEmpty)
+          updateData['profession'] = profession;
+        if (specialties != null && specialties.isNotEmpty)
+          updateData['specialties'] = specialties;
+        if (liabilityAction != null && liabilityAction.isNotEmpty)
+          updateData['liabilityAction'] = liabilityAction;
+        if (licenseAction != null && licenseAction.isNotEmpty)
+          updateData['licenseAction'] = licenseAction;
+        if (previouslyTraveled != null && previouslyTraveled.isNotEmpty)
+          updateData['previouslyTraveled'] = previouslyTraveled;
+        if (terminatedFromAssignment != null &&
+            terminatedFromAssignment.isNotEmpty)
+          updateData['terminatedFromAssignment'] = terminatedFromAssignment;
+        if (licensureState != null && licensureState.isNotEmpty)
+          updateData['licensureState'] = licensureState;
         if (npi != null && npi.isNotEmpty) updateData['npi'] = npi;
-        if (education != null && education.isNotEmpty) updateData['education'] = education;
-        if (certifications != null && certifications.isNotEmpty) updateData['certifications'] = certifications;
-        if (workHistory != null && workHistory.isNotEmpty) updateData['workHistory'] = workHistory;
+        if (education != null && education.isNotEmpty)
+          updateData['education'] = education;
+        if (certifications != null && certifications.isNotEmpty)
+          updateData['certifications'] = certifications;
+        if (workHistory != null && workHistory.isNotEmpty)
+          updateData['workHistory'] = workHistory;
         if (email.isNotEmpty) updateData['email'] = email;
 
         if (updateData.isNotEmpty) {
@@ -370,7 +402,11 @@ class AdminRepositoryImpl implements AdminRepository {
           );
         }
 
-        final profileModel = _createProfileModelFromData(profileData, profileId, userId);
+        final profileModel = _createProfileModelFromData(
+          profileData,
+          profileId,
+          userId,
+        );
         return Right(profileModel.toEntity());
       }
     } on AuthException catch (e) {

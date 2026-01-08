@@ -18,7 +18,8 @@ class ProfileFormState {
   late final TextEditingController stateController;
   late final TextEditingController zipController;
   late final TextEditingController ssnController;
-  late final TextEditingController passwordController; // For candidate side (read-only, prefilled with email)
+  late final TextEditingController
+  passwordController; // For candidate side (read-only, prefilled with email)
 
   // Phones
   final List<PhoneEntry> phoneEntries = [];
@@ -54,19 +55,19 @@ class ProfileFormState {
     firstNameController = TextEditingController();
     middleNameController = TextEditingController();
     lastNameController = TextEditingController();
-    
+
     // Get email from current user account (unchangeable)
     final currentUser = controller.authRepository.getCurrentUser();
     final userEmail = currentUser?.email ?? '';
     emailController = TextEditingController(text: userEmail);
-    
+
     address1Controller = TextEditingController();
     address2Controller = TextEditingController();
     cityController = TextEditingController();
     stateController = TextEditingController();
     zipController = TextEditingController();
     ssnController = TextEditingController();
-    
+
     // Password field prefilled with masked placeholder (read-only for candidate)
     // Use a placeholder that represents a password, not the email
     passwordController = TextEditingController(text: '••••••••');
@@ -123,14 +124,16 @@ class ProfileFormState {
     phoneEntries.clear();
     if (profile.phones != null && profile.phones!.isNotEmpty) {
       for (var phone in profile.phones) {
-        phoneEntries.add(PhoneEntry(
-          countryCodeController: TextEditingController(
-            text: phone['countryCode']?.toString() ?? '+1',
+        phoneEntries.add(
+          PhoneEntry(
+            countryCodeController: TextEditingController(
+              text: phone['countryCode']?.toString() ?? '+1',
+            ),
+            numberController: TextEditingController(
+              text: phone['number']?.toString() ?? '',
+            ),
           ),
-          numberController: TextEditingController(
-            text: phone['number']?.toString() ?? '',
-          ),
-        ));
+        );
       }
     }
 
@@ -175,21 +178,23 @@ class ProfileFormState {
     educationEntries.clear();
     if (profile.education != null && profile.education!.isNotEmpty) {
       for (var edu in profile.education) {
-        educationEntries.add(EducationEntry(
-          institutionController: TextEditingController(
-            text: edu['institutionName']?.toString() ?? '',
+        educationEntries.add(
+          EducationEntry(
+            institutionController: TextEditingController(
+              text: edu['institutionName']?.toString() ?? '',
+            ),
+            degreeController: TextEditingController(
+              text: edu['degree']?.toString() ?? '',
+            ),
+            fromDateController: TextEditingController(
+              text: edu['fromDate']?.toString() ?? '',
+            ),
+            toDateController: TextEditingController(
+              text: edu['toDate']?.toString() ?? '',
+            ),
+            isOngoing: edu['isOngoing'] == true,
           ),
-          degreeController: TextEditingController(
-            text: edu['degree']?.toString() ?? '',
-          ),
-          fromDateController: TextEditingController(
-            text: edu['fromDate']?.toString() ?? '',
-          ),
-          toDateController: TextEditingController(
-            text: edu['toDate']?.toString() ?? '',
-          ),
-          isOngoing: edu['isOngoing'] == true,
-        ));
+        );
       }
     }
 
@@ -201,15 +206,17 @@ class ProfileFormState {
     certificationEntries.clear();
     if (profile.certifications != null && profile.certifications!.isNotEmpty) {
       for (var cert in profile.certifications) {
-        certificationEntries.add(CertificationEntry(
-          nameController: TextEditingController(
-            text: cert['name']?.toString() ?? '',
+        certificationEntries.add(
+          CertificationEntry(
+            nameController: TextEditingController(
+              text: cert['name']?.toString() ?? '',
+            ),
+            expiryController: TextEditingController(
+              text: cert['expiry']?.toString() ?? '',
+            ),
+            hasNoExpiry: cert['hasNoExpiry'] == true,
           ),
-          expiryController: TextEditingController(
-            text: cert['expiry']?.toString() ?? '',
-          ),
-          hasNoExpiry: cert['hasNoExpiry'] == true,
-        ));
+        );
       }
     }
 
@@ -224,34 +231,38 @@ class ProfileFormState {
     workHistoryEntries.clear();
     if (profile.workHistory != null && profile.workHistory!.isNotEmpty) {
       for (var work in profile.workHistory) {
-        workHistoryEntries.add(WorkHistoryEntry(
-          companyController: TextEditingController(
-            text: work['company']?.toString() ?? '',
+        workHistoryEntries.add(
+          WorkHistoryEntry(
+            companyController: TextEditingController(
+              text: work['company']?.toString() ?? '',
+            ),
+            positionController: TextEditingController(
+              text: work['position']?.toString() ?? '',
+            ),
+            descriptionController: TextEditingController(
+              text: work['description']?.toString() ?? '',
+            ),
+            fromDateController: TextEditingController(
+              text: work['fromDate']?.toString() ?? '',
+            ),
+            toDateController: TextEditingController(
+              text: work['toDate']?.toString() ?? '',
+            ),
+            isOngoing: work['isOngoing'] == true,
           ),
-          positionController: TextEditingController(
-            text: work['position']?.toString() ?? '',
-          ),
-          descriptionController: TextEditingController(
-            text: work['description']?.toString() ?? '',
-          ),
-          fromDateController: TextEditingController(
-            text: work['fromDate']?.toString() ?? '',
-          ),
-          toDateController: TextEditingController(
-            text: work['toDate']?.toString() ?? '',
-          ),
-          isOngoing: work['isOngoing'] == true,
-        ));
+        );
       }
     }
   }
 
   void addPhone() {
     if (phoneEntries.length < 2) {
-      phoneEntries.add(PhoneEntry(
-        countryCodeController: TextEditingController(text: '+1'),
-        numberController: TextEditingController(),
-      ));
+      phoneEntries.add(
+        PhoneEntry(
+          countryCodeController: TextEditingController(text: '+1'),
+          numberController: TextEditingController(),
+        ),
+      );
     }
   }
 
@@ -262,12 +273,14 @@ class ProfileFormState {
   }
 
   void addEducation() {
-    educationEntries.add(EducationEntry(
-      institutionController: TextEditingController(),
-      degreeController: TextEditingController(),
-      fromDateController: TextEditingController(),
-      toDateController: TextEditingController(),
-    ));
+    educationEntries.add(
+      EducationEntry(
+        institutionController: TextEditingController(),
+        degreeController: TextEditingController(),
+        fromDateController: TextEditingController(),
+        toDateController: TextEditingController(),
+      ),
+    );
   }
 
   void removeEducation(int index) {
@@ -279,10 +292,12 @@ class ProfileFormState {
   }
 
   void addCertification() {
-    certificationEntries.add(CertificationEntry(
-      nameController: TextEditingController(),
-      expiryController: TextEditingController(),
-    ));
+    certificationEntries.add(
+      CertificationEntry(
+        nameController: TextEditingController(),
+        expiryController: TextEditingController(),
+      ),
+    );
   }
 
   void removeCertification(int index) {
@@ -292,13 +307,15 @@ class ProfileFormState {
   }
 
   void addWorkHistoryEntry() {
-    workHistoryEntries.add(WorkHistoryEntry(
-      companyController: TextEditingController(),
-      positionController: TextEditingController(),
-      descriptionController: TextEditingController(),
-      fromDateController: TextEditingController(),
-      toDateController: TextEditingController(),
-    ));
+    workHistoryEntries.add(
+      WorkHistoryEntry(
+        companyController: TextEditingController(),
+        positionController: TextEditingController(),
+        descriptionController: TextEditingController(),
+        fromDateController: TextEditingController(),
+        toDateController: TextEditingController(),
+      ),
+    );
   }
 
   void removeWorkHistoryEntry(int index) {
@@ -309,7 +326,9 @@ class ProfileFormState {
     workHistoryEntries[index].toDateController.dispose();
     workHistoryEntries.removeAt(index);
     controller.clearWorkHistoryEntryErrors(index);
-    final workHistory = ProfileFormDataHelper.getWorkHistoryData(workHistoryEntries);
+    final workHistory = ProfileFormDataHelper.getWorkHistoryData(
+      workHistoryEntries,
+    );
     controller.validateWorkHistory(workHistory.isEmpty ? null : workHistory);
   }
 

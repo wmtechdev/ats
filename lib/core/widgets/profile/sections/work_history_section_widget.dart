@@ -94,7 +94,9 @@ class WorkHistorySectionWidget extends StatelessWidget {
                   borderRadius: BorderRadius.circular(
                     AppResponsive.radius(context, factor: 1.5),
                   ),
-                  border: Border.all(color: AppColors.primary.withValues(alpha: 0.5)),
+                  border: Border.all(
+                    color: AppColors.primary.withValues(alpha: 0.5),
+                  ),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -104,9 +106,9 @@ class WorkHistorySectionWidget extends StatelessWidget {
                       children: [
                         Text(
                           '${AppTexts.workTitle} ${index + 1}',
-                          style: AppTextStyles.bodyText(context).copyWith(
-                            fontWeight: FontWeight.w600,
-                          ),
+                          style: AppTextStyles.bodyText(
+                            context,
+                          ).copyWith(fontWeight: FontWeight.w600),
                         ),
                         IconButton(
                           icon: const Icon(
@@ -118,50 +120,58 @@ class WorkHistorySectionWidget extends StatelessWidget {
                       ],
                     ),
                     AppSpacing.vertical(context, 0.01),
-                    
+
                     // Company
                     AppTextField(
                       controller: workHistory.companyController,
                       labelText: AppTexts.company,
                       showLabelAbove: true,
-                      onChanged: (value) => onCompanyChanged?.call(index, value),
+                      onChanged: (value) =>
+                          onCompanyChanged?.call(index, value),
                     ),
                     if (getFieldError != null)
-                      Obx(
-                        () {
-                          final error = getFieldError!(index, 'company');
-                          return error != null
-                              ? Padding(
-                                  padding: EdgeInsets.only(
-                                    top: AppSpacing.vertical(context, 0.01).height!,
-                                  ),
-                                  child: AppErrorMessage(
-                                    message: error,
-                                    icon: Iconsax.info_circle,
-                                  ),
-                                )
-                              : const SizedBox.shrink();
-                        },
-                      )
+                      Obx(() {
+                        final error = getFieldError!(index, 'company');
+                        return error != null
+                            ? Padding(
+                                padding: EdgeInsets.only(
+                                  top: AppSpacing.vertical(
+                                    context,
+                                    0.01,
+                                  ).height!,
+                                ),
+                                child: AppErrorMessage(
+                                  message: error,
+                                  icon: Iconsax.info_circle,
+                                ),
+                              )
+                            : const SizedBox.shrink();
+                      })
                     else if (profileController != null)
                       Builder(
                         builder: (context) {
                           final controller = profileController!;
                           return Obx(
-                            () => controller.getWorkHistoryFieldError(
+                            () =>
+                                controller.getWorkHistoryFieldError(
                                       index,
                                       'company',
                                     ) !=
                                     null
                                 ? Padding(
                                     padding: EdgeInsets.only(
-                                      top: AppSpacing.vertical(context, 0.01).height!,
+                                      top: AppSpacing.vertical(
+                                        context,
+                                        0.01,
+                                      ).height!,
                                     ),
                                     child: AppErrorMessage(
-                                      message: controller.getWorkHistoryFieldError(
-                                        index,
-                                        'company',
-                                      ) ?? '',
+                                      message:
+                                          controller.getWorkHistoryFieldError(
+                                            index,
+                                            'company',
+                                          ) ??
+                                          '',
                                       icon: Iconsax.info_circle,
                                     ),
                                   )
@@ -170,50 +180,58 @@ class WorkHistorySectionWidget extends StatelessWidget {
                         },
                       ),
                     AppSpacing.vertical(context, 0.01),
-                    
+
                     // Position
                     AppTextField(
                       controller: workHistory.positionController,
                       labelText: AppTexts.position,
                       showLabelAbove: true,
-                      onChanged: (value) => onPositionChanged?.call(index, value),
+                      onChanged: (value) =>
+                          onPositionChanged?.call(index, value),
                     ),
                     if (getFieldError != null)
-                      Obx(
-                        () {
-                          final error = getFieldError!(index, 'position');
-                          return error != null
-                              ? Padding(
-                                  padding: EdgeInsets.only(
-                                    top: AppSpacing.vertical(context, 0.01).height!,
-                                  ),
-                                  child: AppErrorMessage(
-                                    message: error,
-                                    icon: Iconsax.info_circle,
-                                  ),
-                                )
-                              : const SizedBox.shrink();
-                        },
-                      )
+                      Obx(() {
+                        final error = getFieldError!(index, 'position');
+                        return error != null
+                            ? Padding(
+                                padding: EdgeInsets.only(
+                                  top: AppSpacing.vertical(
+                                    context,
+                                    0.01,
+                                  ).height!,
+                                ),
+                                child: AppErrorMessage(
+                                  message: error,
+                                  icon: Iconsax.info_circle,
+                                ),
+                              )
+                            : const SizedBox.shrink();
+                      })
                     else if (profileController != null)
                       Builder(
                         builder: (context) {
                           final controller = profileController!;
                           return Obx(
-                            () => controller.getWorkHistoryFieldError(
+                            () =>
+                                controller.getWorkHistoryFieldError(
                                       index,
                                       'position',
                                     ) !=
                                     null
                                 ? Padding(
                                     padding: EdgeInsets.only(
-                                      top: AppSpacing.vertical(context, 0.01).height!,
+                                      top: AppSpacing.vertical(
+                                        context,
+                                        0.01,
+                                      ).height!,
                                     ),
                                     child: AppErrorMessage(
-                                      message: controller.getWorkHistoryFieldError(
-                                        index,
-                                        'position',
-                                      ) ?? '',
+                                      message:
+                                          controller.getWorkHistoryFieldError(
+                                            index,
+                                            'position',
+                                          ) ??
+                                          '',
                                       icon: Iconsax.info_circle,
                                     ),
                                   )
@@ -222,7 +240,7 @@ class WorkHistorySectionWidget extends StatelessWidget {
                         },
                       ),
                     AppSpacing.vertical(context, 0.01),
-                    
+
                     // Description
                     AppTextField(
                       controller: workHistory.descriptionController,
@@ -231,7 +249,7 @@ class WorkHistorySectionWidget extends StatelessWidget {
                       maxLines: 3,
                     ),
                     AppSpacing.vertical(context, 0.01),
-                    
+
                     // From Date
                     AppDatePicker(
                       controller: workHistory.fromDateController,
@@ -239,10 +257,11 @@ class WorkHistorySectionWidget extends StatelessWidget {
                       showLabelAbove: true,
                       hintText: 'YYYY-MM-DD',
                       lastDate: DateTime.now(), // Cannot be in future
-                      onChanged: (value) => onFromDateChanged?.call(index, value),
+                      onChanged: (value) =>
+                          onFromDateChanged?.call(index, value),
                     ),
                     AppSpacing.vertical(context, 0.01),
-                    
+
                     // Ongoing Checkbox
                     Row(
                       children: [
@@ -263,7 +282,8 @@ class WorkHistorySectionWidget extends StatelessWidget {
                         labelText: AppTexts.toDate,
                         showLabelAbove: true,
                         hintText: 'YYYY-MM-DD',
-                        onChanged: (value) => onToDateChanged?.call(index, value),
+                        onChanged: (value) =>
+                            onToDateChanged?.call(index, value),
                       ),
                     ],
                   ],

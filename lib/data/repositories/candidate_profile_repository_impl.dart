@@ -119,22 +119,33 @@ class CandidateProfileRepositoryImpl implements CandidateProfileRepository {
 
       // Update with all additional fields
       final updateData = <String, dynamic>{};
-      if (middleName != null && middleName.isNotEmpty) updateData['middleName'] = middleName;
+      if (middleName != null && middleName.isNotEmpty)
+        updateData['middleName'] = middleName;
       if (email != null && email.isNotEmpty) updateData['email'] = email;
-      if (address1 != null && address1.isNotEmpty) updateData['address1'] = address1;
-      if (address2 != null && address2.isNotEmpty) updateData['address2'] = address2;
+      if (address1 != null && address1.isNotEmpty)
+        updateData['address1'] = address1;
+      if (address2 != null && address2.isNotEmpty)
+        updateData['address2'] = address2;
       if (city != null && city.isNotEmpty) updateData['city'] = city;
       if (state != null && state.isNotEmpty) updateData['state'] = state;
       if (zip != null && zip.isNotEmpty) updateData['zip'] = zip;
       if (ssn != null && ssn.isNotEmpty) updateData['ssn'] = ssn;
       if (phones != null) updateData['phones'] = phones;
-      if (profession != null && profession.isNotEmpty) updateData['profession'] = profession;
-      if (specialties != null && specialties.isNotEmpty) updateData['specialties'] = specialties;
-      if (liabilityAction != null && liabilityAction.isNotEmpty) updateData['liabilityAction'] = liabilityAction;
-      if (licenseAction != null && licenseAction.isNotEmpty) updateData['licenseAction'] = licenseAction;
-      if (previouslyTraveled != null && previouslyTraveled.isNotEmpty) updateData['previouslyTraveled'] = previouslyTraveled;
-      if (terminatedFromAssignment != null && terminatedFromAssignment.isNotEmpty) updateData['terminatedFromAssignment'] = terminatedFromAssignment;
-      if (licensureState != null && licensureState.isNotEmpty) updateData['licensureState'] = licensureState;
+      if (profession != null && profession.isNotEmpty)
+        updateData['profession'] = profession;
+      if (specialties != null && specialties.isNotEmpty)
+        updateData['specialties'] = specialties;
+      if (liabilityAction != null && liabilityAction.isNotEmpty)
+        updateData['liabilityAction'] = liabilityAction;
+      if (licenseAction != null && licenseAction.isNotEmpty)
+        updateData['licenseAction'] = licenseAction;
+      if (previouslyTraveled != null && previouslyTraveled.isNotEmpty)
+        updateData['previouslyTraveled'] = previouslyTraveled;
+      if (terminatedFromAssignment != null &&
+          terminatedFromAssignment.isNotEmpty)
+        updateData['terminatedFromAssignment'] = terminatedFromAssignment;
+      if (licensureState != null && licensureState.isNotEmpty)
+        updateData['licensureState'] = licensureState;
       if (npi != null && npi.isNotEmpty) updateData['npi'] = npi;
       if (education != null) updateData['education'] = education;
       if (certifications != null) updateData['certifications'] = certifications;
@@ -153,7 +164,11 @@ class CandidateProfileRepositoryImpl implements CandidateProfileRepository {
         return const Left(ServerFailure('Failed to retrieve profile'));
       }
 
-      final profileModel = _createProfileModelFromData(profileData, profileId, userId);
+      final profileModel = _createProfileModelFromData(
+        profileData,
+        profileId,
+        userId,
+      );
       return Right(profileModel.toEntity());
     } on ServerException catch (e) {
       return Left(ServerFailure(e.message));
@@ -205,22 +220,41 @@ class CandidateProfileRepositoryImpl implements CandidateProfileRepository {
             ? null
             : assignedAgentId;
       }
-      if (middleName != null) updateData['middleName'] = middleName.isEmpty ? null : middleName;
+      if (middleName != null)
+        updateData['middleName'] = middleName.isEmpty ? null : middleName;
       if (email != null) updateData['email'] = email.isEmpty ? null : email;
-      if (address1 != null) updateData['address1'] = address1.isEmpty ? null : address1;
-      if (address2 != null) updateData['address2'] = address2.isEmpty ? null : address2;
+      if (address1 != null)
+        updateData['address1'] = address1.isEmpty ? null : address1;
+      if (address2 != null)
+        updateData['address2'] = address2.isEmpty ? null : address2;
       if (city != null) updateData['city'] = city.isEmpty ? null : city;
       if (state != null) updateData['state'] = state.isEmpty ? null : state;
       if (zip != null) updateData['zip'] = zip.isEmpty ? null : zip;
       if (ssn != null) updateData['ssn'] = ssn.isEmpty ? null : ssn;
       if (phones != null) updateData['phones'] = phones;
-      if (profession != null) updateData['profession'] = profession.isEmpty ? null : profession;
-      if (specialties != null) updateData['specialties'] = specialties.isEmpty ? null : specialties;
-      if (liabilityAction != null) updateData['liabilityAction'] = liabilityAction.isEmpty ? null : liabilityAction;
-      if (licenseAction != null) updateData['licenseAction'] = licenseAction.isEmpty ? null : licenseAction;
-      if (previouslyTraveled != null) updateData['previouslyTraveled'] = previouslyTraveled.isEmpty ? null : previouslyTraveled;
-      if (terminatedFromAssignment != null) updateData['terminatedFromAssignment'] = terminatedFromAssignment.isEmpty ? null : terminatedFromAssignment;
-      if (licensureState != null) updateData['licensureState'] = licensureState.isEmpty ? null : licensureState;
+      if (profession != null)
+        updateData['profession'] = profession.isEmpty ? null : profession;
+      if (specialties != null)
+        updateData['specialties'] = specialties.isEmpty ? null : specialties;
+      if (liabilityAction != null)
+        updateData['liabilityAction'] = liabilityAction.isEmpty
+            ? null
+            : liabilityAction;
+      if (licenseAction != null)
+        updateData['licenseAction'] = licenseAction.isEmpty
+            ? null
+            : licenseAction;
+      if (previouslyTraveled != null)
+        updateData['previouslyTraveled'] = previouslyTraveled.isEmpty
+            ? null
+            : previouslyTraveled;
+      if (terminatedFromAssignment != null)
+        updateData['terminatedFromAssignment'] =
+            terminatedFromAssignment.isEmpty ? null : terminatedFromAssignment;
+      if (licensureState != null)
+        updateData['licensureState'] = licensureState.isEmpty
+            ? null
+            : licensureState;
       if (npi != null) updateData['npi'] = npi.isEmpty ? null : npi;
       if (education != null) updateData['education'] = education;
       if (certifications != null) updateData['certifications'] = certifications;
@@ -237,7 +271,11 @@ class CandidateProfileRepositoryImpl implements CandidateProfileRepository {
         return const Left(ServerFailure('Failed to retrieve updated profile'));
       }
 
-      final profileModel = _createProfileModelFromData(profileData, profileId, profileData['userId'] ?? '');
+      final profileModel = _createProfileModelFromData(
+        profileData,
+        profileId,
+        profileData['userId'] ?? '',
+      );
       return Right(profileModel.toEntity());
     } on ServerException catch (e) {
       return Left(ServerFailure(e.message));

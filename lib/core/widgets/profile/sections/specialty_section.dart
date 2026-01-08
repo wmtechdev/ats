@@ -40,10 +40,12 @@ class SpecialtySection extends StatelessWidget {
             labelText: '${AppTexts.profession}(*)',
             showLabelAbove: true,
             items: ProfileConstants.professions
-                .map((profession) => DropdownMenuItem<String>(
-                      value: profession,
-                      child: Text(profession),
-                    ))
+                .map(
+                  (profession) => DropdownMenuItem<String>(
+                    value: profession,
+                    child: Text(profession),
+                  ),
+                )
                 .toList(),
             onChanged: onProfessionChanged ?? (value) {},
           ),

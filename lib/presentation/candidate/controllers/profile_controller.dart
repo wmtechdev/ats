@@ -161,11 +161,7 @@ class ProfileController extends GetxController {
   }
 
   // Validate individual education field
-  void validateEducationField(
-    int entryIndex,
-    String fieldName,
-    String? value,
-  ) {
+  void validateEducationField(int entryIndex, String fieldName, String? value) {
     // Initialize error map for this entry if it doesn't exist
     if (!educationErrors.containsKey(entryIndex)) {
       educationErrors[entryIndex] = {
@@ -178,13 +174,11 @@ class ProfileController extends GetxController {
     if (fieldName == 'institutionName') {
       educationErrors[entryIndex]!['institutionName']!.value =
           value == null || value.trim().isEmpty
-              ? 'Institution name is required'
-              : null;
+          ? 'Institution name is required'
+          : null;
     } else if (fieldName == 'degree') {
       educationErrors[entryIndex]!['degree']!.value =
-          value == null || value.trim().isEmpty
-              ? 'Degree is required'
-              : null;
+          value == null || value.trim().isEmpty ? 'Degree is required' : null;
     }
 
     // Clear general education error if individual field errors are cleared
@@ -340,7 +334,7 @@ class ProfileController extends GetxController {
     validateFirstName(firstName);
     validateLastName(lastName);
     validateWorkHistory(workHistory);
-    
+
     // Validate new required fields (always validate, even if empty)
     validateEmail(email);
     validateAddress1(address1);
@@ -409,7 +403,8 @@ class ProfileController extends GetxController {
     if (currentProfile.email == null || currentProfile.email!.trim().isEmpty) {
       return false;
     }
-    if (currentProfile.address1 == null || currentProfile.address1!.trim().isEmpty) {
+    if (currentProfile.address1 == null ||
+        currentProfile.address1!.trim().isEmpty) {
       return false;
     }
     if (currentProfile.city == null || currentProfile.city!.trim().isEmpty) {
@@ -421,13 +416,16 @@ class ProfileController extends GetxController {
     if (currentProfile.zip == null || currentProfile.zip!.trim().isEmpty) {
       return false;
     }
-    if (currentProfile.profession == null || currentProfile.profession!.trim().isEmpty) {
+    if (currentProfile.profession == null ||
+        currentProfile.profession!.trim().isEmpty) {
       return false;
     }
-    if (currentProfile.specialties == null || currentProfile.specialties!.trim().isEmpty) {
+    if (currentProfile.specialties == null ||
+        currentProfile.specialties!.trim().isEmpty) {
       return false;
     }
-    if (currentProfile.licensureState == null || currentProfile.licensureState!.trim().isEmpty) {
+    if (currentProfile.licensureState == null ||
+        currentProfile.licensureState!.trim().isEmpty) {
       return false;
     }
 

@@ -90,7 +90,9 @@ class EducationSection extends StatelessWidget {
                   borderRadius: BorderRadius.circular(
                     AppResponsive.radius(context, factor: 1.5),
                   ),
-                  border: Border.all(color: AppColors.primary.withValues(alpha: 0.5)),
+                  border: Border.all(
+                    color: AppColors.primary.withValues(alpha: 0.5),
+                  ),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -100,9 +102,9 @@ class EducationSection extends StatelessWidget {
                       children: [
                         Text(
                           '${AppTexts.education} ${index + 1}',
-                          style: AppTextStyles.bodyText(context).copyWith(
-                            fontWeight: FontWeight.w600,
-                          ),
+                          style: AppTextStyles.bodyText(
+                            context,
+                          ).copyWith(fontWeight: FontWeight.w600),
                         ),
                         IconButton(
                           icon: const Icon(
@@ -120,25 +122,27 @@ class EducationSection extends StatelessWidget {
                       controller: education.institutionController,
                       labelText: AppTexts.institutionName,
                       showLabelAbove: true,
-                      onChanged: (value) => onInstitutionChanged?.call(index, value),
+                      onChanged: (value) =>
+                          onInstitutionChanged?.call(index, value),
                     ),
                     if (getFieldError != null)
-                      Obx(
-                        () {
-                          final error = getFieldError!(index, 'institutionName');
-                          return error != null
-                              ? Padding(
-                                  padding: EdgeInsets.only(
-                                    top: AppSpacing.vertical(context, 0.01).height!,
-                                  ),
-                                  child: AppErrorMessage(
-                                    message: error,
-                                    icon: Iconsax.info_circle,
-                                  ),
-                                )
-                              : const SizedBox.shrink();
-                        },
-                      ),
+                      Obx(() {
+                        final error = getFieldError!(index, 'institutionName');
+                        return error != null
+                            ? Padding(
+                                padding: EdgeInsets.only(
+                                  top: AppSpacing.vertical(
+                                    context,
+                                    0.01,
+                                  ).height!,
+                                ),
+                                child: AppErrorMessage(
+                                  message: error,
+                                  icon: Iconsax.info_circle,
+                                ),
+                              )
+                            : const SizedBox.shrink();
+                      }),
                     AppSpacing.vertical(context, 0.01),
 
                     // Degree
@@ -149,22 +153,23 @@ class EducationSection extends StatelessWidget {
                       onChanged: (value) => onDegreeChanged?.call(index, value),
                     ),
                     if (getFieldError != null)
-                      Obx(
-                        () {
-                          final error = getFieldError!(index, 'degree');
-                          return error != null
-                              ? Padding(
-                                  padding: EdgeInsets.only(
-                                    top: AppSpacing.vertical(context, 0.01).height!,
-                                  ),
-                                  child: AppErrorMessage(
-                                    message: error,
-                                    icon: Iconsax.info_circle,
-                                  ),
-                                )
-                              : const SizedBox.shrink();
-                        },
-                      ),
+                      Obx(() {
+                        final error = getFieldError!(index, 'degree');
+                        return error != null
+                            ? Padding(
+                                padding: EdgeInsets.only(
+                                  top: AppSpacing.vertical(
+                                    context,
+                                    0.01,
+                                  ).height!,
+                                ),
+                                child: AppErrorMessage(
+                                  message: error,
+                                  icon: Iconsax.info_circle,
+                                ),
+                              )
+                            : const SizedBox.shrink();
+                      }),
                     AppSpacing.vertical(context, 0.01),
 
                     // From Date
@@ -174,14 +179,18 @@ class EducationSection extends StatelessWidget {
                       showLabelAbove: true,
                       hintText: 'YYYY-MM-DD',
                       lastDate: DateTime.now(), // Cannot be in future
-                      onChanged: (value) => onFromDateChanged?.call(index, value),
+                      onChanged: (value) =>
+                          onFromDateChanged?.call(index, value),
                     ),
                     if (education.fromDateError != null)
                       Obx(
                         () => education.fromDateError!.value != null
                             ? Padding(
                                 padding: EdgeInsets.only(
-                                  top: AppSpacing.vertical(context, 0.01).height!,
+                                  top: AppSpacing.vertical(
+                                    context,
+                                    0.01,
+                                  ).height!,
                                 ),
                                 child: AppErrorMessage(
                                   message: education.fromDateError!.value!,
@@ -212,14 +221,18 @@ class EducationSection extends StatelessWidget {
                         labelText: AppTexts.toDate,
                         showLabelAbove: true,
                         hintText: 'YYYY-MM-DD',
-                        onChanged: (value) => onToDateChanged?.call(index, value),
+                        onChanged: (value) =>
+                            onToDateChanged?.call(index, value),
                       ),
                       if (education.toDateError != null)
                         Obx(
                           () => education.toDateError!.value != null
                               ? Padding(
                                   padding: EdgeInsets.only(
-                                    top: AppSpacing.vertical(context, 0.01).height!,
+                                    top: AppSpacing.vertical(
+                                      context,
+                                      0.01,
+                                    ).height!,
                                   ),
                                   child: AppErrorMessage(
                                     message: education.toDateError!.value!,

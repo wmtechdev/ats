@@ -52,10 +52,14 @@ class AppTexts {
   static const String profession = "Profession";
   static const String specialties = "Specialties";
   static const String backgroundHistory = "Background History";
-  static const String liabilityAction = "Has this candidate ever been named as a defendant in a professional liability action?";
-  static const String licenseAction = "Has action been taken against this candidate's professional license?";
-  static const String previouslyTraveled = "Has this candidate previously traveled with your agency?";
-  static const String terminatedFromAssignment = "Has this candidate ever been terminated from an assignment?";
+  static const String liabilityAction =
+      "Has this candidate ever been named as a defendant in a professional liability action?";
+  static const String licenseAction =
+      "Has action been taken against this candidate's professional license?";
+  static const String previouslyTraveled =
+      "Has this candidate previously traveled with your agency?";
+  static const String terminatedFromAssignment =
+      "Has this candidate ever been terminated from an assignment?";
   static const String yes = "Yes";
   static const String no = "No";
   static const String select = "Select";
@@ -243,14 +247,18 @@ class AppTexts {
   static const String zipRequired = "Zip code is required";
   static const String zipMinLength = "Zip code must be at least 5 digits";
   static const String address1Required = "Address 1 is required";
-  static const String address1MinLength = "Address 1 must be at least 5 characters";
+  static const String address1MinLength =
+      "Address 1 must be at least 5 characters";
   static const String professionRequired = "Profession is required";
   static const String specialtiesRequired = "Specialties are required";
   static const String licensureStateRequired = "Licensure state is required";
   static const String phoneNumberRequired = "Phone number is required";
-  static const String phoneNumberMinLength = "Phone number must be at least 10 digits";
-  static const String educationRequired = "At least one education entry is required";
-  static const String workHistoryRequired = "At least one work history entry is required";
+  static const String phoneNumberMinLength =
+      "Phone number must be at least 10 digits";
+  static const String educationRequired =
+      "At least one education entry is required";
+  static const String workHistoryRequired =
+      "At least one work history entry is required";
 
   // Common
   static const String cancel = "Cancel";

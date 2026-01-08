@@ -23,7 +23,7 @@ class AdminCreateCandidateController extends GetxController {
 
   // Form state
   late final AdminProfileFormState formState;
-  
+
   // Observable triggers for list updates (to trigger Obx rebuilds)
   // Using counters that increment to force rebuilds even when list length doesn't change
   final phonesListTrigger = 0.obs;
@@ -59,7 +59,7 @@ class AdminCreateCandidateController extends GetxController {
     formState = AdminProfileFormState();
     updateListTriggers();
   }
-  
+
   void updateListTriggers() {
     // Force rebuild by always incrementing the trigger value
     // This ensures rebuilds even when list length doesn't change (e.g., checkbox updates)
@@ -209,13 +209,19 @@ class AdminCreateCandidateController extends GetxController {
     validateSpecialties(specialtiesString);
     validateLicensureState(formState.licensureState);
 
-    final phones = AdminProfileFormDataHelper.getProfileData(formState)['phones'] as List<Map<String, dynamic>>?;
+    final phones =
+        AdminProfileFormDataHelper.getProfileData(formState)['phones']
+            as List<Map<String, dynamic>>?;
     validatePhones(phones);
 
-    final education = AdminProfileFormDataHelper.getProfileData(formState)['education'] as List<Map<String, dynamic>>?;
+    final education =
+        AdminProfileFormDataHelper.getProfileData(formState)['education']
+            as List<Map<String, dynamic>>?;
     validateEducation(education);
 
-    final workHistory = AdminProfileFormDataHelper.getProfileData(formState)['workHistory'] as List<Map<String, dynamic>>?;
+    final workHistory =
+        AdminProfileFormDataHelper.getProfileData(formState)['workHistory']
+            as List<Map<String, dynamic>>?;
     validateWorkHistory(workHistory);
 
     bool hasPhoneErrors = false;
@@ -272,11 +278,13 @@ class AdminCreateCandidateController extends GetxController {
       liabilityAction: profileData['liabilityAction'] as String?,
       licenseAction: profileData['licenseAction'] as String?,
       previouslyTraveled: profileData['previouslyTraveled'] as String?,
-      terminatedFromAssignment: profileData['terminatedFromAssignment'] as String?,
+      terminatedFromAssignment:
+          profileData['terminatedFromAssignment'] as String?,
       licensureState: profileData['licensureState'] as String?,
       npi: profileData['npi'] as String?,
       education: profileData['education'] as List<Map<String, dynamic>>?,
-      certifications: profileData['certifications'] as List<Map<String, dynamic>>?,
+      certifications:
+          profileData['certifications'] as List<Map<String, dynamic>>?,
       workHistory: profileData['workHistory'] as List<Map<String, dynamic>>?,
     );
 

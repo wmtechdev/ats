@@ -36,10 +36,12 @@ class LicensureSection extends StatelessWidget {
             labelText: '${AppTexts.state}(*)',
             showLabelAbove: true,
             items: ProfileConstants.usStates
-                .map((state) => DropdownMenuItem<String>(
-                      value: state,
-                      child: Text(state),
-                    ))
+                .map(
+                  (state) => DropdownMenuItem<String>(
+                    value: state,
+                    child: Text(state),
+                  ),
+                )
                 .toList(),
             onChanged: onStateChanged ?? (value) {},
           ),

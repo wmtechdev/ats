@@ -79,7 +79,8 @@ class AdminCreateCandidateScreen extends StatelessWidget {
                   controller.validateZip(value);
                   return null;
                 },
-                hasError: controller.firstNameError.value != null ||
+                hasError:
+                    controller.firstNameError.value != null ||
                     controller.lastNameError.value != null ||
                     controller.emailError.value != null ||
                     controller.passwordError.value != null ||
@@ -92,21 +93,24 @@ class AdminCreateCandidateScreen extends StatelessWidget {
             AppSpacing.vertical(context, 0.02),
 
             // Phones Section
-            Obx(
-              () {
-                // Access trigger to ensure rebuild when list changes
-                controller.phonesListTrigger.value;
-                return PhonesSection(
-                  phoneEntries: controller.formState.phoneEntries.asMap().entries.map((entry) {
-                  final index = entry.key;
-                  final phone = entry.value;
-                  final error = controller.phoneErrors[index];
-                  return PhoneEntry(
-                    countryCodeController: phone.countryCodeController,
-                    numberController: phone.numberController,
-                    numberError: error ?? Rxn<String>(null),
-                  );
-                }).toList(),
+            Obx(() {
+              // Access trigger to ensure rebuild when list changes
+              controller.phonesListTrigger.value;
+              return PhonesSection(
+                phoneEntries: controller.formState.phoneEntries
+                    .asMap()
+                    .entries
+                    .map((entry) {
+                      final index = entry.key;
+                      final phone = entry.value;
+                      final error = controller.phoneErrors[index];
+                      return PhoneEntry(
+                        countryCodeController: phone.countryCodeController,
+                        numberController: phone.numberController,
+                        numberError: error ?? Rxn<String>(null),
+                      );
+                    })
+                    .toList(),
                 onCountryCodeChanged: (index, countryCode) {
                   // Update handled by controller
                 },
@@ -121,11 +125,11 @@ class AdminCreateCandidateScreen extends StatelessWidget {
                   controller.formState.removePhone(index);
                   controller.updateListTriggers();
                 },
-                hasError: controller.phonesError.value != null ||
+                hasError:
+                    controller.phonesError.value != null ||
                     controller.phoneErrors.values.any((e) => e.value != null),
-                );
-              },
-            ),
+              );
+            }),
             AppSpacing.vertical(context, 0.02),
 
             // Specialty Section
@@ -144,7 +148,8 @@ class AdminCreateCandidateScreen extends StatelessWidget {
                   controller.formState.selectedSpecialties.addAll(specialties);
                   controller.validateSpecialties(specialties.join(', '));
                 },
-                hasError: controller.professionError.value != null ||
+                hasError:
+                    controller.professionError.value != null ||
                     controller.specialtiesError.value != null,
               ),
             ),
@@ -155,7 +160,8 @@ class AdminCreateCandidateScreen extends StatelessWidget {
               liabilityAction: controller.formState.liabilityAction,
               licenseAction: controller.formState.licenseAction,
               previouslyTraveled: controller.formState.previouslyTraveled,
-              terminatedFromAssignment: controller.formState.terminatedFromAssignment,
+              terminatedFromAssignment:
+                  controller.formState.terminatedFromAssignment,
               onLiabilityActionChanged: (value) {
                 controller.formState.liabilityAction = value;
               },
@@ -187,18 +193,29 @@ class AdminCreateCandidateScreen extends StatelessWidget {
             AppSpacing.vertical(context, 0.02),
 
             // Education Section
-            Obx(
-              () {
-                // Access trigger to ensure rebuild when list changes
-                controller.educationListTrigger.value;
-                return EducationSection(
-                  educationEntries: controller.formState.educationEntries,
+            Obx(() {
+              // Access trigger to ensure rebuild when list changes
+              controller.educationListTrigger.value;
+              return EducationSection(
+                educationEntries: controller.formState.educationEntries,
                 onOngoingChanged: (index, isOngoing) {
                   controller.formState.educationEntries[index] = EducationEntry(
-                    institutionController: controller.formState.educationEntries[index].institutionController,
-                    degreeController: controller.formState.educationEntries[index].degreeController,
-                    fromDateController: controller.formState.educationEntries[index].fromDateController,
-                    toDateController: controller.formState.educationEntries[index].toDateController,
+                    institutionController: controller
+                        .formState
+                        .educationEntries[index]
+                        .institutionController,
+                    degreeController: controller
+                        .formState
+                        .educationEntries[index]
+                        .degreeController,
+                    fromDateController: controller
+                        .formState
+                        .educationEntries[index]
+                        .fromDateController,
+                    toDateController: controller
+                        .formState
+                        .educationEntries[index]
+                        .toDateController,
                     isOngoing: isOngoing,
                   );
                   // Trigger rebuild to show/hide "To Date" field
@@ -218,56 +235,75 @@ class AdminCreateCandidateScreen extends StatelessWidget {
                 },
                 generalError: controller.educationError,
                 hasError: controller.educationError.value != null,
-                );
-              },
-            ),
+              );
+            }),
             AppSpacing.vertical(context, 0.02),
 
             // Certifications Section
-            Obx(
-              () {
-                // Access trigger to ensure rebuild when list changes
-                controller.certificationsListTrigger.value;
-                return CertificationsSection(
-                  certificationEntries: controller.formState.certificationEntries,
-              onNoExpiryChanged: (index, hasNoExpiry) {
-                controller.formState.certificationEntries[index] = CertificationEntry(
-                  nameController: controller.formState.certificationEntries[index].nameController,
-                  expiryController: controller.formState.certificationEntries[index].expiryController,
-                  hasNoExpiry: hasNoExpiry,
-                );
-                // Trigger rebuild to show/hide expiry field
-                controller.updateListTriggers();
-              },
-              onAddCertification: () {
-                controller.formState.addCertification();
-                controller.updateListTriggers();
-              },
-              onRemoveCertification: (index) {
-                controller.formState.removeCertification(index);
-                controller.updateListTriggers();
-              },
-                );
-              },
-            ),
+            Obx(() {
+              // Access trigger to ensure rebuild when list changes
+              controller.certificationsListTrigger.value;
+              return CertificationsSection(
+                certificationEntries: controller.formState.certificationEntries,
+                onNoExpiryChanged: (index, hasNoExpiry) {
+                  controller.formState.certificationEntries[index] =
+                      CertificationEntry(
+                        nameController: controller
+                            .formState
+                            .certificationEntries[index]
+                            .nameController,
+                        expiryController: controller
+                            .formState
+                            .certificationEntries[index]
+                            .expiryController,
+                        hasNoExpiry: hasNoExpiry,
+                      );
+                  // Trigger rebuild to show/hide expiry field
+                  controller.updateListTriggers();
+                },
+                onAddCertification: () {
+                  controller.formState.addCertification();
+                  controller.updateListTriggers();
+                },
+                onRemoveCertification: (index) {
+                  controller.formState.removeCertification(index);
+                  controller.updateListTriggers();
+                },
+              );
+            }),
             AppSpacing.vertical(context, 0.02),
 
             // Work History Section
-            Obx(
-              () {
-                // Access trigger to ensure rebuild when list changes
-                controller.workHistoryListTrigger.value;
-                return WorkHistorySectionWidget(
-                  workHistoryEntries: controller.formState.workHistoryEntries,
+            Obx(() {
+              // Access trigger to ensure rebuild when list changes
+              controller.workHistoryListTrigger.value;
+              return WorkHistorySectionWidget(
+                workHistoryEntries: controller.formState.workHistoryEntries,
                 onOngoingChanged: (index, isOngoing) {
-                  controller.formState.workHistoryEntries[index] = WorkHistoryEntry(
-                    companyController: controller.formState.workHistoryEntries[index].companyController,
-                    positionController: controller.formState.workHistoryEntries[index].positionController,
-                    descriptionController: controller.formState.workHistoryEntries[index].descriptionController,
-                    fromDateController: controller.formState.workHistoryEntries[index].fromDateController,
-                    toDateController: controller.formState.workHistoryEntries[index].toDateController,
-                    isOngoing: isOngoing,
-                  );
+                  controller.formState.workHistoryEntries[index] =
+                      WorkHistoryEntry(
+                        companyController: controller
+                            .formState
+                            .workHistoryEntries[index]
+                            .companyController,
+                        positionController: controller
+                            .formState
+                            .workHistoryEntries[index]
+                            .positionController,
+                        descriptionController: controller
+                            .formState
+                            .workHistoryEntries[index]
+                            .descriptionController,
+                        fromDateController: controller
+                            .formState
+                            .workHistoryEntries[index]
+                            .fromDateController,
+                        toDateController: controller
+                            .formState
+                            .workHistoryEntries[index]
+                            .toDateController,
+                        isOngoing: isOngoing,
+                      );
                   // Trigger rebuild to show/hide "To Date" field
                   controller.updateListTriggers();
                 },
@@ -285,9 +321,8 @@ class AdminCreateCandidateScreen extends StatelessWidget {
                 },
                 generalError: controller.workHistoryError,
                 hasError: controller.workHistoryError.value != null,
-                );
-              },
-            ),
+              );
+            }),
             AppSpacing.vertical(context, 0.03),
 
             // Error Message
