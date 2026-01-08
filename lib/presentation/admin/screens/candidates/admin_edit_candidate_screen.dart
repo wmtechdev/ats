@@ -47,13 +47,20 @@ class _AdminEditCandidateScreenState extends State<AdminEditCandidateScreen> {
             lastNameController.text != profile.lastName) {
           lastNameController.text = profile.lastName;
         }
-        if (phoneController.text.isEmpty ||
-            phoneController.text != profile.phone) {
-          phoneController.text = profile.phone;
+        // Phone and address are now in phones and address1 fields
+        // Get first phone if available
+        if (profile.phones != null && profile.phones!.isNotEmpty) {
+          final firstPhone = profile.phones!.first;
+          final phoneNumber = firstPhone['number']?.toString() ?? '';
+          if (phoneController.text.isEmpty || phoneController.text != phoneNumber) {
+            phoneController.text = phoneNumber;
+          }
         }
-        if (addressController.text.isEmpty ||
-            addressController.text != profile.address) {
-          addressController.text = profile.address;
+        // Use address1 if available
+        if (profile.address1 != null && profile.address1!.isNotEmpty) {
+          if (addressController.text.isEmpty || addressController.text != profile.address1) {
+            addressController.text = profile.address1!;
+          }
         }
 
         // Load work history
@@ -95,11 +102,20 @@ class _AdminEditCandidateScreenState extends State<AdminEditCandidateScreen> {
         if (lastNameController.text.isEmpty) {
           lastNameController.text = profile.lastName;
         }
-        if (phoneController.text.isEmpty) {
-          phoneController.text = profile.phone;
+        // Phone and address are now in phones and address1 fields
+        // Get first phone if available
+        if (profile.phones != null && profile.phones!.isNotEmpty) {
+          final firstPhone = profile.phones!.first;
+          final phoneNumber = firstPhone['number']?.toString() ?? '';
+          if (phoneController.text.isEmpty) {
+            phoneController.text = phoneNumber;
+          }
         }
-        if (addressController.text.isEmpty) {
-          addressController.text = profile.address;
+        // Use address1 if available
+        if (profile.address1 != null && profile.address1!.isNotEmpty) {
+          if (addressController.text.isEmpty) {
+            addressController.text = profile.address1!;
+          }
         }
 
         // Load work history if available and controllers are empty
@@ -334,9 +350,20 @@ class _AdminEditCandidateScreenState extends State<AdminEditCandidateScreen> {
                     controller.updateCandidateProfile(
                       firstName: firstNameController.text.trim(),
                       lastName: lastNameController.text.trim(),
-                      phone: phoneController.text.trim(),
-                      address: addressController.text.trim(),
                       workHistory: workHistory.isEmpty ? null : workHistory,
+                      // Convert phone to phones format
+                      phones: phoneController.text.trim().isNotEmpty
+                          ? [
+                              {
+                                'countryCode': '+1',
+                                'number': phoneController.text.trim(),
+                              }
+                            ]
+                          : null,
+                      // Use address1
+                      address1: addressController.text.trim().isNotEmpty
+                          ? addressController.text.trim()
+                          : null,
                     );
                   },
                   isLoading: controller.isLoading.value,

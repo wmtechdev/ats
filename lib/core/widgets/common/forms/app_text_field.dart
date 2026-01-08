@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:ats/core/utils/app_styles/app_text_styles.dart';
 import 'package:ats/core/utils/app_responsive/app_responsive.dart';
 import 'package:ats/core/utils/app_colors/app_colors.dart';
+import 'package:ats/core/widgets/common/forms/app_required_label.dart';
 
 class AppTextField extends StatefulWidget {
   final TextEditingController? controller;
@@ -16,6 +17,7 @@ class AppTextField extends StatefulWidget {
   final String? Function(String?)? validator;
   final void Function(String)? onChanged;
   final bool showLabelAbove;
+  final bool enabled;
 
   const AppTextField({
     super.key,
@@ -30,6 +32,7 @@ class AppTextField extends StatefulWidget {
     this.validator,
     this.onChanged,
     this.showLabelAbove = false,
+    this.enabled = true,
   });
 
   @override
@@ -148,6 +151,7 @@ class _AppTextFieldState extends State<AppTextField> {
       minLines: widget.minLines,
       maxLines: widget.maxLines,
       keyboardType: widget.keyboardType,
+      enabled: widget.enabled,
       style: AppTextStyles.bodyText(context),
       onChanged: (value) {
         // Sync with external controller if it exists and is valid
@@ -170,21 +174,25 @@ class _AppTextFieldState extends State<AppTextField> {
         hintStyle: AppTextStyles.hintText(context),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(
-            AppResponsive.radius(context, factor: 5),
+            AppResponsive.radius(context, factor: 1.5),
           ),
-          borderSide: BorderSide(color: AppColors.primary),
+          borderSide: BorderSide(
+            color: AppColors.primary.withValues(alpha: 0.5),
+          ),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(
-            AppResponsive.radius(context, factor: 5),
+            AppResponsive.radius(context, factor: 1.5),
           ),
-          borderSide: BorderSide(color: AppColors.primary),
+          borderSide: BorderSide(
+            color: AppColors.primary.withValues(alpha: 0.5),
+          ),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(
-            AppResponsive.radius(context, factor: 5),
+            AppResponsive.radius(context, factor: 1.5),
           ),
-          borderSide: const BorderSide(color: AppColors.primary, width: 2),
+          borderSide: const BorderSide(color: AppColors.primary),
         ),
         prefixIcon: widget.prefixIcon != null
             ? Icon(
@@ -201,16 +209,23 @@ class _AppTextFieldState extends State<AppTextField> {
     if (widget.showLabelAbove &&
         widget.labelText != null &&
         widget.labelText!.isNotEmpty) {
+      final isRequired = widget.labelText!.endsWith('(*)');
+      final labelText = isRequired
+          ? widget.labelText!.substring(0, widget.labelText!.length - 3)
+          : widget.labelText!;
+
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(
-            widget.labelText!,
-            style: AppTextStyles.bodyText(
-              context,
-            ).copyWith(fontWeight: FontWeight.w500),
-          ),
+          isRequired
+              ? AppRequiredLabel(text: labelText)
+              : Text(
+                  labelText,
+                  style: AppTextStyles.bodyText(
+                    context,
+                  ).copyWith(fontWeight: FontWeight.w500),
+                ),
           textField,
         ],
       );

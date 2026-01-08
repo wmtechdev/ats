@@ -667,9 +667,9 @@ class AdminCandidatesController extends GetxController {
   Future<void> updateCandidateProfile({
     required String firstName,
     required String lastName,
-    required String phone,
-    required String address,
     List<Map<String, dynamic>>? workHistory,
+    String? address1,
+    List<Map<String, dynamic>>? phones,
   }) async {
     final profile = selectedCandidateProfile.value;
     if (profile == null) {
@@ -690,9 +690,9 @@ class AdminCandidatesController extends GetxController {
       profileId: profileId,
       firstName: firstName,
       lastName: lastName,
-      phone: phone,
-      address: address,
       workHistory: workHistory,
+      address1: address1,
+      phones: phones,
     );
 
     result.fold(

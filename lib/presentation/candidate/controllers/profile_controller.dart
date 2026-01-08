@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ats/core/constants/app_constants.dart';
 import 'package:ats/core/utils/app_validators/app_validators.dart';
+import 'package:ats/core/utils/app_texts/app_texts.dart';
 import 'package:ats/domain/repositories/candidate_auth_repository.dart';
 import 'package:ats/domain/repositories/candidate_profile_repository.dart';
 import 'package:ats/domain/entities/candidate_profile_entity.dart';
@@ -22,9 +23,25 @@ class ProfileController extends GetxController {
   // Validation errors
   final firstNameError = Rxn<String>();
   final lastNameError = Rxn<String>();
-  final phoneError = Rxn<String>();
-  final addressError = Rxn<String>();
   final workHistoryError = Rxn<String>();
+
+  // New field validation errors
+  final emailError = Rxn<String>();
+  final address1Error = Rxn<String>();
+  final cityError = Rxn<String>();
+  final stateError = Rxn<String>();
+  final zipError = Rxn<String>();
+  final professionError = Rxn<String>();
+  final specialtiesError = Rxn<String>();
+  final licensureStateError = Rxn<String>();
+  final educationError = Rxn<String>();
+  final phonesError = Rxn<String>();
+
+  // Phone validation errors - Map<phoneIndex, error>
+  final phoneErrors = <int, Rxn<String>>{}.obs;
+
+  // Education validation errors - Map<entryIndex, Map<fieldName, error>>
+  final educationErrors = <int, Map<String, Rxn<String>>>{}.obs;
 
   // Work history validation errors - Map<entryIndex, Map<fieldName, error>>
   final workHistoryErrors = <int, Map<String, Rxn<String>>>{}.obs;
@@ -76,12 +93,141 @@ class ProfileController extends GetxController {
     lastNameError.value = AppValidators.validateLastName(value);
   }
 
-  void validatePhone(String? value) {
-    phoneError.value = AppValidators.validatePhone(value);
+  // New validation methods
+  void validateEmail(String? value) {
+    emailError.value = AppValidators.validateEmail(value);
   }
 
-  void validateAddress(String? value) {
-    addressError.value = AppValidators.validateAddress(value);
+  void validateAddress1(String? value) {
+    address1Error.value = AppValidators.validateAddress1(value);
+  }
+
+  void validateCity(String? value) {
+    cityError.value = AppValidators.validateCity(value);
+  }
+
+  void validateState(String? value) {
+    stateError.value = AppValidators.validateState(value);
+  }
+
+  void validateZip(String? value) {
+    zipError.value = AppValidators.validateZip(value);
+  }
+
+  void validateProfession(String? value) {
+    professionError.value = AppValidators.validateProfession(value);
+  }
+
+  void validateSpecialties(String? value) {
+    specialtiesError.value = AppValidators.validateSpecialties(value);
+  }
+
+  void validateLicensureState(String? value) {
+    licensureStateError.value = AppValidators.validateLicensureState(value);
+  }
+
+  void validatePhoneNumber(int index, String? value) {
+    if (!phoneErrors.containsKey(index)) {
+      phoneErrors[index] = Rxn<String>();
+    }
+    phoneErrors[index]!.value = AppValidators.validatePhoneNumber(value);
+    _updatePhonesGeneralError();
+  }
+
+  void _updatePhonesGeneralError() {
+    bool hasErrors = false;
+    for (var error in phoneErrors.values) {
+      if (error.value != null) {
+        hasErrors = true;
+        break;
+      }
+    }
+    if (!hasErrors) {
+      phonesError.value = null;
+    }
+  }
+
+  void validatePhones(List<Map<String, dynamic>>? phones) {
+    phoneErrors.clear();
+    if (phones == null || phones.isEmpty) {
+      phonesError.value = null; // Phones are optional
+      return;
+    }
+    for (int i = 0; i < phones.length; i++) {
+      final phone = phones[i];
+      final number = phone['number']?.toString();
+      validatePhoneNumber(i, number);
+    }
+  }
+
+  // Validate individual education field
+  void validateEducationField(
+    int entryIndex,
+    String fieldName,
+    String? value,
+  ) {
+    // Initialize error map for this entry if it doesn't exist
+    if (!educationErrors.containsKey(entryIndex)) {
+      educationErrors[entryIndex] = {
+        'institutionName': Rxn<String>(),
+        'degree': Rxn<String>(),
+      };
+    }
+
+    // Validate based on field name
+    if (fieldName == 'institutionName') {
+      educationErrors[entryIndex]!['institutionName']!.value =
+          value == null || value.trim().isEmpty
+              ? 'Institution name is required'
+              : null;
+    } else if (fieldName == 'degree') {
+      educationErrors[entryIndex]!['degree']!.value =
+          value == null || value.trim().isEmpty
+              ? 'Degree is required'
+              : null;
+    }
+
+    // Clear general education error if individual field errors are cleared
+    _updateEducationGeneralError();
+  }
+
+  // Get error for a specific education field
+  String? getEducationFieldError(int entryIndex, String fieldName) {
+    if (!educationErrors.containsKey(entryIndex)) {
+      return null;
+    }
+    return educationErrors[entryIndex]![fieldName]?.value;
+  }
+
+  // Clear errors for an education entry
+  void clearEducationEntryErrors(int entryIndex) {
+    educationErrors.remove(entryIndex);
+    _updateEducationGeneralError();
+  }
+
+  // Update general education error based on individual field errors
+  void _updateEducationGeneralError() {
+    bool hasErrors = false;
+    for (var entryErrors in educationErrors.values) {
+      if (entryErrors['institutionName']?.value != null ||
+          entryErrors['degree']?.value != null) {
+        hasErrors = true;
+        break;
+      }
+    }
+    if (!hasErrors) {
+      educationError.value = null;
+    }
+  }
+
+  void validateEducation(List<Map<String, dynamic>>? education) {
+    educationErrors.clear();
+    if (education == null || education.isEmpty) {
+      educationError.value = AppTexts.educationRequired;
+      return;
+    }
+    educationError.value = null;
+    // Education entries are optional fields, so no individual field validation needed
   }
 
   // Validate individual work history field
@@ -179,15 +325,33 @@ class ProfileController extends GetxController {
   bool validateProfileForm({
     required String firstName,
     required String lastName,
-    required String phone,
-    required String address,
     List<Map<String, dynamic>>? workHistory,
+    String? email,
+    String? address1,
+    String? city,
+    String? state,
+    String? zip,
+    String? profession,
+    String? specialties,
+    String? licensureState,
+    List<Map<String, dynamic>>? phones,
+    List<Map<String, dynamic>>? education,
   }) {
     validateFirstName(firstName);
     validateLastName(lastName);
-    validatePhone(phone);
-    validateAddress(address);
     validateWorkHistory(workHistory);
+    
+    // Validate new required fields (always validate, even if empty)
+    validateEmail(email);
+    validateAddress1(address1);
+    validateCity(city);
+    validateState(state);
+    validateZip(zip);
+    validateProfession(profession);
+    validateSpecialties(specialties);
+    validateLicensureState(licensureState);
+    validatePhones(phones);
+    validateEducation(education);
 
     // Check if there are any work history field errors
     bool hasWorkHistoryErrors = false;
@@ -199,12 +363,30 @@ class ProfileController extends GetxController {
       }
     }
 
+    // Check phone errors
+    bool hasPhoneErrors = false;
+    for (var error in phoneErrors.values) {
+      if (error.value != null) {
+        hasPhoneErrors = true;
+        break;
+      }
+    }
+
     return firstNameError.value == null &&
         lastNameError.value == null &&
-        phoneError.value == null &&
-        addressError.value == null &&
         workHistoryError.value == null &&
-        !hasWorkHistoryErrors;
+        !hasWorkHistoryErrors &&
+        emailError.value == null &&
+        address1Error.value == null &&
+        cityError.value == null &&
+        stateError.value == null &&
+        zipError.value == null &&
+        professionError.value == null &&
+        specialtiesError.value == null &&
+        licensureStateError.value == null &&
+        educationError.value == null &&
+        phonesError.value == null &&
+        !hasPhoneErrors;
   }
 
   // Check if profile is completed
@@ -219,9 +401,54 @@ class ProfileController extends GetxController {
 
     // Check basic required fields
     if (currentProfile.firstName.trim().isEmpty ||
-        currentProfile.lastName.trim().isEmpty ||
-        currentProfile.phone.trim().isEmpty ||
-        currentProfile.address.trim().isEmpty) {
+        currentProfile.lastName.trim().isEmpty) {
+      return false;
+    }
+
+    // Check new required fields
+    if (currentProfile.email == null || currentProfile.email!.trim().isEmpty) {
+      return false;
+    }
+    if (currentProfile.address1 == null || currentProfile.address1!.trim().isEmpty) {
+      return false;
+    }
+    if (currentProfile.city == null || currentProfile.city!.trim().isEmpty) {
+      return false;
+    }
+    if (currentProfile.state == null || currentProfile.state!.trim().isEmpty) {
+      return false;
+    }
+    if (currentProfile.zip == null || currentProfile.zip!.trim().isEmpty) {
+      return false;
+    }
+    if (currentProfile.profession == null || currentProfile.profession!.trim().isEmpty) {
+      return false;
+    }
+    if (currentProfile.specialties == null || currentProfile.specialties!.trim().isEmpty) {
+      return false;
+    }
+    if (currentProfile.licensureState == null || currentProfile.licensureState!.trim().isEmpty) {
+      return false;
+    }
+
+    // Check phones - at least one phone required
+    if (currentProfile.phones == null || currentProfile.phones!.isEmpty) {
+      return false;
+    }
+    bool hasValidPhone = false;
+    for (var phone in currentProfile.phones!) {
+      final number = phone['number']?.toString().trim() ?? '';
+      if (number.isNotEmpty) {
+        hasValidPhone = true;
+        break;
+      }
+    }
+    if (!hasValidPhone) {
+      return false;
+    }
+
+    // Check education - at least one education entry required
+    if (currentProfile.education == null || currentProfile.education!.isEmpty) {
       return false;
     }
 
@@ -248,17 +475,42 @@ class ProfileController extends GetxController {
   Future<void> createOrUpdateProfile({
     required String firstName,
     required String lastName,
-    required String phone,
-    required String address,
     List<Map<String, dynamic>>? workHistory,
+    String? middleName,
+    String? email,
+    String? address1,
+    String? address2,
+    String? city,
+    String? state,
+    String? zip,
+    String? ssn,
+    List<Map<String, dynamic>>? phones,
+    String? profession,
+    String? specialties,
+    String? liabilityAction,
+    String? licenseAction,
+    String? previouslyTraveled,
+    String? terminatedFromAssignment,
+    String? licensureState,
+    String? npi,
+    List<Map<String, dynamic>>? education,
+    List<Map<String, dynamic>>? certifications,
   }) async {
     // Validate form
     if (!validateProfileForm(
       firstName: firstName,
       lastName: lastName,
-      phone: phone,
-      address: address,
       workHistory: workHistory,
+      email: email,
+      address1: address1,
+      city: city,
+      state: state,
+      zip: zip,
+      profession: profession,
+      specialties: specialties,
+      licensureState: licensureState,
+      phones: phones,
+      education: education,
     )) {
       errorMessage.value = 'Please fix the validation errors';
       return;
@@ -283,17 +535,51 @@ class ProfileController extends GetxController {
             profileId: existingProfile.profileId,
             firstName: firstName.trim(),
             lastName: lastName.trim(),
-            phone: phone.trim(),
-            address: address.trim(),
             workHistory: workHistory,
+            middleName: middleName?.trim(),
+            email: email?.trim(),
+            address1: address1?.trim(),
+            address2: address2?.trim(),
+            city: city?.trim(),
+            state: state?.trim(),
+            zip: zip?.trim(),
+            ssn: ssn?.trim(),
+            phones: phones,
+            profession: profession?.trim(),
+            specialties: specialties?.trim(),
+            liabilityAction: liabilityAction?.trim(),
+            licenseAction: licenseAction?.trim(),
+            previouslyTraveled: previouslyTraveled?.trim(),
+            terminatedFromAssignment: terminatedFromAssignment?.trim(),
+            licensureState: licensureState?.trim(),
+            npi: npi?.trim(),
+            education: education,
+            certifications: certifications,
           )
-        : await createProfileUseCase(
+        : await profileRepository.createProfile(
             userId: currentUser.userId,
             firstName: firstName.trim(),
             lastName: lastName.trim(),
-            phone: phone.trim(),
-            address: address.trim(),
             workHistory: workHistory,
+            middleName: middleName?.trim(),
+            email: email?.trim(),
+            address1: address1?.trim(),
+            address2: address2?.trim(),
+            city: city?.trim(),
+            state: state?.trim(),
+            zip: zip?.trim(),
+            ssn: ssn?.trim(),
+            phones: phones,
+            profession: profession?.trim(),
+            specialties: specialties?.trim(),
+            liabilityAction: liabilityAction?.trim(),
+            licenseAction: licenseAction?.trim(),
+            previouslyTraveled: previouslyTraveled?.trim(),
+            terminatedFromAssignment: terminatedFromAssignment?.trim(),
+            licensureState: licensureState?.trim(),
+            npi: npi?.trim(),
+            education: education,
+            certifications: certifications,
           );
 
     result.fold(

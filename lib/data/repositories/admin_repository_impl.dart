@@ -246,8 +246,6 @@ class AdminRepositoryImpl implements AdminRepository {
           userId: result['userId'] as String,
           firstName: result['firstName'] as String,
           lastName: result['lastName'] as String,
-          phone: profileData['phone'] ?? '',
-          address: profileData['address'] ?? '',
           workHistory: profileData['workHistory'] != null
               ? List<Map<String, dynamic>>.from(profileData['workHistory'])
               : null,
@@ -280,8 +278,6 @@ class AdminRepositoryImpl implements AdminRepository {
           userId: userId,
           firstName: firstName,
           lastName: lastName,
-          phone: phone ?? '',
-          address: address ?? '',
         );
 
         // Update user with profileId
@@ -309,8 +305,6 @@ class AdminRepositoryImpl implements AdminRepository {
           userId: userId,
           firstName: firstName,
           lastName: lastName,
-          phone: phone ?? '',
-          address: address ?? '',
           workHistory: profileData['workHistory'] != null
               ? List<Map<String, dynamic>>.from(profileData['workHistory'])
               : null,

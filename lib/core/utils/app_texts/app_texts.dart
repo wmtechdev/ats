@@ -38,6 +38,42 @@ class AppTexts {
   static const String profileSaved = "Profile saved successfully";
   static const String phone = "Phone";
   static const String address = "Address";
+  static const String middleName = "Middle Name";
+  static const String address1 = "Address 1";
+  static const String address2 = "Address 2";
+  static const String city = "City";
+  static const String state = "State";
+  static const String zip = "Zip";
+  static const String ssn = "SSN";
+  static const String phones = "Phones";
+  static const String addPhone = "Add Phone";
+  static const String countryCode = "Country Code";
+  static const String number = "Number";
+  static const String profession = "Profession";
+  static const String specialties = "Specialties";
+  static const String backgroundHistory = "Background History";
+  static const String liabilityAction = "Has this candidate ever been named as a defendant in a professional liability action?";
+  static const String licenseAction = "Has action been taken against this candidate's professional license?";
+  static const String previouslyTraveled = "Has this candidate previously traveled with your agency?";
+  static const String terminatedFromAssignment = "Has this candidate ever been terminated from an assignment?";
+  static const String yes = "Yes";
+  static const String no = "No";
+  static const String select = "Select";
+  static const String licensure = "Licensure";
+  static const String npi = "NPI";
+  static const String education = "Education";
+  static const String addEducation = "Add Education";
+  static const String institutionName = "Institution Name";
+  static const String degree = "Degree";
+  static const String ongoing = "Ongoing";
+  static const String fromDate = "From Date";
+  static const String toDate = "To Date";
+  static const String certifications = "Certifications";
+  static const String addCertification = "Add Certification";
+  static const String certificationName = "Name";
+  static const String expiry = "Expiry";
+  static const String candidateProfile = "Candidate Profile";
+  static const String specialty = "Specialty";
 
   // Jobs
   static const String jobDetails = "Job Details";
@@ -201,6 +237,19 @@ class AppTexts {
   static const String documentTitleRequired = "Document title is required";
   static const String documentTitleMinLength =
       "Document title must be at least 3 characters";
+  static const String cityRequired = "City is required";
+  static const String cityMinLength = "City must be at least 2 characters";
+  static const String stateRequired = "State is required";
+  static const String zipRequired = "Zip code is required";
+  static const String zipMinLength = "Zip code must be at least 5 digits";
+  static const String address1Required = "Address 1 is required";
+  static const String address1MinLength = "Address 1 must be at least 5 characters";
+  static const String professionRequired = "Profession is required";
+  static const String specialtiesRequired = "Specialties are required";
+  static const String licensureStateRequired = "Licensure state is required";
+  static const String phoneNumberRequired = "Phone number is required";
+  static const String phoneNumberMinLength = "Phone number must be at least 10 digits";
+  static const String educationRequired = "At least one education entry is required";
 
   // Common
   static const String cancel = "Cancel";
