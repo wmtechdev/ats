@@ -52,8 +52,6 @@ class CandidateAuthRepositoryImpl implements CandidateAuthRepository {
         userId: userId,
         firstName: firstName,
         lastName: lastName,
-        phone: phone ?? '',
-        address: address ?? '',
       );
 
       // Update user with profileId

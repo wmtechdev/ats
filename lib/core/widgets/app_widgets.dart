@@ -16,3 +16,6 @@ export 'documents/documents.dart';
 
 // Candidates widgets (used in candidate screens - admin view)
 export 'candidates/candidates.dart';
+
+// Profile widgets (used in profile screens)
+export 'profile/profile.dart';

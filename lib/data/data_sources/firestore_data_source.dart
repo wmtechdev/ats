@@ -25,8 +25,6 @@ abstract class FirestoreDataSource {
     required String userId,
     required String firstName,
     required String lastName,
-    required String phone,
-    required String address,
     List<Map<String, dynamic>>? workHistory,
   });
 
@@ -224,8 +222,6 @@ class FirestoreDataSourceImpl implements FirestoreDataSource {
     required String userId,
     required String firstName,
     required String lastName,
-    required String phone,
-    required String address,
     List<Map<String, dynamic>>? workHistory,
   }) async {
     try {
@@ -235,8 +231,6 @@ class FirestoreDataSourceImpl implements FirestoreDataSource {
             'userId': userId,
             'firstName': firstName,
             'lastName': lastName,
-            'phone': phone,
-            'address': address,
             if (workHistory != null) 'workHistory': workHistory,
           });
       return docRef.id;

@@ -87,4 +87,74 @@ class AppValidators {
     }
     return null;
   }
+
+  static String? validateCity(String? value) {
+    if (value == null || value.trim().isEmpty) {
+      return AppTexts.cityRequired;
+    }
+    if (value.trim().length < 2) {
+      return AppTexts.cityMinLength;
+    }
+    return null;
+  }
+
+  static String? validateState(String? value) {
+    if (value == null || value.trim().isEmpty) {
+      return AppTexts.stateRequired;
+    }
+    return null;
+  }
+
+  static String? validateZip(String? value) {
+    if (value == null || value.trim().isEmpty) {
+      return AppTexts.zipRequired;
+    }
+    final digitsOnly = value.replaceAll(RegExp(r'[^\d]'), '');
+    if (digitsOnly.length < 5) {
+      return AppTexts.zipMinLength;
+    }
+    return null;
+  }
+
+  static String? validateAddress1(String? value) {
+    if (value == null || value.trim().isEmpty) {
+      return AppTexts.address1Required;
+    }
+    if (value.trim().length < 5) {
+      return AppTexts.address1MinLength;
+    }
+    return null;
+  }
+
+  static String? validateProfession(String? value) {
+    if (value == null || value.trim().isEmpty) {
+      return AppTexts.professionRequired;
+    }
+    return null;
+  }
+
+  static String? validateSpecialties(String? value) {
+    if (value == null || value.trim().isEmpty) {
+      return AppTexts.specialtiesRequired;
+    }
+    return null;
+  }
+
+  static String? validateLicensureState(String? value) {
+    if (value == null || value.trim().isEmpty) {
+      return AppTexts.licensureStateRequired;
+    }
+    return null;
+  }
+
+  static String? validatePhoneNumber(String? value) {
+    if (value == null || value.trim().isEmpty) {
+      return AppTexts.phoneNumberRequired;
+    }
+    final digitsOnly = value.replaceAll(RegExp(r'[^\d]'), '');
+    if (digitsOnly.length < 10) {
+      return AppTexts.phoneNumberMinLength;
+    }
+    return null;
+  }
 }
