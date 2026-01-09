@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:ats/core/widgets/profile/sections/sections.dart';
-import 'package:ats/core/widgets/profile/form/profile_form_data_helper.dart';
 
 /// Manages all form controllers and state for admin candidate profile creation/editing
 class AdminProfileFormState {

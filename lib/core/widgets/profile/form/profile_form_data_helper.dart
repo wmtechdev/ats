@@ -1,7 +1,6 @@
 import 'package:ats/core/widgets/profile/sections/sections.dart';
 import 'package:ats/core/widgets/profile/form/profile_form_state.dart';
 import 'package:ats/presentation/candidate/controllers/profile_controller.dart';
-import 'package:ats/core/widgets/profile/form/admin_profile_form_state.dart';
 
 /// Helper class for collecting and transforming form data
 class ProfileFormDataHelper {

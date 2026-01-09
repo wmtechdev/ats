@@ -741,8 +741,8 @@ class AdminCandidatesController extends GetxController {
         candidateProfiles.refresh();
         isLoading.value = false;
         AppSnackbar.success('Candidate updated successfully');
-        // Navigate back
-        Get.back();
+        // Navigate to candidate details screen
+        Get.offNamed(AppConstants.routeAdminCandidateDetails);
       },
     );
   }

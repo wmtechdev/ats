@@ -46,6 +46,7 @@ class AppTexts {
   static const String zip = "Zip";
   static const String ssn = "SSN";
   static const String phones = "Phones";
+  static const String phoneNumber = "Phone Number";
   static const String addPhone = "Add Phone";
   static const String countryCode = "Country Code";
   static const String number = "Number";

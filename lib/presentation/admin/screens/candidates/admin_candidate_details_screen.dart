@@ -49,11 +49,6 @@ class AdminCandidateDetailsScreen extends StatelessWidget {
         final availableAgents = controller.availableAgents.toList();
 
         final profile = controller.selectedCandidateProfile.value;
-        final name = profile != null
-            ? '${profile.firstName} ${profile.lastName}'.trim()
-            : 'N/A';
-        final email = candidate.email;
-        final workHistory = controller.getWorkHistoryText();
         final documentsCount = controller.getDocumentsCount();
         final applicationsCount = controller.getApplicationsCount();
         final agentName = controller.getCandidateAgentName(candidate.userId);
@@ -96,9 +91,8 @@ class AdminCandidateDetailsScreen extends StatelessWidget {
                       children: [
                         Expanded(
                           child: AppCandidateProfileTable(
-                            name: name,
-                            email: email,
-                            workHistory: workHistory,
+                            profile: profile,
+                            fallbackEmail: candidate.email,
                             documentsCount: documentsCount,
                             applicationsCount: applicationsCount,
                             agentName: agentName,
@@ -142,10 +136,13 @@ class AdminCandidateDetailsScreen extends StatelessWidget {
                                     text: AppTexts.deleteCandidate,
                                     icon: Iconsax.trash,
                                     onPressed: () {
+                                      final profileName = profile != null
+                                          ? '${profile.firstName} ${profile.lastName}'.trim()
+                                          : 'N/A';
                                       _showDeleteConfirmation(
                                         context,
                                         controller,
-                                        name,
+                                        profileName,
                                       );
                                     },
                                     backgroundColor: AppColors.error,
