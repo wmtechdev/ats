@@ -4,6 +4,7 @@ import 'package:ats/core/constants/app_constants.dart';
 import 'package:ats/core/utils/app_texts/app_texts.dart';
 import 'package:ats/core/utils/app_spacing/app_spacing.dart';
 import 'package:ats/core/utils/app_colors/app_colors.dart';
+import 'package:ats/core/utils/app_responsive/app_responsive.dart';
 import 'package:ats/domain/entities/application_entity.dart';
 import 'package:ats/core/widgets/app_widgets.dart';
 
@@ -43,11 +44,13 @@ class AppCandidateApplicationsList extends StatelessWidget {
           title: jobTitle,
           subtitle: '${AppTexts.status}: ${app.status}',
           icon: Iconsax.briefcase,
-          trailing: Row(
-            mainAxisSize: MainAxisSize.min,
+          trailing: null,
+          contentBelowSubtitle: Wrap(
+            spacing: AppResponsive.screenWidth(context) * 0.01,
+            runSpacing: AppResponsive.screenHeight(context) * 0.005,
             children: [
               // Show only status chip when application is approved
-              if (isApproved) ...[AppStatusChip(status: app.status)],
+              if (isApproved) AppStatusChip(status: app.status),
               // Show approve/deny buttons only when application is pending
               if (isPending) ...[
                 AppActionButton(
@@ -59,7 +62,6 @@ class AppCandidateApplicationsList extends StatelessWidget {
                   backgroundColor: AppColors.success,
                   foregroundColor: AppColors.white,
                 ),
-                AppSpacing.horizontal(context, 0.01),
                 AppActionButton(
                   text: AppTexts.deny,
                   onPressed: () => onStatusUpdate(
@@ -71,7 +73,7 @@ class AppCandidateApplicationsList extends StatelessWidget {
                 ),
               ],
               // Show status chip when application is denied (no buttons for admin)
-              if (isDenied) ...[AppStatusChip(status: app.status)],
+              if (isDenied) AppStatusChip(status: app.status),
             ],
           ),
           onTap: null,

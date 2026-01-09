@@ -6,6 +6,7 @@ import 'package:ats/domain/entities/document_type_entity.dart';
 import 'package:ats/domain/entities/candidate_document_entity.dart';
 import 'package:ats/domain/usecases/document/upload_document_usecase.dart';
 import 'package:ats/core/utils/app_file_validator/app_file_validator.dart';
+import 'package:ats/core/constants/app_constants.dart';
 import 'package:ats/data/repositories/document_repository_impl.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:ats/core/widgets/app_widgets.dart';
@@ -319,6 +320,8 @@ class DocumentsController extends GetxController {
   Future<void> createUserDocument({
     required String title,
     required String description,
+    DateTime? expiryDate,
+    bool hasNoExpiry = false,
   }) async {
     // Validate file is selected
     if (selectedFile.value == null) {
@@ -371,6 +374,8 @@ class DocumentsController extends GetxController {
         onProgress: (progress) {
           uploadProgress.value = progress;
         },
+        expiryDate: expiryDate,
+        hasNoExpiry: hasNoExpiry,
       );
 
       createResult.fold(
@@ -391,7 +396,8 @@ class DocumentsController extends GetxController {
           Future.delayed(const Duration(seconds: 2), () {
             uploadProgress.value = 0.0;
           });
-          Get.back();
+          // Navigate to MyDocumentsScreen after successful creation
+          Get.offNamed(AppConstants.routeCandidateDocuments);
         },
       );
     } catch (e) {

@@ -12,6 +12,7 @@ class AppColors {
   static const Color information = Colors.blue;
   static const Color warning = Colors.orange;
   static const Color error = Colors.red;
+  static const Color expiry = Colors.limeAccent;
   static const Color lightBackground = Color(0xFFFFFFFF);
   static const Color lightColor = Colors.white;
   static const Color lightText = Colors.black;

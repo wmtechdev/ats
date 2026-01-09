@@ -8,6 +8,8 @@ class CandidateDocumentEntity {
   final DateTime uploadedAt;
   final String? title;
   final String? description;
+  final DateTime? expiryDate;
+  final bool hasNoExpiry;
 
   CandidateDocumentEntity({
     required this.candidateDocId,
@@ -19,6 +21,8 @@ class CandidateDocumentEntity {
     required this.uploadedAt,
     this.title,
     this.description,
+    this.expiryDate,
+    this.hasNoExpiry = false,
   });
 
   bool get isUserAdded => docTypeId.isEmpty;

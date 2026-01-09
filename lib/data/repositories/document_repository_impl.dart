@@ -193,6 +193,7 @@ class DocumentRepositoryImpl implements DocumentRepository {
         storageUrl: downloadUrl,
         status: AppConstants.documentStatusPending,
         uploadedAt: DateTime.now(),
+        hasNoExpiry: false,
       );
 
       return Right(doc.toEntity());
@@ -358,6 +359,8 @@ class DocumentRepositoryImpl implements DocumentRepository {
     required String documentName,
     required String filePath,
     void Function(double progress)? onProgress,
+    DateTime? expiryDate,
+    bool hasNoExpiry = false,
   }) async {
     try {
       File? file;
@@ -400,6 +403,8 @@ class DocumentRepositoryImpl implements DocumentRepository {
         storageUrl: downloadUrl,
         title: title,
         description: description,
+        expiryDate: expiryDate,
+        hasNoExpiry: hasNoExpiry,
       );
 
       final doc = CandidateDocumentModel(
@@ -412,6 +417,8 @@ class DocumentRepositoryImpl implements DocumentRepository {
         uploadedAt: DateTime.now(),
         title: title,
         description: description,
+        expiryDate: expiryDate,
+        hasNoExpiry: hasNoExpiry,
       );
 
       return Right(doc.toEntity());
@@ -432,6 +439,8 @@ class DocumentRepositoryImpl implements DocumentRepository {
     required String documentName,
     required PlatformFile platformFile,
     void Function(double progress)? onProgress,
+    DateTime? expiryDate,
+    bool hasNoExpiry = false,
   }) async {
     try {
       // Validate file
@@ -491,6 +500,8 @@ class DocumentRepositoryImpl implements DocumentRepository {
         storageUrl: downloadUrl,
         title: title,
         description: description,
+        expiryDate: expiryDate,
+        hasNoExpiry: hasNoExpiry,
       );
 
       final doc = CandidateDocumentModel(
@@ -503,6 +514,8 @@ class DocumentRepositoryImpl implements DocumentRepository {
         uploadedAt: DateTime.now(),
         title: title,
         description: description,
+        expiryDate: expiryDate,
+        hasNoExpiry: hasNoExpiry,
       );
 
       return Right(doc.toEntity());
@@ -535,6 +548,8 @@ class DocumentRepositoryImpl implements DocumentRepository {
               (data['uploadedAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
           title: data['title'] as String?,
           description: data['description'] as String?,
+          expiryDate: (data['expiryDate'] as Timestamp?)?.toDate(),
+          hasNoExpiry: data['hasNoExpiry'] ?? false,
         ).toEntity();
       }).toList();
       return Right(docs);
@@ -564,6 +579,8 @@ class DocumentRepositoryImpl implements DocumentRepository {
               (data['uploadedAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
           title: data['title'] as String?,
           description: data['description'] as String?,
+          expiryDate: (data['expiryDate'] as Timestamp?)?.toDate(),
+          hasNoExpiry: data['hasNoExpiry'] ?? false,
         ).toEntity();
       }).toList();
     });
@@ -589,6 +606,7 @@ class DocumentRepositoryImpl implements DocumentRepository {
         storageUrl: '',
         status: status,
         uploadedAt: DateTime.now(),
+        hasNoExpiry: false,
       );
 
       return Right(doc.toEntity());

@@ -12,6 +12,8 @@ class CandidateDocumentModel extends CandidateDocumentEntity {
     required super.uploadedAt,
     super.title,
     super.description,
+    super.expiryDate,
+    super.hasNoExpiry = false,
   });
 
   factory CandidateDocumentModel.fromFirestore(DocumentSnapshot doc) {
@@ -27,6 +29,8 @@ class CandidateDocumentModel extends CandidateDocumentEntity {
           (data['uploadedAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
       title: data['title'] as String?,
       description: data['description'] as String?,
+      expiryDate: (data['expiryDate'] as Timestamp?)?.toDate(),
+      hasNoExpiry: data['hasNoExpiry'] ?? false,
     );
   }
 
@@ -40,6 +44,8 @@ class CandidateDocumentModel extends CandidateDocumentEntity {
       'uploadedAt': Timestamp.fromDate(uploadedAt),
       if (title != null) 'title': title,
       if (description != null) 'description': description,
+      if (expiryDate != null) 'expiryDate': Timestamp.fromDate(expiryDate!),
+      'hasNoExpiry': hasNoExpiry,
     };
   }
 
@@ -54,6 +60,8 @@ class CandidateDocumentModel extends CandidateDocumentEntity {
       uploadedAt: uploadedAt,
       title: title,
       description: description,
+      expiryDate: expiryDate,
+      hasNoExpiry: hasNoExpiry,
     );
   }
 }

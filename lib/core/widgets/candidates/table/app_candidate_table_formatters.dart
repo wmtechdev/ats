@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:ats/core/constants/app_constants.dart';
 import 'package:ats/core/utils/app_texts/app_texts.dart';
 import 'package:ats/core/utils/app_colors/app_colors.dart';
+import 'package:ats/domain/entities/candidate_document_entity.dart';
 
 class AppCandidateTableFormatters {
   AppCandidateTableFormatters._();
@@ -51,5 +53,18 @@ class AppCandidateTableFormatters {
     }
     // Show first 2 with dots
     return '${specialtiesList.take(2).join(', ')}...';
+  }
+
+  /// Formats expiry status for a document
+  /// Returns "No Expiry" if hasNoExpiry is true, otherwise "Expiry: MM/yyyy"
+  static String? formatExpiryStatus(CandidateDocumentEntity document) {
+    if (document.hasNoExpiry) {
+      return 'No Expiry';
+    }
+    if (document.expiryDate != null) {
+      final format = DateFormat('MM/yyyy');
+      return 'Expiry: ${format.format(document.expiryDate!)}';
+    }
+    return null;
   }
 }

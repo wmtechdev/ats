@@ -7,8 +7,10 @@ import 'package:ats/presentation/candidate/controllers/documents_controller.dart
 import 'package:ats/core/utils/app_texts/app_texts.dart';
 import 'package:ats/core/utils/app_spacing/app_spacing.dart';
 import 'package:ats/core/utils/app_styles/app_text_styles.dart';
+import 'package:ats/core/utils/app_responsive/app_responsive.dart';
 import 'package:ats/core/utils/app_file_validator/app_file_validator.dart';
 import 'package:ats/core/widgets/app_widgets.dart';
+import 'package:ats/core/widgets/candidates/table/app_candidate_table_formatters.dart';
 
 class MyDocumentsScreen extends StatelessWidget {
   const MyDocumentsScreen({super.key});
@@ -148,13 +150,25 @@ class MyDocumentsScreen extends StatelessWidget {
                                     ),
                                   )
                                 : currentHasDoc
-                                ? Row(
-                                    mainAxisSize: MainAxisSize.min,
+                                ? null
+                                : AppButton(
+                                    backgroundColor: AppColors.primary,
+                                    text: AppTexts.upload,
+                                    icon: Iconsax.document_upload,
+                                    onPressed: () => controller.uploadDocument(
+                                      docType.docTypeId,
+                                      docType.name,
+                                    ),
+                                    isFullWidth: false,
+                                  ),
+                            contentBelowSubtitle: currentHasDoc
+                                ? Wrap(
+                                    spacing: AppResponsive.screenWidth(context) * 0.01,
+                                    runSpacing: AppResponsive.screenHeight(context) * 0.005,
                                     children: [
                                       AppStatusChip(status: documentStatus),
                                       // Show view button when document has been uploaded
-                                      if (hasStorageUrl) ...[
-                                        AppSpacing.horizontal(context, 0.01),
+                                      if (hasStorageUrl)
                                         AppActionButton(
                                           text: AppTexts.view,
                                           onPressed: () {
@@ -168,10 +182,8 @@ class MyDocumentsScreen extends StatelessWidget {
                                               AppColors.information,
                                           foregroundColor: AppColors.white,
                                         ),
-                                      ],
                                       // Show delete button when pending
-                                      if (isPending) ...[
-                                        AppSpacing.horizontal(context, 0.01),
+                                      if (isPending)
                                         AppActionButton(
                                           text: AppTexts.delete,
                                           onPressed: () =>
@@ -185,10 +197,8 @@ class MyDocumentsScreen extends StatelessWidget {
                                           backgroundColor: AppColors.error,
                                           foregroundColor: AppColors.white,
                                         ),
-                                      ],
                                       // Show reupload button when denied
-                                      if (isDenied) ...[
-                                        AppSpacing.horizontal(context, 0.01),
+                                      if (isDenied)
                                         AppActionButton(
                                           text: AppTexts.reupload,
                                           onPressed: () =>
@@ -199,20 +209,9 @@ class MyDocumentsScreen extends StatelessWidget {
                                           backgroundColor: AppColors.warning,
                                           foregroundColor: AppColors.black,
                                         ),
-                                      ],
-                                      // Approved: Only show status (no buttons)
                                     ],
                                   )
-                                : AppButton(
-                                    backgroundColor: AppColors.primary,
-                                    text: AppTexts.upload,
-                                    icon: Iconsax.document_upload,
-                                    onPressed: () => controller.uploadDocument(
-                                      docType.docTypeId,
-                                      docType.name,
-                                    ),
-                                    isFullWidth: false,
-                                  ),
+                                : null,
                             onTap: null,
                           ),
                         ],
@@ -238,6 +237,7 @@ class MyDocumentsScreen extends StatelessWidget {
                       final isDenied =
                           userDoc.status == AppConstants.documentStatusDenied;
                       final hasStorageUrl = userDoc.storageUrl.isNotEmpty;
+                      final expiryStatus = AppCandidateTableFormatters.formatExpiryStatus(userDoc);
 
                       return AppListCard(
                         title:
@@ -247,13 +247,36 @@ class MyDocumentsScreen extends StatelessWidget {
                             ),
                         subtitle: userDoc.description ?? '',
                         icon: Iconsax.document_text,
-                        trailing: Row(
-                          mainAxisSize: MainAxisSize.min,
+                        trailing: null,
+                        contentBelowSubtitle: Wrap(
+                          spacing: AppResponsive.screenWidth(context) * 0.01,
+                          runSpacing: AppResponsive.screenHeight(context) * 0.005,
                           children: [
+                            // Expiry Status Chip
+                            if (expiryStatus != null)
+                              Container(
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: AppResponsive.screenWidth(context) * 0.01,
+                                  vertical: AppResponsive.screenHeight(context) * 0.005,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: AppColors.expiry,
+                                  borderRadius: BorderRadius.circular(
+                                    AppResponsive.radius(context, factor: 5),
+                                  ),
+                                ),
+                                child: Text(
+                                  expiryStatus.toUpperCase(),
+                                  style: AppTextStyles.bodyText(context).copyWith(
+                                    color: AppColors.black,
+                                    fontWeight: FontWeight.w500,
+                                    letterSpacing: 0.5,
+                                  ),
+                                ),
+                              ),
                             AppStatusChip(status: userDoc.status),
                             // Show view button when document has been uploaded
-                            if (hasStorageUrl) ...[
-                              AppSpacing.horizontal(context, 0.01),
+                            if (hasStorageUrl)
                               AppActionButton(
                                 text: AppTexts.view,
                                 onPressed: () {
@@ -269,10 +292,8 @@ class MyDocumentsScreen extends StatelessWidget {
                                 backgroundColor: AppColors.information,
                                 foregroundColor: AppColors.white,
                               ),
-                            ],
                             // Show delete button when pending
-                            if (isPending) ...[
-                              AppSpacing.horizontal(context, 0.01),
+                            if (isPending)
                               AppActionButton(
                                 text: AppTexts.delete,
                                 onPressed: () => _showDeleteConfirmation(
@@ -288,10 +309,8 @@ class MyDocumentsScreen extends StatelessWidget {
                                 backgroundColor: AppColors.error,
                                 foregroundColor: AppColors.white,
                               ),
-                            ],
                             // Show reupload button when denied
-                            if (isDenied) ...[
-                              AppSpacing.horizontal(context, 0.01),
+                            if (isDenied)
                               AppActionButton(
                                 text: AppTexts.reupload,
                                 onPressed: () {
@@ -303,8 +322,6 @@ class MyDocumentsScreen extends StatelessWidget {
                                 backgroundColor: AppColors.warning,
                                 foregroundColor: AppColors.black,
                               ),
-                            ],
-                            // Approved: Only show status (no buttons)
                           ],
                         ),
                         onTap: null,

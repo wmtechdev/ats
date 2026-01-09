@@ -112,28 +112,31 @@ class AppCandidateTableRows {
           vertical: 8.0,
           horizontal: 4.0,
         ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            if (onEdit != null)
-              IconButton(
-                icon: const Icon(
-                  Iconsax.edit,
-                  color: AppColors.secondary,
+        child: SizedBox(
+          width: 120.0, // Ensure Actions column has minimum width
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (onEdit != null)
+                IconButton(
+                  icon: const Icon(
+                    Iconsax.edit,
+                    color: AppColors.secondary,
+                  ),
+                  onPressed: () => onEdit(candidate),
+                  tooltip: AppTexts.edit,
                 ),
-                onPressed: () => onEdit(candidate),
-                tooltip: AppTexts.edit,
-              ),
-            if (onDelete != null)
-              IconButton(
-                icon: const Icon(
-                  Iconsax.trash,
-                  color: AppColors.error,
+              if (onDelete != null)
+                IconButton(
+                  icon: const Icon(
+                    Iconsax.trash,
+                    color: AppColors.error,
+                  ),
+                  onPressed: () => onDelete(candidate),
+                  tooltip: AppTexts.deleteCandidate,
                 ),
-                onPressed: () => onDelete(candidate),
-                tooltip: AppTexts.deleteCandidate,
-              ),
-          ],
+            ],
+          ),
         ),
       ),
     );

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:ats/core/utils/app_texts/app_texts.dart';
 import 'package:ats/core/utils/app_spacing/app_spacing.dart';
@@ -7,11 +8,29 @@ import 'package:ats/core/widgets/app_widgets.dart';
 class AppDocumentFormFields extends StatelessWidget {
   final TextEditingController titleController;
   final TextEditingController descriptionController;
+  final TextEditingController? expiryController;
+  final bool hasNoExpiry;
+  final void Function(bool)? onNoExpiryChanged;
+  final void Function(String)? onTitleChanged;
+  final void Function(String)? onDescriptionChanged;
+  final void Function()? onExpiryChanged;
+  final Rxn<String>? titleError;
+  final Rxn<String>? descriptionError;
+  final Rxn<String>? expiryError;
 
   const AppDocumentFormFields({
     super.key,
     required this.titleController,
     required this.descriptionController,
+    this.expiryController,
+    this.hasNoExpiry = false,
+    this.onNoExpiryChanged,
+    this.onTitleChanged,
+    this.onDescriptionChanged,
+    this.onExpiryChanged,
+    this.titleError,
+    this.descriptionError,
+    this.expiryError,
   });
 
   @override
@@ -23,6 +42,7 @@ class AppDocumentFormFields extends StatelessWidget {
           controller: titleController,
           labelText: AppTexts.documentTitle,
           prefixIcon: Iconsax.document_text,
+          onChanged: onTitleChanged,
           validator: (value) {
             if (value == null || value.trim().isEmpty) {
               return AppTexts.documentTitleRequired;
@@ -33,12 +53,27 @@ class AppDocumentFormFields extends StatelessWidget {
             return null;
           },
         ),
+        if (titleError != null)
+          Obx(
+            () => titleError!.value != null
+                ? Padding(
+                    padding: EdgeInsets.only(
+                      top: AppSpacing.vertical(context, 0.01).height!,
+                    ),
+                    child: AppErrorMessage(
+                      message: titleError!.value!,
+                      icon: Iconsax.info_circle,
+                    ),
+                  )
+                : const SizedBox.shrink(),
+          ),
         AppSpacing.vertical(context, 0.02),
         AppTextField(
           controller: descriptionController,
           labelText: AppTexts.description,
           prefixIcon: Iconsax.document_text_1,
           maxLines: 5,
+          onChanged: onDescriptionChanged,
           validator: (value) {
             if (value == null || value.trim().isEmpty) {
               return AppTexts.descriptionRequired;
@@ -49,6 +84,66 @@ class AppDocumentFormFields extends StatelessWidget {
             return null;
           },
         ),
+        if (descriptionError != null)
+          Obx(
+            () => descriptionError!.value != null
+                ? Padding(
+                    padding: EdgeInsets.only(
+                      top: AppSpacing.vertical(context, 0.01).height!,
+                    ),
+                    child: AppErrorMessage(
+                      message: descriptionError!.value!,
+                      icon: Iconsax.info_circle,
+                    ),
+                  )
+                : const SizedBox.shrink(),
+          ),
+        // Expiry Date Section (only shown if expiryController is provided)
+        if (expiryController != null && onNoExpiryChanged != null) ...[
+          AppSpacing.vertical(context, 0.02),
+          // No Expiry Checkbox
+          Row(
+            children: [
+              Checkbox(
+                value: hasNoExpiry,
+                onChanged: (value) {
+                  onNoExpiryChanged!(value ?? false);
+                },
+              ),
+              Text('No Expiry'),
+            ],
+          ),
+          // Expiry Date Picker
+          if (!hasNoExpiry) ...[
+            AppSpacing.vertical(context, 0.01),
+            AppDatePicker(
+              controller: expiryController!,
+              labelText: AppTexts.expiry,
+              showLabelAbove: true,
+              hintText: 'MM/YYYY',
+              monthYearOnly: true,
+              onChanged: (value) {
+                // Trigger expiry validation when date is selected
+                onExpiryChanged?.call();
+              },
+            ),
+          ],
+          // Expiry Error Message
+          if (expiryError != null)
+            Obx(
+              () => expiryError!.value != null
+                  ? Padding(
+                      padding: EdgeInsets.only(
+                        top: AppSpacing.vertical(context, 0.01).height!,
+                      ),
+                      child: AppErrorMessage(
+                        message: expiryError!.value!,
+                        icon: Iconsax.info_circle,
+                      ),
+                    )
+                  : const SizedBox.shrink(),
+            ),
+        ],
       ],
     );
   }

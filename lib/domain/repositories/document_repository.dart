@@ -40,6 +40,8 @@ abstract class DocumentRepository {
     required String documentName,
     required String filePath,
     void Function(double progress)? onProgress,
+    DateTime? expiryDate,
+    bool hasNoExpiry = false,
   });
 
   Future<Either<Failure, List<CandidateDocumentEntity>>> getCandidateDocuments(

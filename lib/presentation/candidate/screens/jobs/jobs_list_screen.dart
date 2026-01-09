@@ -6,6 +6,7 @@ import 'package:ats/core/constants/app_constants.dart';
 import 'package:ats/presentation/candidate/controllers/jobs_controller.dart';
 import 'package:ats/core/utils/app_texts/app_texts.dart';
 import 'package:ats/core/utils/app_spacing/app_spacing.dart';
+import 'package:ats/core/utils/app_responsive/app_responsive.dart';
 import 'package:ats/core/widgets/app_widgets.dart';
 
 class JobsListScreen extends StatelessWidget {
@@ -35,10 +36,7 @@ class JobsListScreen extends StatelessWidget {
                         : job.description,
                     icon: Iconsax.briefcase,
                     trailing: controller.hasApplied(job.jobId)
-                        ? AppStatusChip(
-                            status: 'applied',
-                            customText: AppTexts.applied,
-                          )
+                        ? null
                         : AppButton(
                             backgroundColor: AppColors.primary,
                             text: AppTexts.apply,
@@ -51,6 +49,18 @@ class JobsListScreen extends StatelessWidget {
                             },
                             isFullWidth: false,
                           ),
+                    contentBelowSubtitle: controller.hasApplied(job.jobId)
+                        ? Wrap(
+                            spacing: AppResponsive.screenWidth(context) * 0.01,
+                            runSpacing: AppResponsive.screenHeight(context) * 0.005,
+                            children: [
+                              AppStatusChip(
+                                status: 'applied',
+                                customText: AppTexts.applied,
+                              ),
+                            ],
+                          )
+                        : null,
                     onTap: () {
                       controller.selectJob(job);
                       Get.toNamed(AppConstants.routeCandidateJobDetails);

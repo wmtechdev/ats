@@ -130,6 +130,8 @@ abstract class FirestoreDataSource {
     required String storageUrl,
     String? title,
     String? description,
+    DateTime? expiryDate,
+    bool hasNoExpiry = false,
   });
 
   Future<List<Map<String, dynamic>>> getCandidateDocuments(String candidateId);
@@ -675,6 +677,8 @@ class FirestoreDataSourceImpl implements FirestoreDataSource {
     required String storageUrl,
     String? title,
     String? description,
+    DateTime? expiryDate,
+    bool hasNoExpiry = false,
   }) async {
     try {
       final docRef = await firestore
@@ -688,6 +692,8 @@ class FirestoreDataSourceImpl implements FirestoreDataSource {
             'uploadedAt': FieldValue.serverTimestamp(),
             if (title != null) 'title': title,
             if (description != null) 'description': description,
+            if (expiryDate != null) 'expiryDate': Timestamp.fromDate(expiryDate),
+            'hasNoExpiry': hasNoExpiry,
           });
       return docRef.id;
     } catch (e) {

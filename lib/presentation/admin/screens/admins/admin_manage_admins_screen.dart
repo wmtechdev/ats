@@ -5,6 +5,7 @@ import 'package:ats/core/constants/app_constants.dart';
 import 'package:ats/core/utils/app_texts/app_texts.dart';
 import 'package:ats/core/utils/app_spacing/app_spacing.dart';
 import 'package:ats/core/utils/app_colors/app_colors.dart';
+import 'package:ats/core/utils/app_responsive/app_responsive.dart';
 import 'package:ats/core/widgets/app_widgets.dart';
 import 'package:ats/domain/entities/admin_profile_entity.dart';
 import 'package:ats/presentation/admin/controllers/admin_manage_admins_controller.dart';
@@ -67,45 +68,46 @@ class AdminManageAdminsScreen extends StatelessWidget {
                         '${profile.email}\n${AppTexts.role}: ${isAdmin ? AppTexts.admin : AppTexts.recruiter}',
                     icon: Iconsax.user,
                     iconColor: AppColors.primary,
-                    statusWidget: AppStatusChip(
-                      status: isAdmin ? 'admin' : 'recruiter',
-                      customText: isAdmin ? AppTexts.admin : AppTexts.recruiter,
+                    trailing: null,
+                    contentBelowSubtitle: Wrap(
+                      spacing: AppResponsive.screenWidth(context) * 0.01,
+                      runSpacing: AppResponsive.screenHeight(context) * 0.005,
+                      children: [
+                        AppStatusChip(
+                          status: isAdmin ? 'admin' : 'recruiter',
+                          customText: isAdmin ? AppTexts.admin : AppTexts.recruiter,
+                        ),
+                        if (!isCurrentUser) ...[
+                          AppActionButton(
+                            text: AppTexts.changeRole,
+                            onPressed: isChanging
+                                ? null
+                                : () => _showChangeRoleConfirmation(
+                                    context,
+                                    controller,
+                                    profile,
+                                  ),
+                            backgroundColor: AppColors.success,
+                            foregroundColor: AppColors.white,
+                          ),
+                          AppActionButton(
+                            text: AppTexts.deleteUser,
+                            onPressed:
+                                (controller.isDeletingUser[profile
+                                        .profileId] ??
+                                    false)
+                                ? null
+                                : () => _showDeleteUserConfirmation(
+                                    context,
+                                    controller,
+                                    profile,
+                                  ),
+                            backgroundColor: AppColors.error,
+                            foregroundColor: AppColors.white,
+                          ),
+                        ],
+                      ],
                     ),
-                    trailing: !isCurrentUser
-                        ? Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              AppActionButton(
-                                text: AppTexts.changeRole,
-                                onPressed: isChanging
-                                    ? null
-                                    : () => _showChangeRoleConfirmation(
-                                        context,
-                                        controller,
-                                        profile,
-                                      ),
-                                backgroundColor: AppColors.success,
-                                foregroundColor: AppColors.white,
-                              ),
-                              AppSpacing.horizontal(context, 0.01),
-                              AppActionButton(
-                                text: AppTexts.deleteUser,
-                                onPressed:
-                                    (controller.isDeletingUser[profile
-                                            .profileId] ??
-                                        false)
-                                    ? null
-                                    : () => _showDeleteUserConfirmation(
-                                        context,
-                                        controller,
-                                        profile,
-                                      ),
-                                backgroundColor: AppColors.error,
-                                foregroundColor: AppColors.white,
-                              ),
-                            ],
-                          )
-                        : null,
                     useRowLayout: true,
                   );
                 },

@@ -45,54 +45,66 @@ class AppCandidatesTable extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Calculate minimum width needed for all columns
-    // Name(180) + Email(250) + Company(180) + Position(180) + Profession(220) + Specialties(250) + Status(120) + Agent(180) + Actions(120) = ~1680
-    // Adding extra padding and spacing: ~1800 to ensure all columns are visible
-    const minTableWidth = 1800.0;
+    // Name(200) + Email(280) + Company(200) + Position(200) + Profession(250) + Specialties(280) + Status(150) + Agent(200) + Actions(150) = ~1910
+    // Column spacing: 8 gaps * 20 = 160
+    // Cell padding: ~100
+    // Adding extra padding: ~2200 to ensure all columns are visible, especially Actions column
+    const minTableWidth = 2200.0;
+    
+    final hasActionsColumn = isSuperAdmin && (onCandidateEdit != null || onCandidateDelete != null);
     
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
-      padding: AppSpacing.padding(context).copyWith(left: 0, right: 0),
+      padding: AppSpacing.padding(context).copyWith(
+        left: 0,
+        right: hasActionsColumn ? 16.0 : 0,
+      ),
       child: SingleChildScrollView(
         scrollDirection: Axis.vertical,
-        child: SizedBox(
-          width: minTableWidth,
-          child: DataTable(
-            columnSpacing: 20,
-            headingRowColor: WidgetStateProperty.all(AppColors.lightGrey),
-            columns: AppCandidateTableColumns.buildColumns(
-              context,
-              isSuperAdmin: isSuperAdmin,
-              hasEditOrDelete: onCandidateEdit != null || onCandidateDelete != null,
-            ),
-            rows: candidates.map((candidate) {
-              final name = getName(candidate.userId);
-              final company = getCompany(candidate.userId);
-              final position = getPosition(candidate.userId);
-              final profession = getProfession(candidate.userId);
-              final specialties = getSpecialties(candidate.userId);
-              final status = getStatus(candidate.userId);
-              final agentName = getAgentName(candidate.userId);
-
-              return AppCandidateTableRows.buildRow(
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            minWidth: minTableWidth,
+          ),
+          child: SizedBox(
+            width: minTableWidth,
+            child: DataTable(
+              columnSpacing: 20,
+              headingRowColor: WidgetStateProperty.all(AppColors.lightGrey),
+              columns: AppCandidateTableColumns.buildColumns(
                 context,
-                candidate,
-                name: name,
-                email: candidate.email,
-                company: company,
-                position: position,
-                profession: profession,
-                specialties: specialties,
-                status: status,
-                agentName: agentName,
-                assignedAgentProfileId: getAssignedAgentProfileId(candidate.userId),
                 isSuperAdmin: isSuperAdmin,
-                availableAgents: availableAgents,
-                onAgentChanged: onAgentChanged,
-                onCandidateTap: () => onCandidateTap(candidate),
-                onCandidateEdit: onCandidateEdit,
-                onCandidateDelete: onCandidateDelete,
-              );
-            }).toList(),
+                hasEditOrDelete: onCandidateEdit != null || onCandidateDelete != null,
+              ),
+              rows: candidates.map((candidate) {
+                final name = getName(candidate.userId);
+                final company = getCompany(candidate.userId);
+                final position = getPosition(candidate.userId);
+                final profession = getProfession(candidate.userId);
+                final specialties = getSpecialties(candidate.userId);
+                final status = getStatus(candidate.userId);
+                final agentName = getAgentName(candidate.userId);
+
+                return AppCandidateTableRows.buildRow(
+                  context,
+                  candidate,
+                  name: name,
+                  email: candidate.email,
+                  company: company,
+                  position: position,
+                  profession: profession,
+                  specialties: specialties,
+                  status: status,
+                  agentName: agentName,
+                  assignedAgentProfileId: getAssignedAgentProfileId(candidate.userId),
+                  isSuperAdmin: isSuperAdmin,
+                  availableAgents: availableAgents,
+                  onAgentChanged: onAgentChanged,
+                  onCandidateTap: () => onCandidateTap(candidate),
+                  onCandidateEdit: onCandidateEdit,
+                  onCandidateDelete: onCandidateDelete,
+                );
+              }).toList(),
+            ),
           ),
         ),
       ),
