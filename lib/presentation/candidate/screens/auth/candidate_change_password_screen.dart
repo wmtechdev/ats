@@ -10,10 +10,12 @@ class CandidateChangePasswordScreen extends StatefulWidget {
   const CandidateChangePasswordScreen({super.key});
 
   @override
-  State<CandidateChangePasswordScreen> createState() => _CandidateChangePasswordScreenState();
+  State<CandidateChangePasswordScreen> createState() =>
+      _CandidateChangePasswordScreenState();
 }
 
-class _CandidateChangePasswordScreenState extends State<CandidateChangePasswordScreen> {
+class _CandidateChangePasswordScreenState
+    extends State<CandidateChangePasswordScreen> {
   @override
   void initState() {
     super.initState();

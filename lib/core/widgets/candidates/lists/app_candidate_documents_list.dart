@@ -9,8 +9,6 @@ import 'package:ats/core/utils/app_responsive/app_responsive.dart';
 import 'package:ats/core/utils/app_styles/app_text_styles.dart';
 import 'package:ats/domain/entities/candidate_document_entity.dart';
 import 'package:ats/core/widgets/app_widgets.dart';
-import 'package:ats/core/widgets/candidates/dialogs/app_document_denial_dialog.dart';
-import 'package:ats/core/widgets/candidates/table/app_candidate_table_formatters.dart';
 
 class AppCandidateDocumentsList extends StatelessWidget {
   final List<CandidateDocumentEntity> documents;

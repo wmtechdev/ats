@@ -40,7 +40,7 @@ class AppDropDownField<T> extends StatelessWidget {
         : defaultPadding;
 
     final dropdown = DropdownButtonFormField<T>(
-      value: value,
+      initialValue: value,
       decoration: InputDecoration(
         labelText: showLabelAbove ? null : labelText,
         hintText: hintText,

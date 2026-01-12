@@ -13,10 +13,12 @@ class CandidateForgotPasswordScreen extends StatefulWidget {
   const CandidateForgotPasswordScreen({super.key});
 
   @override
-  State<CandidateForgotPasswordScreen> createState() => _CandidateForgotPasswordScreenState();
+  State<CandidateForgotPasswordScreen> createState() =>
+      _CandidateForgotPasswordScreenState();
 }
 
-class _CandidateForgotPasswordScreenState extends State<CandidateForgotPasswordScreen> {
+class _CandidateForgotPasswordScreenState
+    extends State<CandidateForgotPasswordScreen> {
   @override
   void initState() {
     super.initState();
@@ -43,9 +45,9 @@ class _CandidateForgotPasswordScreenState extends State<CandidateForgotPasswordS
       formFields: [
         Text(
           AppTexts.forgotPasswordDescription,
-          style: AppTextStyles.bodyText(context).copyWith(
-            color: AppColors.white,
-          ),
+          style: AppTextStyles.bodyText(
+            context,
+          ).copyWith(color: AppColors.white),
         ),
         AppSpacing.vertical(context, 0.03),
         AppTextField(

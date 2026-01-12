@@ -166,8 +166,9 @@ class JobRepositoryImpl implements JobRepository {
       if (title != null) updateData['title'] = title;
       if (description != null) updateData['description'] = description;
       if (requirements != null) updateData['requirements'] = requirements;
-      if (requiredDocumentIds != null)
+      if (requiredDocumentIds != null) {
         updateData['requiredDocumentIds'] = requiredDocumentIds;
+      }
       if (status != null) updateData['status'] = status;
 
       await firestoreDataSource.updateJob(jobId: jobId, data: updateData);

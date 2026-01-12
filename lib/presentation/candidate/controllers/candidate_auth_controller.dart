@@ -29,6 +29,7 @@ class CandidateAuthController extends BaseAuthController {
     _forgotPasswordEmailController ??= TextEditingController();
     return _forgotPasswordEmailController!;
   }
+
   final forgotPasswordEmailError = Rxn<String>();
   final forgotPasswordEmailValue = ''.obs;
   final forgotPasswordSuccessMessage = ''.obs;
@@ -39,16 +40,19 @@ class CandidateAuthController extends BaseAuthController {
     _currentPasswordController ??= TextEditingController();
     return _currentPasswordController!;
   }
+
   TextEditingController? _newPasswordController;
   TextEditingController get newPasswordController {
     _newPasswordController ??= TextEditingController();
     return _newPasswordController!;
   }
+
   TextEditingController? _confirmPasswordController;
   TextEditingController get confirmPasswordController {
     _confirmPasswordController ??= TextEditingController();
     return _confirmPasswordController!;
   }
+
   final currentPasswordError = Rxn<String>();
   final newPasswordError = Rxn<String>();
   final confirmPasswordError = Rxn<String>();
@@ -61,8 +65,12 @@ class CandidateAuthController extends BaseAuthController {
     signUpUseCase = CandidateSignUpUseCase(candidateAuthRepository);
     signInUseCase = CandidateSignInUseCase(candidateAuthRepository);
     signOutUseCase = CandidateSignOutUseCase(candidateAuthRepository);
-    forgotPasswordUseCase = CandidateForgotPasswordUseCase(candidateAuthRepository);
-    changePasswordUseCase = CandidateChangePasswordUseCase(candidateAuthRepository);
+    forgotPasswordUseCase = CandidateForgotPasswordUseCase(
+      candidateAuthRepository,
+    );
+    changePasswordUseCase = CandidateChangePasswordUseCase(
+      candidateAuthRepository,
+    );
   }
 
   @override
@@ -261,9 +269,9 @@ class CandidateAuthController extends BaseAuthController {
 
   Future<void> sendPasswordResetEmail() async {
     final email = forgotPasswordEmailValue.value.trim();
-    
+
     validateForgotPasswordEmail(email);
-    
+
     if (forgotPasswordEmailError.value != null) {
       return;
     }
@@ -324,7 +332,7 @@ class CandidateAuthController extends BaseAuthController {
     } else {
       currentPasswordError.value = null;
     }
-    
+
     // Re-validate new password when current password changes
     // to check if new password is same as current
     if (newPasswordValue.value.isNotEmpty) {
@@ -334,23 +342,23 @@ class CandidateAuthController extends BaseAuthController {
 
   void validateNewPassword(String? value) {
     newPasswordValue.value = value ?? '';
-    
+
     // First check standard password validation
     final standardValidation = AppValidators.validatePassword(value);
     if (standardValidation != null) {
       newPasswordError.value = standardValidation;
       return;
     }
-    
+
     // Check if new password is same as current password
-    if (value != null && 
-        value.isNotEmpty && 
+    if (value != null &&
+        value.isNotEmpty &&
         currentPasswordValue.value.isNotEmpty &&
         value == currentPasswordValue.value) {
       newPasswordError.value = AppTexts.newPasswordSameAsCurrent;
       return;
     }
-    
+
     newPasswordError.value = null;
   }
 
@@ -369,7 +377,7 @@ class CandidateAuthController extends BaseAuthController {
     validateCurrentPassword(currentPasswordValue.value);
     validateNewPassword(newPasswordValue.value);
     validateConfirmPassword(confirmPasswordValue.value);
-    
+
     return currentPasswordError.value == null &&
         newPasswordError.value == null &&
         confirmPasswordError.value == null;

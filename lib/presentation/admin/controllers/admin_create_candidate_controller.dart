@@ -7,8 +7,6 @@ import 'package:ats/domain/repositories/admin_repository.dart';
 import 'package:ats/domain/usecases/admin/create_candidate_usecase.dart';
 import 'package:ats/presentation/admin/controllers/admin_candidates_controller.dart';
 import 'package:ats/core/widgets/app_widgets.dart';
-import 'package:ats/core/widgets/profile/form/admin_profile_form_state.dart';
-import 'package:ats/core/widgets/profile/form/admin_profile_form_data_helper.dart';
 
 class AdminCreateCandidateController extends GetxController {
   final AdminRepository adminRepository;

@@ -8,8 +8,6 @@ import 'package:ats/core/utils/app_texts/app_texts.dart';
 import 'package:ats/core/utils/app_colors/app_colors.dart';
 import 'package:ats/core/utils/app_spacing/app_spacing.dart';
 import 'package:ats/core/widgets/app_widgets.dart';
-import 'package:ats/core/widgets/common/forms/app_dropdown_field.dart';
-import 'package:ats/core/widgets/common/chips/app_status_chip.dart';
 
 class AdminCandidatesListScreen extends StatelessWidget {
   const AdminCandidatesListScreen({super.key});
@@ -117,7 +115,7 @@ class AdminCandidatesListScreen extends StatelessWidget {
                                         overflow: TextOverflow.ellipsis,
                                       ),
                                     );
-                                  }).toList(),
+                                  }),
                                 ],
                                 onChanged: (value) =>
                                     controller.setAgentFilter(value),
@@ -143,7 +141,7 @@ class AdminCandidatesListScreen extends StatelessWidget {
                                         overflow: TextOverflow.ellipsis,
                                       ),
                                     );
-                                  }).toList(),
+                                  }),
                                 ],
                                 onChanged: (value) =>
                                     controller.setProfessionFilter(value),
@@ -252,7 +250,7 @@ class AdminCandidatesListScreen extends StatelessWidget {
                                         overflow: TextOverflow.ellipsis,
                                       ),
                                     );
-                                  }).toList(),
+                                  }),
                                 ],
                                 onChanged: (value) =>
                                     controller.setAgentFilter(value),
@@ -278,7 +276,7 @@ class AdminCandidatesListScreen extends StatelessWidget {
                                         overflow: TextOverflow.ellipsis,
                                       ),
                                     );
-                                  }).toList(),
+                                  }),
                                 ],
                                 onChanged: (value) =>
                                     controller.setProfessionFilter(value),

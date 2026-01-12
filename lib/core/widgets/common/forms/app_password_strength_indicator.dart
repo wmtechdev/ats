@@ -21,7 +21,9 @@ class AppPasswordStrengthIndicator extends StatelessWidget {
     }
 
     final strength = PasswordStrengthCalculator.calculateStrength(password);
-    final percentage = PasswordStrengthCalculator.getStrengthPercentage(password);
+    final percentage = PasswordStrengthCalculator.getStrengthPercentage(
+      password,
+    );
     final label = PasswordStrengthCalculator.getStrengthLabel(strength);
 
     Color strengthColor;

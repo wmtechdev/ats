@@ -47,7 +47,8 @@ class AppConstants {
   // Candidate Routes
   static const String routeCandidateDashboard = '/candidate/dashboard';
   static const String routeCandidateProfile = '/candidate/profile';
-  static const String routeChangePassword = '/candidate/profile/change-password';
+  static const String routeChangePassword =
+      '/candidate/profile/change-password';
   static const String routeCandidateJobs = '/candidate/jobs';
   static const String routeCandidateJobDetails = '/candidate/jobs/details';
   static const String routeCandidateApplications = '/candidate/applications';

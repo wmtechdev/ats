@@ -1,8 +1,4 @@
-enum PasswordStrength {
-  weak,
-  medium,
-  strong,
-}
+enum PasswordStrength { weak, medium, strong }
 
 class PasswordStrengthCalculator {
   PasswordStrengthCalculator._();

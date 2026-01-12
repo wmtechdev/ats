@@ -4,7 +4,6 @@ import 'package:iconsax/iconsax.dart';
 import 'package:ats/core/widgets/app_widgets.dart';
 import 'package:ats/core/utils/app_spacing/app_spacing.dart';
 import 'package:ats/core/utils/app_texts/app_texts.dart';
-import 'package:ats/core/widgets/common/forms/app_password_strength_indicator.dart';
 
 class CandidateProfileSection extends StatelessWidget {
   final TextEditingController firstNameController;
@@ -173,14 +172,14 @@ class CandidateProfileSection extends StatelessWidget {
               enabled: passwordEnabled, // Controlled by parameter
               onChanged: onPasswordChanged,
             ),
-            if (passwordValue != null && passwordValue!.isNotEmpty && passwordEnabled)
+            if (passwordValue != null &&
+                passwordValue!.isNotEmpty &&
+                passwordEnabled)
               Padding(
                 padding: EdgeInsets.only(
                   top: AppSpacing.vertical(context, 0.01).height!,
                 ),
-                child: AppPasswordStrengthIndicator(
-                  password: passwordValue,
-                ),
+                child: AppPasswordStrengthIndicator(password: passwordValue),
               ),
             if (passwordError != null)
               Obx(

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:ats/presentation/candidate/controllers/profile_controller.dart';
 import 'package:ats/core/widgets/profile/profile.dart';
-import 'package:ats/core/widgets/profile/form/profile_form_data_helper.dart';
 
 /// Manages all form controllers and state for candidate profile
 class ProfileFormState {
@@ -151,18 +150,10 @@ class ProfileFormState {
     }
 
     // Background History
-    if (liabilityAction == null) {
-      liabilityAction = profile.liabilityAction;
-    }
-    if (licenseAction == null) {
-      licenseAction = profile.licenseAction;
-    }
-    if (previouslyTraveled == null) {
-      previouslyTraveled = profile.previouslyTraveled;
-    }
-    if (terminatedFromAssignment == null) {
-      terminatedFromAssignment = profile.terminatedFromAssignment;
-    }
+    liabilityAction ??= profile.liabilityAction;
+    licenseAction ??= profile.licenseAction;
+    previouslyTraveled ??= profile.previouslyTraveled;
+    terminatedFromAssignment ??= profile.terminatedFromAssignment;
 
     // Licensure
     licensureState = profile.licensureState;

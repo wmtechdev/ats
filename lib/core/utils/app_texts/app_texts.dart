@@ -329,26 +329,36 @@ class AppTexts {
   // Password Management
   static const String forgotPassword = "Forgot Password?";
   static const String forgotPasswordTitle = "Reset Password";
-  static const String forgotPasswordDescription = "Enter your email address and we'll send you a link to reset your password.";
+  static const String forgotPasswordDescription =
+      "Enter your email address and we'll send you a link to reset your password.";
   static const String sendResetLink = "Send Reset Link";
   static const String resendEmail = "Resend Email";
-  static const String passwordResetEmailSent = "Password reset email sent successfully! Please check your inbox (and spam folder if needed). The link will expire in 1 hour.";
-  static const String passwordResetEmailResent = "Password reset email resent successfully! Please check your inbox.";
-  static const String passwordResetRateLimitExceeded = "Too many password reset requests. Please wait before requesting another email.";
-  static const String passwordResetRateLimitWait = "Please wait {minutes} minute(s) before requesting another password reset email.";
+  static const String passwordResetEmailSent =
+      "Password reset email sent successfully! Please check your inbox (and spam folder if needed). The link will expire in 1 hour.";
+  static const String passwordResetEmailResent =
+      "Password reset email resent successfully! Please check your inbox.";
+  static const String passwordResetRateLimitExceeded =
+      "Too many password reset requests. Please wait before requesting another email.";
+  static const String passwordResetRateLimitWait =
+      "Please wait {minutes} minute(s) before requesting another password reset email.";
   static const String backToLogin = "Back to Login";
   static const String changePassword = "Change Password";
   static const String changePasswordTitle = "Change Password";
   static const String currentPassword = "Current Password";
   static const String newPassword = "New Password";
   static const String confirmPassword = "Confirm Password";
-  static const String passwordChanged = "Your password has been changed successfully. Please use your new password to log in.";
+  static const String passwordChanged =
+      "Your password has been changed successfully. Please use your new password to log in.";
   static const String currentPasswordRequired = "Current password is required";
-  static const String confirmPasswordRequired = "Please confirm your new password";
+  static const String confirmPasswordRequired =
+      "Please confirm your new password";
   static const String passwordsDoNotMatch = "Passwords do not match";
   static const String passwordResetSending = "Sending password reset email...";
   static const String passwordChanging = "Changing your password...";
-  static const String passwordResetFailed = "Failed to send password reset email. Please check your email address and try again.";
-  static const String passwordChangeFailed = "Failed to change password. Please verify your current password and try again.";
-  static const String currentPasswordIncorrect = "Current password is incorrect. Please try again.";
+  static const String passwordResetFailed =
+      "Failed to send password reset email. Please check your email address and try again.";
+  static const String passwordChangeFailed =
+      "Failed to change password. Please verify your current password and try again.";
+  static const String currentPasswordIncorrect =
+      "Current password is incorrect. Please try again.";
 }

@@ -20,32 +20,32 @@ class AppValidators {
     if (value == null || value.isEmpty) {
       return AppTexts.passwordRequired;
     }
-    
+
     // Minimum length check
     if (value.length < 8) {
       return AppTexts.passwordMinLength;
     }
-    
+
     // Check for uppercase letter
     if (!value.contains(RegExp(r'[A-Z]'))) {
       return AppTexts.passwordMustContainUppercase;
     }
-    
+
     // Check for lowercase letter
     if (!value.contains(RegExp(r'[a-z]'))) {
       return AppTexts.passwordMustContainLowercase;
     }
-    
+
     // Check for digit
     if (!value.contains(RegExp(r'[0-9]'))) {
       return AppTexts.passwordMustContainDigit;
     }
-    
+
     // Check for special character
     if (!value.contains(RegExp(r'[!@#$%^&*()_+\-=\[\]{}|;:,.<>?]'))) {
       return AppTexts.passwordMustContainSymbol;
     }
-    
+
     return null;
   }
 
