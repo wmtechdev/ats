@@ -4,6 +4,7 @@ import 'package:ats/core/utils/app_styles/app_text_styles.dart';
 import 'package:ats/core/utils/app_responsive/app_responsive.dart';
 import 'package:ats/core/utils/app_colors/app_colors.dart';
 import 'package:ats/core/widgets/common/forms/app_required_label.dart';
+import 'package:iconsax/iconsax.dart';
 
 class AppTextField extends StatefulWidget {
   final TextEditingController? controller;
@@ -11,6 +12,7 @@ class AppTextField extends StatefulWidget {
   final String? hintText;
   final IconData? prefixIcon;
   final bool obscureText;
+  final bool showPasswordToggle;
   final int? minLines;
   final int? maxLines;
   final TextInputType? keyboardType;
@@ -26,6 +28,7 @@ class AppTextField extends StatefulWidget {
     this.hintText,
     this.prefixIcon,
     this.obscureText = false,
+    this.showPasswordToggle = true,
     this.minLines = 1,
     this.maxLines = 1,
     this.keyboardType,
@@ -43,12 +46,14 @@ class _AppTextFieldState extends State<AppTextField> {
   late final TextEditingController _internalController;
   TextEditingController? _externalController;
   VoidCallback? _externalControllerListener;
+  bool _obscureText = true;
 
   @override
   void initState() {
     super.initState();
     // Always create internal controller for safety
     _internalController = TextEditingController();
+    _obscureText = widget.obscureText;
 
     // If external controller provided, sync with it
     if (widget.controller != null) {
@@ -65,6 +70,10 @@ class _AppTextFieldState extends State<AppTextField> {
       if (widget.controller != null) {
         _syncWithExternalController();
       }
+    }
+    // Update obscure text if it changed
+    if (widget.obscureText != oldWidget.obscureText) {
+      _obscureText = widget.obscureText;
     }
   }
 
@@ -147,7 +156,7 @@ class _AppTextFieldState extends State<AppTextField> {
 
     final textField = TextField(
       controller: _internalController,
-      obscureText: widget.obscureText,
+      obscureText: widget.obscureText ? _obscureText : false,
       minLines: widget.minLines,
       maxLines: widget.maxLines,
       keyboardType: widget.keyboardType,
@@ -199,6 +208,20 @@ class _AppTextFieldState extends State<AppTextField> {
                 widget.prefixIcon,
                 size: AppResponsive.iconSize(context),
                 color: AppColors.primary,
+              )
+            : null,
+        suffixIcon: widget.obscureText && widget.showPasswordToggle
+            ? IconButton(
+                icon: Icon(
+                  _obscureText ? Iconsax.eye : Iconsax.eye_slash,
+                  size: AppResponsive.iconSize(context),
+                  color: AppColors.primary,
+                ),
+                onPressed: () {
+                  setState(() {
+                    _obscureText = !_obscureText;
+                  });
+                },
               )
             : null,
         contentPadding: contentPadding,

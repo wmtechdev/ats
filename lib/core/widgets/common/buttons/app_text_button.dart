@@ -8,6 +8,7 @@ class AppTextButton extends StatelessWidget {
   final VoidCallback? onPressed;
   final Color? textColor;
   final IconData? icon;
+  final TextDecoration? decoration;
 
   const AppTextButton({
     super.key,
@@ -15,35 +16,38 @@ class AppTextButton extends StatelessWidget {
     this.onPressed,
     this.textColor,
     this.icon,
+    this.decoration,
   });
 
   @override
   Widget build(BuildContext context) {
+    final buttonStyle = TextButton.styleFrom(
+      foregroundColor: textColor ?? AppColors.primary,
+    );
+
+    final textStyle = AppTextStyles.bodyText(context).copyWith(
+      color: textColor ?? AppColors.primary,
+      decoration: decoration,
+      decorationColor: textColor ?? AppColors.primary,
+    );
+
     if (icon != null) {
       return TextButton.icon(
         onPressed: onPressed,
+        style: buttonStyle,
         icon: Icon(
           icon,
           size: AppResponsive.iconSize(context),
           color: textColor ?? AppColors.primary,
         ),
-        label: Text(
-          text,
-          style: AppTextStyles.bodyText(
-            context,
-          ).copyWith(color: textColor ?? AppColors.primary),
-        ),
+        label: Text(text, style: textStyle),
       );
     }
 
     return TextButton(
       onPressed: onPressed,
-      child: Text(
-        text,
-        style: AppTextStyles.bodyText(
-          context,
-        ).copyWith(color: textColor ?? AppColors.primary),
-      ),
+      style: buttonStyle,
+      child: Text(text, style: textStyle),
     );
   }
 }

@@ -16,6 +16,10 @@ abstract class FirebaseAuthDataSource {
 
   Future<void> sendPasswordResetEmail(String email);
 
+  Future<void> updatePassword(String newPassword);
+
+  Future<void> reauthenticateWithPassword(String email, String password);
+
   Future<void> deleteUser(String userId);
 
   Stream<User?> get authStateChanges;
@@ -77,6 +81,40 @@ class FirebaseAuthDataSourceImpl implements FirebaseAuthDataSource {
       await firebaseAuth.sendPasswordResetEmail(email: email);
     } on FirebaseAuthException catch (e) {
       throw AuthException(e.message ?? 'Failed to send password reset email');
+    } catch (e) {
+      throw AuthException('An unexpected error occurred: $e');
+    }
+  }
+
+  @override
+  Future<void> updatePassword(String newPassword) async {
+    try {
+      final user = firebaseAuth.currentUser;
+      if (user == null) {
+        throw AuthException('No user is currently signed in');
+      }
+      await user.updatePassword(newPassword);
+    } on FirebaseAuthException catch (e) {
+      throw AuthException(e.message ?? 'Failed to update password');
+    } catch (e) {
+      throw AuthException('An unexpected error occurred: $e');
+    }
+  }
+
+  @override
+  Future<void> reauthenticateWithPassword(String email, String password) async {
+    try {
+      final user = firebaseAuth.currentUser;
+      if (user == null) {
+        throw AuthException('No user is currently signed in');
+      }
+      final credential = EmailAuthProvider.credential(
+        email: email,
+        password: password,
+      );
+      await user.reauthenticateWithCredential(credential);
+    } on FirebaseAuthException catch (e) {
+      throw AuthException(e.message ?? 'Failed to reauthenticate');
     } catch (e) {
       throw AuthException('An unexpected error occurred: $e');
     }

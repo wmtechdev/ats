@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:ats/presentation/candidate/controllers/profile_controller.dart';
+import 'package:ats/core/constants/app_constants.dart';
 import 'package:ats/core/utils/app_texts/app_texts.dart';
 import 'package:ats/core/utils/app_spacing/app_spacing.dart';
 import 'package:ats/core/widgets/app_widgets.dart';
@@ -383,6 +384,15 @@ class _CandidateProfileFormState extends State<CandidateProfileForm> {
             },
             isLoading: controller.isLoading.value,
           ),
+        ),
+        AppSpacing.vertical(context, 0.02),
+        // Change Password Button
+        AppButton(
+          text: AppTexts.changePassword,
+          onPressed: () {
+            Get.toNamed(AppConstants.routeChangePassword);
+          },
+          backgroundColor: Get.theme.colorScheme.secondary,
         ),
       ],
     );

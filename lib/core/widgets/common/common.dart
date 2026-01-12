@@ -6,6 +6,7 @@ export 'forms/app_required_label.dart';
 export 'forms/app_tag_input.dart';
 export 'forms/app_country_code_picker.dart';
 export 'forms/app_date_picker.dart';
+export 'forms/app_password_strength_indicator.dart';
 export 'buttons/app_button.dart';
 export 'buttons/app_text_button.dart';
 export 'buttons/app_action_button.dart';

@@ -80,6 +80,18 @@ class AdminCreateNewUserScreen extends StatelessWidget {
               },
             ),
             Obx(
+              () => controller.passwordValue.value.isNotEmpty
+                  ? Padding(
+                      padding: EdgeInsets.only(
+                        top: AppResponsive.screenHeight(context) * 0.01,
+                      ),
+                      child: AppPasswordStrengthIndicator(
+                        password: controller.passwordValue.value,
+                      ),
+                    )
+                  : const SizedBox.shrink(),
+            ),
+            Obx(
               () => controller.passwordError.value != null
                   ? Padding(
                       padding: EdgeInsets.only(

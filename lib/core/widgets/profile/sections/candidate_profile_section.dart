@@ -4,6 +4,7 @@ import 'package:iconsax/iconsax.dart';
 import 'package:ats/core/widgets/app_widgets.dart';
 import 'package:ats/core/utils/app_spacing/app_spacing.dart';
 import 'package:ats/core/utils/app_texts/app_texts.dart';
+import 'package:ats/core/widgets/common/forms/app_password_strength_indicator.dart';
 
 class CandidateProfileSection extends StatelessWidget {
   final TextEditingController firstNameController;
@@ -33,6 +34,7 @@ class CandidateProfileSection extends StatelessWidget {
   final Rxn<String>? lastNameError;
   final Rxn<String>? emailError;
   final Rxn<String>? passwordError; // Optional, for admin side only
+  final String? passwordValue; // Optional, for password strength indicator
   final Rxn<String>? address1Error;
   final Rxn<String>? cityError;
   final Rxn<String>? stateError;
@@ -66,6 +68,7 @@ class CandidateProfileSection extends StatelessWidget {
     this.lastNameError,
     this.emailError,
     this.passwordError,
+    this.passwordValue,
     this.address1Error,
     this.cityError,
     this.stateError,
@@ -170,6 +173,15 @@ class CandidateProfileSection extends StatelessWidget {
               enabled: passwordEnabled, // Controlled by parameter
               onChanged: onPasswordChanged,
             ),
+            if (passwordValue != null && passwordValue!.isNotEmpty && passwordEnabled)
+              Padding(
+                padding: EdgeInsets.only(
+                  top: AppSpacing.vertical(context, 0.01).height!,
+                ),
+                child: AppPasswordStrengthIndicator(
+                  password: passwordValue,
+                ),
+              ),
             if (passwordError != null)
               Obx(
                 () => passwordError!.value != null
