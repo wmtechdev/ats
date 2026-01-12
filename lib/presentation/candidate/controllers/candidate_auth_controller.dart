@@ -1,12 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ats/core/constants/app_constants.dart';
+import 'package:ats/core/utils/app_validators/app_validators.dart';
+import 'package:ats/core/utils/app_texts/app_texts.dart';
 import 'package:ats/domain/entities/user_entity.dart';
 import 'package:ats/domain/repositories/candidate_auth_repository.dart';
 import 'package:ats/domain/usecases/candidate_auth/candidate_sign_up_usecase.dart';
 import 'package:ats/domain/usecases/candidate_auth/candidate_sign_in_usecase.dart';
 import 'package:ats/domain/usecases/candidate_auth/candidate_sign_out_usecase.dart';
+import 'package:ats/domain/usecases/candidate_auth/candidate_forgot_password_usecase.dart';
+import 'package:ats/domain/usecases/candidate_auth/candidate_change_password_usecase.dart';
 import 'package:ats/presentation/common/controllers/base_auth_controller.dart';
+import 'package:ats/core/widgets/common/feedback/app_snackbar.dart';
 
 /// Candidate authentication controller
 /// Handles candidate-specific authentication flows with complete isolation
@@ -15,11 +20,49 @@ class CandidateAuthController extends BaseAuthController {
   late final CandidateSignUpUseCase signUpUseCase;
   late final CandidateSignInUseCase signInUseCase;
   late final CandidateSignOutUseCase signOutUseCase;
+  late final CandidateForgotPasswordUseCase forgotPasswordUseCase;
+  late final CandidateChangePasswordUseCase changePasswordUseCase;
+
+  // Controllers for forgot password
+  TextEditingController? _forgotPasswordEmailController;
+  TextEditingController get forgotPasswordEmailController {
+    _forgotPasswordEmailController ??= TextEditingController();
+    return _forgotPasswordEmailController!;
+  }
+  final forgotPasswordEmailError = Rxn<String>();
+  final forgotPasswordEmailValue = ''.obs;
+  final forgotPasswordSuccessMessage = ''.obs;
+
+  // Controllers for change password
+  TextEditingController? _currentPasswordController;
+  TextEditingController get currentPasswordController {
+    _currentPasswordController ??= TextEditingController();
+    return _currentPasswordController!;
+  }
+  TextEditingController? _newPasswordController;
+  TextEditingController get newPasswordController {
+    _newPasswordController ??= TextEditingController();
+    return _newPasswordController!;
+  }
+  TextEditingController? _confirmPasswordController;
+  TextEditingController get confirmPasswordController {
+    _confirmPasswordController ??= TextEditingController();
+    return _confirmPasswordController!;
+  }
+  final currentPasswordError = Rxn<String>();
+  final newPasswordError = Rxn<String>();
+  final confirmPasswordError = Rxn<String>();
+  final currentPasswordValue = ''.obs;
+  final newPasswordValue = ''.obs;
+  final confirmPasswordValue = ''.obs;
+  final changePasswordSuccessMessage = ''.obs;
 
   CandidateAuthController(this.candidateAuthRepository) : super() {
     signUpUseCase = CandidateSignUpUseCase(candidateAuthRepository);
     signInUseCase = CandidateSignInUseCase(candidateAuthRepository);
     signOutUseCase = CandidateSignOutUseCase(candidateAuthRepository);
+    forgotPasswordUseCase = CandidateForgotPasswordUseCase(candidateAuthRepository);
+    changePasswordUseCase = CandidateChangePasswordUseCase(candidateAuthRepository);
   }
 
   @override
@@ -47,6 +90,23 @@ class CandidateAuthController extends BaseAuthController {
   @override
   void deleteController() {
     Get.delete<CandidateAuthController>();
+  }
+
+  @override
+  void onClose() {
+    try {
+      _forgotPasswordEmailController?.dispose();
+      _currentPasswordController?.dispose();
+      _newPasswordController?.dispose();
+      _confirmPasswordController?.dispose();
+      _forgotPasswordEmailController = null;
+      _currentPasswordController = null;
+      _newPasswordController = null;
+      _confirmPasswordController = null;
+    } catch (e) {
+      // Controllers already disposed, ignore
+    }
+    super.onClose();
   }
 
   @override
@@ -191,5 +251,199 @@ class CandidateAuthController extends BaseAuthController {
         });
       },
     );
+  }
+
+  // Forgot Password Methods
+  void validateForgotPasswordEmail(String? value) {
+    forgotPasswordEmailValue.value = value ?? '';
+    forgotPasswordEmailError.value = AppValidators.validateEmail(value);
+  }
+
+  Future<void> sendPasswordResetEmail() async {
+    final email = forgotPasswordEmailValue.value.trim();
+    
+    validateForgotPasswordEmail(email);
+    
+    if (forgotPasswordEmailError.value != null) {
+      return;
+    }
+
+    isLoading.value = true;
+    errorMessage.value = '';
+    forgotPasswordSuccessMessage.value = '';
+
+    final result = await forgotPasswordUseCase(email);
+
+    result.fold(
+      (failure) {
+        errorMessage.value = failure.message;
+        isLoading.value = false;
+        forgotPasswordSuccessMessage.value = '';
+      },
+      (_) {
+        isLoading.value = false;
+        errorMessage.value = '';
+        forgotPasswordSuccessMessage.value = '';
+        try {
+          forgotPasswordEmailController.clear();
+        } catch (e) {
+          // Controller might be disposed, recreate it
+          _forgotPasswordEmailController = null;
+        }
+        forgotPasswordEmailValue.value = '';
+        forgotPasswordEmailError.value = null;
+        // Show snackbar and navigate to login
+        AppSnackbar.success('Password reset email sent successfully. Please check your inbox.');
+        Future.delayed(const Duration(milliseconds: 500), () {
+          Get.offNamed(AppConstants.routeLogin);
+        });
+      },
+    );
+  }
+
+  void resetForgotPasswordState() {
+    try {
+      forgotPasswordEmailController.clear();
+    } catch (e) {
+      // Controller might be disposed, recreate it
+      _forgotPasswordEmailController = null;
+    }
+    forgotPasswordEmailValue.value = '';
+    forgotPasswordEmailError.value = null;
+    forgotPasswordSuccessMessage.value = '';
+    errorMessage.value = '';
+  }
+
+  // Change Password Methods
+  void validateCurrentPassword(String? value) {
+    currentPasswordValue.value = value ?? '';
+    if (value == null || value.isEmpty) {
+      currentPasswordError.value = AppTexts.passwordRequired;
+    } else {
+      currentPasswordError.value = null;
+    }
+    
+    // Re-validate new password when current password changes
+    // to check if new password is same as current
+    if (newPasswordValue.value.isNotEmpty) {
+      validateNewPassword(newPasswordValue.value);
+    }
+  }
+
+  void validateNewPassword(String? value) {
+    newPasswordValue.value = value ?? '';
+    
+    // First check standard password validation
+    final standardValidation = AppValidators.validatePassword(value);
+    if (standardValidation != null) {
+      newPasswordError.value = standardValidation;
+      return;
+    }
+    
+    // Check if new password is same as current password
+    if (value != null && 
+        value.isNotEmpty && 
+        currentPasswordValue.value.isNotEmpty &&
+        value == currentPasswordValue.value) {
+      newPasswordError.value = AppTexts.newPasswordSameAsCurrent;
+      return;
+    }
+    
+    newPasswordError.value = null;
+  }
+
+  void validateConfirmPassword(String? value) {
+    confirmPasswordValue.value = value ?? '';
+    if (value == null || value.isEmpty) {
+      confirmPasswordError.value = AppTexts.confirmPasswordRequired;
+    } else if (value != newPasswordValue.value) {
+      confirmPasswordError.value = AppTexts.passwordsDoNotMatch;
+    } else {
+      confirmPasswordError.value = null;
+    }
+  }
+
+  bool validateChangePasswordForm() {
+    validateCurrentPassword(currentPasswordValue.value);
+    validateNewPassword(newPasswordValue.value);
+    validateConfirmPassword(confirmPasswordValue.value);
+    
+    return currentPasswordError.value == null &&
+        newPasswordError.value == null &&
+        confirmPasswordError.value == null;
+  }
+
+  Future<void> performChangePassword() async {
+    if (!validateChangePasswordForm()) {
+      return;
+    }
+
+    final currentPassword = currentPasswordValue.value;
+    final newPassword = newPasswordValue.value;
+
+    isLoading.value = true;
+    errorMessage.value = '';
+    changePasswordSuccessMessage.value = '';
+
+    final result = await changePasswordUseCase(
+      currentPassword: currentPassword,
+      newPassword: newPassword,
+    );
+
+    result.fold(
+      (failure) {
+        errorMessage.value = failure.message;
+        isLoading.value = false;
+        changePasswordSuccessMessage.value = '';
+      },
+      (_) {
+        isLoading.value = false;
+        errorMessage.value = '';
+        changePasswordSuccessMessage.value = '';
+        // Clear form
+        try {
+          currentPasswordController.clear();
+          newPasswordController.clear();
+          confirmPasswordController.clear();
+        } catch (e) {
+          // Controllers might be disposed, recreate them
+          _currentPasswordController = null;
+          _newPasswordController = null;
+          _confirmPasswordController = null;
+        }
+        currentPasswordValue.value = '';
+        newPasswordValue.value = '';
+        confirmPasswordValue.value = '';
+        currentPasswordError.value = null;
+        newPasswordError.value = null;
+        confirmPasswordError.value = null;
+        // Show snackbar and navigate to profile
+        AppSnackbar.success(AppTexts.passwordChanged);
+        Future.delayed(const Duration(milliseconds: 500), () {
+          Get.offNamed(AppConstants.routeCandidateProfile);
+        });
+      },
+    );
+  }
+
+  void resetChangePasswordState() {
+    try {
+      currentPasswordController.clear();
+      newPasswordController.clear();
+      confirmPasswordController.clear();
+    } catch (e) {
+      // Controllers might be disposed, recreate them
+      _currentPasswordController = null;
+      _newPasswordController = null;
+      _confirmPasswordController = null;
+    }
+    currentPasswordValue.value = '';
+    newPasswordValue.value = '';
+    confirmPasswordValue.value = '';
+    currentPasswordError.value = null;
+    newPasswordError.value = null;
+    confirmPasswordError.value = null;
+    changePasswordSuccessMessage.value = '';
+    errorMessage.value = '';
   }
 }

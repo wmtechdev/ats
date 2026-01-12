@@ -13,6 +13,7 @@ class AuthMiddleware extends GetMiddleware {
     final publicRoutes = [
       AppConstants.routeLogin,
       AppConstants.routeSignUp,
+      AppConstants.routeForgotPassword,
       AppConstants.routeAdminLogin,
     ];
 
@@ -23,6 +24,7 @@ class AuthMiddleware extends GetMiddleware {
     final candidateAuthRoutes = [
       AppConstants.routeLogin,
       AppConstants.routeSignUp,
+      AppConstants.routeForgotPassword,
     ];
 
     // Admin auth routes

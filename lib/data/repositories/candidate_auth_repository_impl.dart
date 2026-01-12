@@ -184,6 +184,48 @@ class CandidateAuthRepositoryImpl implements CandidateAuthRepository {
   }
 
   @override
+  Future<Either<Failure, void>> sendPasswordResetEmail(String email) async {
+    try {
+      await authDataSource.sendPasswordResetEmail(email);
+      return const Right(null);
+    } on AuthException catch (e) {
+      return Left(AuthFailure(e.message));
+    } catch (e) {
+      return Left(AuthFailure('Failed to send password reset email: $e'));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> changePassword({
+    required String currentPassword,
+    required String newPassword,
+  }) async {
+    try {
+      final currentUser = authDataSource.getCurrentUser();
+      if (currentUser == null) {
+        return const Left(AuthFailure('No user is currently signed in'));
+      }
+
+      final email = currentUser.email;
+      if (email == null || email.isEmpty) {
+        return const Left(AuthFailure('User email not found'));
+      }
+
+      // Reauthenticate with current password
+      await authDataSource.reauthenticateWithPassword(email, currentPassword);
+
+      // Update password
+      await authDataSource.updatePassword(newPassword);
+
+      return const Right(null);
+    } on AuthException catch (e) {
+      return Left(AuthFailure(e.message));
+    } catch (e) {
+      return Left(AuthFailure('Failed to change password: $e'));
+    }
+  }
+
+  @override
   Stream<UserEntity?> get authStateChanges {
     return authDataSource.authStateChanges.asyncMap((firebaseUser) async {
       if (firebaseUser == null) return null;

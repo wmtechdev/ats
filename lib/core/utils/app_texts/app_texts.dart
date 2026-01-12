@@ -213,7 +213,17 @@ class AppTexts {
   static const String emailInvalid = "Please enter a valid email address";
   static const String passwordRequired = "Password is required";
   static const String passwordMinLength =
-      "Password must be at least 6 characters";
+      "Password must be at least 8 characters";
+  static const String passwordMustContainUppercase =
+      "Password must contain at least one uppercase letter";
+  static const String passwordMustContainLowercase =
+      "Password must contain at least one lowercase letter";
+  static const String passwordMustContainDigit =
+      "Password must contain at least one digit";
+  static const String passwordMustContainSymbol =
+      "Password must contain at least one special character (!@#\$%^&*()_+-=[]{}|;:,.<>?)";
+  static const String newPasswordSameAsCurrent =
+      "New password must be different from your current password";
   static const String firstNameRequired = "First name is required";
   static const String firstNameMinLength =
       "First name must be at least 2 characters";
@@ -315,4 +325,21 @@ class AppTexts {
   static const String documentDenied = "Document denied successfully";
   static const String emailSent = "Email sent successfully";
   static const String emailFailed = "Failed to send email";
+
+  // Password Management
+  static const String forgotPassword = "Forgot Password?";
+  static const String forgotPasswordTitle = "Reset Password";
+  static const String forgotPasswordDescription = "Enter your email address and we'll send you a link to reset your password.";
+  static const String sendResetLink = "Send Reset Link";
+  static const String passwordResetEmailSent = "Password reset email sent successfully. Please check your inbox.";
+  static const String backToLogin = "Back to Login";
+  static const String changePassword = "Change Password";
+  static const String changePasswordTitle = "Change Password";
+  static const String currentPassword = "Current Password";
+  static const String newPassword = "New Password";
+  static const String confirmPassword = "Confirm Password";
+  static const String passwordChanged = "Password changed successfully";
+  static const String currentPasswordRequired = "Current password is required";
+  static const String confirmPasswordRequired = "Please confirm your new password";
+  static const String passwordsDoNotMatch = "Passwords do not match";
 }

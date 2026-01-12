@@ -25,6 +25,16 @@ abstract class CandidateAuthRepository {
   /// Sign out the current candidate user
   Future<Either<Failure, void>> signOut();
 
+  /// Send password reset email to candidate
+  Future<Either<Failure, void>> sendPasswordResetEmail(String email);
+
+  /// Change password for the current candidate user
+  /// Requires reauthentication with current password
+  Future<Either<Failure, void>> changePassword({
+    required String currentPassword,
+    required String newPassword,
+  });
+
   /// Stream of authentication state changes
   Stream<UserEntity?> get authStateChanges;
 

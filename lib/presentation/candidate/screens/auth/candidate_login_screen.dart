@@ -75,6 +75,18 @@ class CandidateLoginScreen extends StatelessWidget {
                 )
               : const SizedBox.shrink(),
         ),
+        AppSpacing.vertical(context, 0.01),
+        Align(
+          alignment: Alignment.centerRight,
+          child: AppTextButton(
+            text: AppTexts.forgotPassword,
+            onPressed: () {
+              Get.toNamed(AppConstants.routeForgotPassword);
+            },
+            textColor: AppColors.white,
+            decoration: TextDecoration.underline,
+          ),
+        ),
       ],
       errorMessage: Obx(
         () => controller.errorMessage.value.isNotEmpty

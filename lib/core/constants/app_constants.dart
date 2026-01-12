@@ -40,12 +40,14 @@ class AppConstants {
   // Candidate Auth Routes
   static const String routeLogin = '/candidate/login';
   static const String routeSignUp = '/candidate/signup';
+  static const String routeForgotPassword = '/candidate/forgot-password';
   // Admin Auth Routes
   static const String routeAdminLogin = '/admin/login';
   static const String routeAdminSignUp = '/admin/signup';
   // Candidate Routes
   static const String routeCandidateDashboard = '/candidate/dashboard';
   static const String routeCandidateProfile = '/candidate/profile';
+  static const String routeChangePassword = '/candidate/profile/change-password';
   static const String routeCandidateJobs = '/candidate/jobs';
   static const String routeCandidateJobDetails = '/candidate/jobs/details';
   static const String routeCandidateApplications = '/candidate/applications';
