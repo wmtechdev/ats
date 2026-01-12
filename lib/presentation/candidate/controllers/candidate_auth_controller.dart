@@ -276,7 +276,9 @@ class CandidateAuthController extends BaseAuthController {
 
     result.fold(
       (failure) {
-        errorMessage.value = failure.message;
+        errorMessage.value = failure.message.isNotEmpty
+            ? failure.message
+            : AppTexts.passwordResetFailed;
         isLoading.value = false;
         forgotPasswordSuccessMessage.value = '';
       },
@@ -293,7 +295,7 @@ class CandidateAuthController extends BaseAuthController {
         forgotPasswordEmailValue.value = '';
         forgotPasswordEmailError.value = null;
         // Show snackbar and navigate to login
-        AppSnackbar.success('Password reset email sent successfully. Please check your inbox.');
+        AppSnackbar.success(AppTexts.passwordResetEmailSent);
         Future.delayed(const Duration(milliseconds: 500), () {
           Get.offNamed(AppConstants.routeLogin);
         });
@@ -392,7 +394,16 @@ class CandidateAuthController extends BaseAuthController {
 
     result.fold(
       (failure) {
-        errorMessage.value = failure.message;
+        // Provide more specific error messages
+        if (failure.message.toLowerCase().contains('wrong password') ||
+            failure.message.toLowerCase().contains('invalid') ||
+            failure.message.toLowerCase().contains('credential')) {
+          errorMessage.value = AppTexts.currentPasswordIncorrect;
+        } else {
+          errorMessage.value = failure.message.isNotEmpty
+              ? failure.message
+              : AppTexts.passwordChangeFailed;
+        }
         isLoading.value = false;
         changePasswordSuccessMessage.value = '';
       },

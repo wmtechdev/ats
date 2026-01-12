@@ -58,11 +58,28 @@ class CandidateSignUpScreen extends StatelessWidget {
           },
         ),
         Obx(
+          () => controller.passwordValue.value.isNotEmpty
+              ? Padding(
+                  padding: EdgeInsets.only(
+                    top: AppSpacing.vertical(context, 0.01).height!,
+                  ),
+                  child: AppPasswordStrengthIndicator(
+                    password: controller.passwordValue.value,
+                  ),
+                )
+              : const SizedBox.shrink(),
+        ),
+        Obx(
           () => controller.passwordError.value != null
-              ? AppErrorMessage(
-                  message: controller.passwordError.value!,
-                  icon: Iconsax.info_circle,
-                  messageColor: AppColors.white,
+              ? Padding(
+                  padding: EdgeInsets.only(
+                    top: AppSpacing.vertical(context, 0.01).height!,
+                  ),
+                  child: AppErrorMessage(
+                    message: controller.passwordError.value!,
+                    icon: Iconsax.info_circle,
+                    messageColor: AppColors.white,
+                  ),
                 )
               : const SizedBox.shrink(),
         ),

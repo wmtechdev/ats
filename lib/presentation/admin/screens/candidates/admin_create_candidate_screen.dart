@@ -43,6 +43,7 @@ class AdminCreateCandidateScreen extends StatelessWidget {
                 lastNameError: controller.lastNameError,
                 emailError: controller.emailError,
                 passwordError: controller.passwordError,
+                passwordValue: controller.passwordValue.value,
                 address1Error: controller.address1Error,
                 cityError: controller.cityError,
                 stateError: controller.stateError,

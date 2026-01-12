@@ -84,7 +84,9 @@ class _CandidateForgotPasswordScreenState extends State<CandidateForgotPasswordS
       ),
       actionButton: Obx(
         () => AppButton(
-          text: AppTexts.sendResetLink,
+          text: controller.isLoading.value
+              ? AppTexts.passwordResetSending
+              : AppTexts.sendResetLink,
           onPressed: controller.sendPasswordResetEmail,
           isLoading: controller.isLoading.value,
           backgroundColor: AppColors.primary,

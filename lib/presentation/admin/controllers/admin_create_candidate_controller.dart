@@ -34,6 +34,7 @@ class AdminCreateCandidateController extends GetxController {
   // Password field (only for creation)
   final passwordController = TextEditingController();
   final passwordError = Rxn<String>();
+  final passwordValue = ''.obs;
 
   // Validation errors
   final firstNameError = Rxn<String>();
@@ -89,6 +90,7 @@ class AdminCreateCandidateController extends GetxController {
   }
 
   void validatePassword(String? value) {
+    passwordValue.value = value ?? '';
     passwordError.value = AppValidators.validatePassword(value);
   }
 

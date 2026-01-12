@@ -74,6 +74,18 @@ class _CandidateChangePasswordScreenState extends State<CandidateChangePasswordS
               },
             ),
             Obx(
+              () => controller.newPasswordValue.value.isNotEmpty
+                  ? Padding(
+                      padding: EdgeInsets.only(
+                        top: AppSpacing.vertical(context, 0.01).height!,
+                      ),
+                      child: AppPasswordStrengthIndicator(
+                        password: controller.newPasswordValue.value,
+                      ),
+                    )
+                  : const SizedBox.shrink(),
+            ),
+            Obx(
               () => controller.newPasswordError.value != null
                   ? Padding(
                       padding: EdgeInsets.only(
@@ -125,7 +137,9 @@ class _CandidateChangePasswordScreenState extends State<CandidateChangePasswordS
             ),
             Obx(
               () => AppButton(
-                text: AppTexts.changePassword,
+                text: controller.isLoading.value
+                    ? AppTexts.passwordChanging
+                    : AppTexts.changePassword,
                 onPressed: controller.performChangePassword,
                 isLoading: controller.isLoading.value,
               ),
