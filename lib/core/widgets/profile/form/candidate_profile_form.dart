@@ -17,6 +17,8 @@ class CandidateProfileForm extends StatefulWidget {
 class _CandidateProfileFormState extends State<CandidateProfileForm> {
   final controller = Get.find<ProfileController>();
   late final ProfileFormState formState;
+  bool _hasLoadedProfile = false;
+  String? _lastLoadedProfileId;
 
   @override
   void initState() {
@@ -28,15 +30,40 @@ class _CandidateProfileFormState extends State<CandidateProfileForm> {
   void _loadProfileData() {
     ever(controller.profile, (profile) {
       if (profile != null && mounted) {
-        formState.loadFromProfile(profile);
-        if (mounted) setState(() {});
+        // Only reload if profile actually changed (different profileId)
+        // This prevents unnecessary rebuilds when the stream fires with the same data
+        final profileId = profile.profileId;
+        final profileChanged = !_hasLoadedProfile || _lastLoadedProfileId != profileId;
+        
+        if (profileChanged) {
+          formState.loadFromProfile(profile);
+          _hasLoadedProfile = true;
+          _lastLoadedProfileId = profileId;
+          
+          // Call setState AFTER loading profile data to update UI
+          // GlobalKey preserves form state, so text fields won't be disposed
+          // Use post-frame callback to batch the update and avoid interrupting focus
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (mounted) {
+              setState(() {});
+            }
+          });
+        }
       }
     });
 
+    // Initial load - call setState after loading to show the data
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (controller.profile.value != null && mounted) {
-        formState.loadFromProfile(controller.profile.value!);
-        if (mounted) setState(() {});
+      if (controller.profile.value != null && mounted && !_hasLoadedProfile) {
+        final profile = controller.profile.value!;
+        formState.loadFromProfile(profile);
+        _hasLoadedProfile = true;
+        _lastLoadedProfileId = profile.profileId;
+        // Call setState to update UI with loaded data
+        // GlobalKey preserves form state, so this is safe
+        if (mounted) {
+          setState(() {});
+        }
       }
     });
   }
@@ -60,66 +87,57 @@ class _CandidateProfileFormState extends State<CandidateProfileForm> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         // Candidate Profile Section
-        Obx(
-          () => CandidateProfileSection(
-            firstNameController: formState.firstNameController,
-            middleNameController: formState.middleNameController,
-            lastNameController: formState.lastNameController,
-            emailController: formState.emailController,
-            passwordController: formState.passwordController,
-            emailEnabled: false, // Email is read-only for candidates
-            passwordEnabled:
-                false, // Password is read-only for candidates (prefilled with email)
-            address1Controller: formState.address1Controller,
-            address2Controller: formState.address2Controller,
-            cityController: formState.cityController,
-            stateController: formState.stateController,
-            zipController: formState.zipController,
-            ssnController: formState.ssnController,
-            onFirstNameChanged: (value) {
-              controller.validateFirstName(value);
-              return null;
-            },
-            onLastNameChanged: (value) {
-              controller.validateLastName(value);
-              return null;
-            },
-            onEmailChanged: (value) {
-              controller.validateEmail(value);
-              return null;
-            },
-            onAddress1Changed: (value) {
-              controller.validateAddress1(value);
-              return null;
-            },
-            onCityChanged: (value) {
-              controller.validateCity(value);
-              return null;
-            },
-            onStateChanged: (value) {
-              controller.validateState(value);
-              return null;
-            },
-            onZipChanged: (value) {
-              controller.validateZip(value);
-              return null;
-            },
-            firstNameError: controller.firstNameError,
-            lastNameError: controller.lastNameError,
-            emailError: controller.emailError,
-            address1Error: controller.address1Error,
-            cityError: controller.cityError,
-            stateError: controller.stateError,
-            zipError: controller.zipError,
-            hasError:
-                controller.firstNameError.value != null ||
-                controller.lastNameError.value != null ||
-                controller.emailError.value != null ||
-                controller.address1Error.value != null ||
-                controller.cityError.value != null ||
-                controller.stateError.value != null ||
-                controller.zipError.value != null,
-          ),
+        CandidateProfileSection(
+          firstNameController: formState.firstNameController,
+          middleNameController: formState.middleNameController,
+          lastNameController: formState.lastNameController,
+          emailController: formState.emailController,
+          passwordController: formState.passwordController,
+          emailEnabled: false, // Email is read-only for candidates
+          passwordEnabled:
+              false, // Password is read-only for candidates (prefilled with email)
+          address1Controller: formState.address1Controller,
+          address2Controller: formState.address2Controller,
+          cityController: formState.cityController,
+          stateController: formState.stateController,
+          zipController: formState.zipController,
+          ssnController: formState.ssnController,
+          onFirstNameChanged: (value) {
+            controller.validateFirstName(value);
+            return null;
+          },
+          onLastNameChanged: (value) {
+            controller.validateLastName(value);
+            return null;
+          },
+          onEmailChanged: (value) {
+            controller.validateEmail(value);
+            return null;
+          },
+          onAddress1Changed: (value) {
+            controller.validateAddress1(value);
+            return null;
+          },
+          onCityChanged: (value) {
+            controller.validateCity(value);
+            return null;
+          },
+          onStateChanged: (value) {
+            controller.validateState(value);
+            return null;
+          },
+          onZipChanged: (value) {
+            controller.validateZip(value);
+            return null;
+          },
+          firstNameError: controller.firstNameError,
+          lastNameError: controller.lastNameError,
+          emailError: controller.emailError,
+          address1Error: controller.address1Error,
+          cityError: controller.cityError,
+          stateError: controller.stateError,
+          zipError: controller.zipError,
+          hasError: false, // Individual error messages are already wrapped in Obx
         ),
         AppSpacing.vertical(context, 0.02),
 

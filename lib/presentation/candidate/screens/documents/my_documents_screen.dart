@@ -11,8 +11,39 @@ import 'package:ats/core/utils/app_responsive/app_responsive.dart';
 import 'package:ats/core/utils/app_file_validator/app_file_validator.dart';
 import 'package:ats/core/widgets/app_widgets.dart';
 
-class MyDocumentsScreen extends StatelessWidget {
+class MyDocumentsScreen extends StatefulWidget {
   const MyDocumentsScreen({super.key});
+
+  @override
+  State<MyDocumentsScreen> createState() => _MyDocumentsScreenState();
+}
+
+class _MyDocumentsScreenState extends State<MyDocumentsScreen> {
+  late final TextEditingController _searchController;
+  late final DocumentsController _controller;
+  Widget? _cachedContent; // Cache the entire Column content
+  final _searchBarKey = GlobalKey(debugLabel: 'documents-search-bar'); // GlobalKey for search bar
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = Get.find<DocumentsController>();
+    // Create search controller and sync with controller's search query
+    _searchController = TextEditingController(text: _controller.searchQuery.value);
+    
+    // Listen to search query changes from controller (e.g., when cleared)
+    ever(_controller.searchQuery, (query) {
+      if (_searchController.text != query) {
+        _searchController.text = query;
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
 
   void _showDeleteConfirmation(
     BuildContext context,
@@ -42,18 +73,20 @@ class MyDocumentsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.find<DocumentsController>();
-
-    return AppCandidateLayout(
-      title: AppTexts.myDocuments,
-      child: Column(
+    // Cache the entire Column content to prevent search bar recreation
+    // Use Builder to ensure context is available
+    _cachedContent ??= Builder(
+      builder: (context) => Column(
+        key: const ValueKey('documents-content-column'),
         children: [
-          // Search and Add Section
+          // Search and Add Section - Use GlobalKey to preserve state
           AppSearchCreateBar(
+            key: _searchBarKey, // Use GlobalKey to preserve search field state
+            searchController: _searchController,
             searchHint: AppTexts.searchDocuments,
             createButtonText: AppTexts.addNewDocument,
             createButtonIcon: Iconsax.add,
-            onSearchChanged: (value) => controller.setSearchQuery(value),
+            onSearchChanged: (value) => _controller.setSearchQuery(value),
             onCreatePressed: () {
               Get.toNamed(AppConstants.routeCandidateCreateDocument);
             },
@@ -61,15 +94,15 @@ class MyDocumentsScreen extends StatelessWidget {
           // Documents List
           Expanded(
             child: Obx(() {
-              final adminDocs = controller.filteredDocumentTypes.toList();
-              final userDocs = controller.filteredUserDocuments.toList();
+              final adminDocs = _controller.filteredDocumentTypes.toList();
+              final userDocs = _controller.filteredUserDocuments.toList();
               final hasAnyDocs = adminDocs.isNotEmpty || userDocs.isNotEmpty;
 
               if (!hasAnyDocs) {
                 return AppEmptyState(
                   message:
-                      controller.documentTypes.isEmpty &&
-                          controller.candidateDocuments
+                      _controller.documentTypes.isEmpty &&
+                          _controller.candidateDocuments
                               .where((doc) => doc.isUserAdded)
                               .isEmpty
                       ? AppTexts.noDocumentTypesAvailable
@@ -89,13 +122,13 @@ class MyDocumentsScreen extends StatelessWidget {
                     return Obx(() {
                       // Re-read reactive values inside Obx for this specific item
                       final isUploadingThisItem =
-                          controller.uploadingDocTypeId.value ==
+                          _controller.uploadingDocTypeId.value ==
                           docType.docTypeId;
-                      final currentProgress = controller.uploadProgress.value;
-                      final currentHasDoc = controller.hasDocument(
+                      final currentProgress = _controller.uploadProgress.value;
+                      final currentHasDoc = _controller.hasDocument(
                         docType.docTypeId,
                       );
-                      final currentDocument = controller.getDocumentByType(
+                      final currentDocument = _controller.getDocumentByType(
                         docType.docTypeId,
                       );
                       final documentStatus = currentDocument?.status ?? '';
@@ -154,7 +187,7 @@ class MyDocumentsScreen extends StatelessWidget {
                                     backgroundColor: AppColors.primary,
                                     text: AppTexts.upload,
                                     icon: Iconsax.document_upload,
-                                    onPressed: () => controller.uploadDocument(
+                                    onPressed: () => _controller.uploadDocument(
                                       docType.docTypeId,
                                       docType.name,
                                     ),
@@ -192,7 +225,7 @@ class MyDocumentsScreen extends StatelessWidget {
                                           onPressed: () =>
                                               _showDeleteConfirmation(
                                                 context,
-                                                controller,
+                                                _controller,
                                                 currentDocument!.candidateDocId,
                                                 currentDocument.storageUrl,
                                                 docType.name,
@@ -205,7 +238,7 @@ class MyDocumentsScreen extends StatelessWidget {
                                         AppActionButton(
                                           text: AppTexts.reupload,
                                           onPressed: () =>
-                                              controller.uploadDocument(
+                                              _controller.uploadDocument(
                                                 docType.docTypeId,
                                                 docType.name,
                                               ),
@@ -227,7 +260,7 @@ class MyDocumentsScreen extends StatelessWidget {
                     return Obx(() {
                       // Re-read reactive values inside Obx for this specific item
                       // Get the current document from the reactive list
-                      final currentUserDocs = controller.filteredUserDocuments
+                      final currentUserDocs = _controller.filteredUserDocuments
                           .toList();
                       if (userDocIndex >= currentUserDocs.length) {
                         // Document was deleted, return empty container
@@ -309,7 +342,7 @@ class MyDocumentsScreen extends StatelessWidget {
                                 text: AppTexts.delete,
                                 onPressed: () => _showDeleteConfirmation(
                                   context,
-                                  controller,
+                                  _controller,
                                   userDoc.candidateDocId,
                                   userDoc.storageUrl,
                                   userDoc.title ??
@@ -345,6 +378,11 @@ class MyDocumentsScreen extends StatelessWidget {
           ),
         ],
       ),
+    );
+    
+    return AppCandidateLayout(
+      title: AppTexts.myDocuments,
+      child: _cachedContent!,
     );
   }
 }

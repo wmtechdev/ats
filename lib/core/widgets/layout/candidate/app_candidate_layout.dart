@@ -25,10 +25,127 @@ class AppCandidateLayout extends StatefulWidget {
 }
 
 class _AppCandidateLayoutState extends State<AppCandidateLayout> {
+  ProfileController? _profileController;
+  Widget? _cachedChild;
+  AppSideLayout? _cachedLayout; // Cache the layout widget itself
+  List<AppNavigationItemModel>? _navigationItems; // Static navigation items
+  bool _isUpdatingNavigation = false; // Prevent rapid navigation updates
+  
   @override
   void initState() {
     super.initState();
+    _profileController = Get.find<ProfileController>();
+    _cachedChild = widget.child; // Cache child on first build
     _setupProfileCompletionCheck();
+    _setupNavigationItems();
+    
+    // Listen to profile changes to update navigation when profile loads
+    // But only update once, not reactively during input
+    // Use a debounce to prevent rapid updates
+    ever(_profileController!.profile, (profile) {
+      if (profile != null && mounted && !_isUpdatingNavigation) {
+        _isUpdatingNavigation = true;
+        // Update navigation items once when profile loads
+        // Use a delay to batch updates and avoid interrupting user input
+        Future.delayed(const Duration(milliseconds: 500), () {
+          if (mounted) {
+            _updateNavigationItems();
+            _isUpdatingNavigation = false;
+          }
+        });
+      }
+    });
+  }
+  
+  void _setupNavigationItems() {
+    // Build navigation items once on init
+    _updateNavigationItems();
+  }
+  
+  bool? _lastProfileCompletedStatus;
+  
+  void _updateNavigationItems() {
+    if (_profileController == null) return;
+    final isProfileCompleted = _profileController!.isProfileCompleted();
+    
+    // Only update if completion status actually changed
+    if (_lastProfileCompletedStatus == isProfileCompleted) {
+      return; // Don't rebuild if nothing changed
+    }
+    
+    _lastProfileCompletedStatus = isProfileCompleted;
+    _navigationItems = _buildNavigationItems(isProfileCompleted);
+    // Clear cached layout so it rebuilds with new navigation
+    _cachedLayout = null;
+    // Trigger rebuild to update navigation
+    if (mounted) {
+      setState(() {});
+    }
+  }
+  
+  @override
+  void didUpdateWidget(AppCandidateLayout oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Only update cached child if it's actually different
+    // Use runtimeType and key comparison to avoid false positives
+    final oldChildType = oldWidget.child.runtimeType;
+    final newChildType = widget.child.runtimeType;
+    final oldChildKey = _getWidgetKey(oldWidget.child);
+    final newChildKey = _getWidgetKey(widget.child);
+    
+    // Also check if title, actions, or other properties changed
+    final titleChanged = oldWidget.title != widget.title;
+    final actionsChanged = oldWidget.actions != widget.actions;
+    
+    if (oldChildType != newChildType || oldChildKey != newChildKey || titleChanged || actionsChanged) {
+      if (oldChildType != newChildType || oldChildKey != newChildKey) {
+        _cachedChild = widget.child;
+      }
+      // Clear cached layout so it will be rebuilt with new values
+      _cachedLayout = null;
+    }
+  }
+  
+  Key? _getWidgetKey(Widget widget) {
+    if (widget is KeyedSubtree) {
+      return widget.key;
+    }
+    // Try to extract key from widget
+    return widget.key;
+  }
+  
+  List<AppNavigationItemModel> _buildNavigationItems(bool isProfileCompleted) {
+    return [
+      AppNavigationItemModel(
+        title: AppTexts.dashboard,
+        icon: Iconsax.home,
+        route: AppConstants.routeCandidateDashboard,
+        enabled: isProfileCompleted,
+      ),
+      AppNavigationItemModel(
+        title: AppTexts.profile,
+        icon: Iconsax.profile_circle,
+        route: AppConstants.routeCandidateProfile,
+      ),
+      AppNavigationItemModel(
+        title: AppTexts.jobs,
+        icon: Iconsax.briefcase,
+        route: AppConstants.routeCandidateJobs,
+        enabled: isProfileCompleted,
+      ),
+      AppNavigationItemModel(
+        title: AppTexts.applications,
+        icon: Iconsax.document,
+        route: AppConstants.routeCandidateApplications,
+        enabled: isProfileCompleted,
+      ),
+      AppNavigationItemModel(
+        title: AppTexts.documents,
+        icon: Iconsax.folder,
+        route: AppConstants.routeCandidateDocuments,
+        enabled: isProfileCompleted,
+      ),
+    ];
   }
 
   void _setupProfileCompletionCheck() {
@@ -89,51 +206,41 @@ class _AppCandidateLayoutState extends State<AppCandidateLayout> {
         permanent: false,
       );
     }
-    final profileController = Get.find<ProfileController>();
-
-    return Obx(() {
-      final isProfileCompleted = profileController.isProfileCompleted();
-
-      final navigationItems = [
-        AppNavigationItemModel(
-          title: AppTexts.dashboard,
-          icon: Iconsax.home,
-          route: AppConstants.routeCandidateDashboard,
-          enabled: isProfileCompleted,
-        ),
-        AppNavigationItemModel(
-          title: AppTexts.profile,
-          icon: Iconsax.profile_circle,
-          route: AppConstants.routeCandidateProfile,
-        ),
-        AppNavigationItemModel(
-          title: AppTexts.jobs,
-          icon: Iconsax.briefcase,
-          route: AppConstants.routeCandidateJobs,
-          enabled: isProfileCompleted,
-        ),
-        AppNavigationItemModel(
-          title: AppTexts.applications,
-          icon: Iconsax.document,
-          route: AppConstants.routeCandidateApplications,
-          enabled: isProfileCompleted,
-        ),
-        AppNavigationItemModel(
-          title: AppTexts.documents,
-          icon: Iconsax.folder,
-          route: AppConstants.routeCandidateDocuments,
-          enabled: isProfileCompleted,
-        ),
-      ];
-
-      return AppSideLayout(
-        title: widget.title,
-        actions: widget.actions,
-        navigationItems: navigationItems,
-        dashboardRoute: AppConstants.routeCandidateDashboard,
-        onLogout: () => authController.signOut(),
-        child: widget.child,
-      );
-    });
+    
+    // Use cached child to prevent unnecessary rebuilds
+    // The child is only updated in didUpdateWidget when it actually changes
+    final childToUse = _cachedChild ?? widget.child;
+    
+    // CRITICAL: If layout is cached and widget is unchanged, return the EXACT SAME instance
+    // to prevent Flutter from disposing the child widget tree
+    if (_cachedLayout != null) {
+      return _cachedLayout!;
+    }
+    _cachedLayout = _buildLayout(authController, childToUse);
+    return _cachedLayout!;
+  }
+  
+  AppSideLayout _buildLayout(CandidateAuthController authController, Widget child) {
+    // Wrap child in RepaintBoundary to prevent unnecessary repaints
+    // and use a stable key to preserve widget identity
+    final stableChild = RepaintBoundary(
+      key: const ValueKey('candidate-layout-child-repaint'),
+      child: KeyedSubtree(
+        key: const ValueKey('candidate-layout-child'),
+        child: child, // Use cached child to prevent recreation
+      ),
+    );
+    
+    // Use static navigationItems instead of reactive navigationItemsBuilder
+    // This eliminates Obx rebuilds that were causing the form to be disposed
+    return AppSideLayout(
+      key: const ValueKey('candidate-layout'),
+      title: widget.title,
+      actions: widget.actions,
+      dashboardRoute: AppConstants.routeCandidateDashboard,
+      onLogout: () => authController.signOut(),
+      navigationItems: _navigationItems ?? _buildNavigationItems(false), // Static navigation items
+      child: stableChild, // Use stable child wrapped in RepaintBoundary
+    );
   }
 }

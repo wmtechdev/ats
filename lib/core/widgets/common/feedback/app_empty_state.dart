@@ -13,23 +13,26 @@ class AppEmptyState extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            icon ?? Iconsax.document_text,
-            size: AppResponsive.iconSize(context, factor: 3),
-            color: AppColors.grey,
-          ),
-          SizedBox(height: AppResponsive.screenHeight(context) * 0.02),
-          Text(
-            message,
-            style: AppTextStyles.bodyText(
-              context,
-            ).copyWith(color: AppColors.grey),
-            textAlign: TextAlign.center,
-          ),
-        ],
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              icon ?? Iconsax.document_text,
+              size: AppResponsive.iconSize(context, factor: 3),
+              color: AppColors.grey,
+            ),
+            SizedBox(height: AppResponsive.screenHeight(context) * 0.02),
+            Text(
+              message,
+              style: AppTextStyles.bodyText(
+                context,
+              ).copyWith(color: AppColors.grey),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
       ),
     );
   }

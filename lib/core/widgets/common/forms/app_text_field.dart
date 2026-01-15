@@ -43,109 +43,89 @@ class AppTextField extends StatefulWidget {
 }
 
 class _AppTextFieldState extends State<AppTextField> {
-  late final TextEditingController _internalController;
-  TextEditingController? _externalController;
-  VoidCallback? _externalControllerListener;
   bool _obscureText = true;
+  late final FocusNode _focusNode;
 
   @override
   void initState() {
     super.initState();
-    // Always create internal controller for safety
-    _internalController = TextEditingController();
     _obscureText = widget.obscureText;
-
-    // If external controller provided, sync with it
+    _focusNode = FocusNode();
+    
+    // Add focus listener
+    _focusNode.addListener(_onFocusChange);
+    
+    // Add controller listener if controller exists
+    // Use try-catch to handle disposed controllers gracefully
     if (widget.controller != null) {
-      _syncWithExternalController();
+      try {
+        widget.controller!.addListener(_onControllerChange);
+      } catch (e) {
+        // Controller might be disposed, ignore
+      }
+    }
+  }
+  
+  void _onFocusChange() {
+    // Focus change handler
+  }
+  
+  void _onControllerChange() {
+    // Controller change handler
+  }
+  
+  /// Get a valid controller, returning null if the controller is disposed
+  TextEditingController? _getValidController() {
+    if (widget.controller == null) return null;
+    try {
+      // Try to access the controller's value to check if it's disposed
+      // If it throws, the controller is disposed
+      final _ = widget.controller!.value;
+      return widget.controller;
+    } catch (e) {
+      // Controller is disposed, return null
+      return null;
     }
   }
 
   @override
   void didUpdateWidget(AppTextField oldWidget) {
     super.didUpdateWidget(oldWidget);
-    // If controller changed, update sync
-    if (widget.controller != oldWidget.controller) {
-      _removeExternalListener();
-      if (widget.controller != null) {
-        _syncWithExternalController();
+    
+    // Update controller listener if controller changed
+    if (oldWidget.controller != widget.controller) {
+      try {
+        oldWidget.controller?.removeListener(_onControllerChange);
+      } catch (e) {
+        // Old controller might be disposed, ignore
+      }
+      try {
+        widget.controller?.addListener(_onControllerChange);
+      } catch (e) {
+        // New controller might be disposed, ignore
       }
     }
+    
     // Update obscure text if it changed
     if (widget.obscureText != oldWidget.obscureText) {
       _obscureText = widget.obscureText;
     }
   }
-
-  void _syncWithExternalController() {
-    if (widget.controller == null) return;
-
-    try {
-      // Try to access controller to check if it's valid
-      final _ = widget.controller!.value;
-      _externalController = widget.controller;
-
-      // Sync initial value
-      if (_internalController.text != _externalController!.text) {
-        _internalController.text = _externalController!.text;
-      }
-
-      // Listen to external controller changes
-      _externalControllerListener = () {
-        if (mounted && _externalController != null) {
-          try {
-            if (_internalController.text != _externalController!.text) {
-              _internalController.text = _externalController!.text;
-            }
-          } catch (e) {
-            // External controller disposed, stop listening
-            _removeExternalListener();
-          }
-        }
-      };
-      _externalController!.addListener(_externalControllerListener!);
-    } catch (e) {
-      // External controller is disposed or invalid, ignore it
-      _externalController = null;
-    }
-  }
-
-  void _removeExternalListener() {
-    if (_externalController != null && _externalControllerListener != null) {
-      try {
-        _externalController!.removeListener(_externalControllerListener!);
-      } catch (e) {
-        // Controller already disposed, ignore
-      }
-    }
-    _externalController = null;
-    _externalControllerListener = null;
-  }
-
+  
   @override
   void dispose() {
-    _removeExternalListener();
-    _internalController.dispose();
+    _focusNode.removeListener(_onFocusChange);
+    try {
+      widget.controller?.removeListener(_onControllerChange);
+    } catch (e) {
+      // Controller might be disposed, ignore
+    }
+    _focusNode.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    // Always use internal controller to avoid disposal errors
-    // It's synced with external controller via listener
-
-    // Ensure sync is up to date before building
-    // This helps when controller is recreated after sign-out
-    if (_externalController != null && widget.controller != null) {
-      try {
-        if (_internalController.text != _externalController!.text) {
-          _internalController.text = _externalController!.text;
-        }
-      } catch (e) {
-        // External controller disposed, ignore
-      }
-    }
-
     final defaultPadding = AppSpacing.symmetric(context, h: 0.04, v: 0.02);
     final contentPadding = widget.prefixIcon == null
         ? EdgeInsets.only(
@@ -154,28 +134,29 @@ class _AppTextFieldState extends State<AppTextField> {
           )
         : defaultPadding;
 
-    final textField = TextField(
-      controller: _internalController,
-      obscureText: widget.obscureText ? _obscureText : false,
-      minLines: widget.minLines,
-      maxLines: widget.maxLines,
-      keyboardType: widget.keyboardType,
-      enabled: widget.enabled,
-      style: AppTextStyles.bodyText(context),
-      onChanged: (value) {
-        // Sync with external controller if it exists and is valid
-        if (_externalController != null) {
-          try {
-            if (_externalController!.text != value) {
-              _externalController!.text = value;
-            }
-          } catch (e) {
-            // External controller disposed, stop syncing
-            _removeExternalListener();
-          }
+    final textField = GestureDetector(
+      onTap: () {
+        if (!_focusNode.hasFocus && widget.enabled) {
+          _focusNode.requestFocus();
         }
-        widget.onChanged?.call(value);
       },
+      behavior: HitTestBehavior.opaque,
+      child: TextField(
+        controller: _getValidController(),
+        focusNode: _focusNode,
+        obscureText: widget.obscureText ? _obscureText : false,
+        minLines: widget.minLines,
+        maxLines: widget.maxLines,
+        keyboardType: widget.keyboardType,
+        enabled: widget.enabled,
+        enableInteractiveSelection: true,
+        enableSuggestions: !widget.obscureText,
+        autocorrect: !widget.obscureText,
+        style: AppTextStyles.bodyText(context),
+        onTapOutside: (event) {
+          _focusNode.unfocus();
+        },
+        onChanged: widget.onChanged,
       decoration: InputDecoration(
         hintText: widget.hintText,
         filled: true,
@@ -226,9 +207,10 @@ class _AppTextFieldState extends State<AppTextField> {
             : null,
         contentPadding: contentPadding,
       ),
-    );
+    ));
 
     // If labelText is provided and showLabelAbove is true, show it above the text field
+    Widget result;
     if (widget.showLabelAbove &&
         widget.labelText != null &&
         widget.labelText!.isNotEmpty) {
@@ -237,7 +219,7 @@ class _AppTextFieldState extends State<AppTextField> {
           ? widget.labelText!.substring(0, widget.labelText!.length - 3)
           : widget.labelText!;
 
-      return Column(
+      result = Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -252,8 +234,10 @@ class _AppTextFieldState extends State<AppTextField> {
           textField,
         ],
       );
+    } else {
+      result = textField;
     }
-
-    return textField;
+    
+    return result;
   }
 }

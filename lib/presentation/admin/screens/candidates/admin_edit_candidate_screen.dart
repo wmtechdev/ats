@@ -18,6 +18,8 @@ class AdminEditCandidateScreen extends StatefulWidget {
 class _AdminEditCandidateScreenState extends State<AdminEditCandidateScreen> {
   final controller = Get.find<AdminCandidatesController>();
   late final AdminProfileFormState formState;
+  Widget? _cachedForm;
+  final _formKey = GlobalKey(debugLabel: 'admin-edit-candidate-form');
 
   // Password field (for admin side only)
   final passwordController = TextEditingController();
@@ -107,9 +109,8 @@ class _AdminEditCandidateScreenState extends State<AdminEditCandidateScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return AppAdminLayout(
-      title: '${AppTexts.edit} ${AppTexts.candidate}',
-      child: Obx(() {
+    _cachedForm ??= Builder(
+      builder: (context) => Obx(() {
         final candidate = controller.selectedCandidate.value;
         if (candidate == null) {
           return AppEmptyState(
@@ -119,53 +120,47 @@ class _AdminEditCandidateScreenState extends State<AdminEditCandidateScreen> {
         }
 
         return SingleChildScrollView(
+          key: const ValueKey('admin-edit-candidate-scroll-view'),
           padding: AppSpacing.padding(context),
           child: Column(
+            key: _formKey,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               // Candidate Profile Section
-              Obx(
-                () => CandidateProfileSection(
-                  firstNameController: formState.firstNameController,
-                  middleNameController: formState.middleNameController,
-                  lastNameController: formState.lastNameController,
-                  emailController: formState.emailController,
-                  passwordController: passwordController,
-                  emailEnabled: false, // Email is disabled in admin edit
-                  passwordEnabled: false, // Password is disabled in admin edit
-                  address1Controller: formState.address1Controller,
-                  address2Controller: formState.address2Controller,
-                  cityController: formState.cityController,
-                  stateController: formState.stateController,
-                  zipController: formState.zipController,
-                  ssnController: formState.ssnController,
-                  firstNameError: firstNameError,
-                  lastNameError: lastNameError,
-                  emailError: Rxn<String>(),
-                  passwordError: passwordError,
-                  address1Error: address1Error,
-                  cityError: cityError,
-                  stateError: stateError,
-                  zipError: zipError,
-                  onFirstNameChanged: (_) => null,
-                  onLastNameChanged: (_) => null,
-                  onEmailChanged: (_) => null,
-                  onPasswordChanged: (value) {
-                    passwordError.value = AppValidators.validatePassword(value);
-                    return null;
-                  },
-                  onAddress1Changed: (_) => null,
-                  onCityChanged: (_) => null,
-                  onStateChanged: (_) => null,
-                  onZipChanged: (_) => null,
-                  hasError:
-                      firstNameError.value != null ||
-                      lastNameError.value != null ||
-                      address1Error.value != null ||
-                      cityError.value != null ||
-                      stateError.value != null ||
-                      zipError.value != null,
-                ),
+              CandidateProfileSection(
+                firstNameController: formState.firstNameController,
+                middleNameController: formState.middleNameController,
+                lastNameController: formState.lastNameController,
+                emailController: formState.emailController,
+                passwordController: passwordController,
+                emailEnabled: false, // Email is disabled in admin edit
+                passwordEnabled: false, // Password is disabled in admin edit
+                address1Controller: formState.address1Controller,
+                address2Controller: formState.address2Controller,
+                cityController: formState.cityController,
+                stateController: formState.stateController,
+                zipController: formState.zipController,
+                ssnController: formState.ssnController,
+                firstNameError: firstNameError,
+                lastNameError: lastNameError,
+                emailError: Rxn<String>(),
+                passwordError: passwordError,
+                address1Error: address1Error,
+                cityError: cityError,
+                stateError: stateError,
+                zipError: zipError,
+                onFirstNameChanged: (_) => null,
+                onLastNameChanged: (_) => null,
+                onEmailChanged: (_) => null,
+                onPasswordChanged: (value) {
+                  passwordError.value = AppValidators.validatePassword(value);
+                  return null;
+                },
+                onAddress1Changed: (_) => null,
+                onCityChanged: (_) => null,
+                onStateChanged: (_) => null,
+                onZipChanged: (_) => null,
+                hasError: false, // Individual error messages are already wrapped in Obx
               ),
               AppSpacing.vertical(context, 0.02),
 
@@ -414,6 +409,11 @@ class _AdminEditCandidateScreenState extends State<AdminEditCandidateScreen> {
           ),
         );
       }),
+    );
+
+    return AppAdminLayout(
+      title: '${AppTexts.edit} ${AppTexts.candidate}',
+      child: _cachedForm!,
     );
   }
 }

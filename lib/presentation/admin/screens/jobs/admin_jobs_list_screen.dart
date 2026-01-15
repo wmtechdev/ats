@@ -8,25 +8,54 @@ import 'package:ats/core/utils/app_spacing/app_spacing.dart';
 import 'package:ats/core/utils/app_colors/app_colors.dart';
 import 'package:ats/core/widgets/app_widgets.dart';
 
-class AdminJobsListScreen extends StatelessWidget {
+class AdminJobsListScreen extends StatefulWidget {
   const AdminJobsListScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final controller = Get.find<AdminJobsController>();
+  State<AdminJobsListScreen> createState() => _AdminJobsListScreenState();
+}
 
-    return AppAdminLayout(
-      title: AppTexts.jobs,
-      child: Column(
+class _AdminJobsListScreenState extends State<AdminJobsListScreen> {
+  late final TextEditingController _searchController;
+  late final AdminJobsController _controller;
+  Widget? _cachedContent;
+  final _searchBarKey = GlobalKey(debugLabel: 'admin-jobs-search-bar');
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = Get.find<AdminJobsController>();
+    _searchController = TextEditingController(text: _controller.searchQuery.value);
+    
+    ever(_controller.searchQuery, (query) {
+      if (_searchController.text != query) {
+        _searchController.text = query;
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    _cachedContent ??= Builder(
+      builder: (context) => Column(
+        key: const ValueKey('admin-jobs-content-column'),
         children: [
           Column(
             children: [
-              // Search Field and Create Button Row
+              // Search Field and Create Button Row - Use GlobalKey to preserve state
               AppSearchCreateBar(
+                key: _searchBarKey,
+                searchController: _searchController,
                 searchHint: AppTexts.searchJobs,
                 createButtonText: AppTexts.createJob,
                 createButtonIcon: Iconsax.add,
-                onSearchChanged: (value) => controller.setSearchQuery(value),
+                onSearchChanged: (value) => _controller.setSearchQuery(value),
                 onCreatePressed: () =>
                     Get.toNamed(AppConstants.routeAdminJobCreate),
               ),
@@ -34,9 +63,9 @@ class AdminJobsListScreen extends StatelessWidget {
               // Status Filter Tabs
               Obx(
                 () => AppFilterTabs(
-                  selectedFilter: controller.selectedStatusFilter.value,
+                  selectedFilter: _controller.selectedStatusFilter.value,
                   onFilterChanged: (filter) {
-                    controller.setStatusFilter(
+                    _controller.setStatusFilter(
                       filter == 'open'
                           ? AppConstants.jobStatusOpen
                           : filter == 'closed'
@@ -51,9 +80,9 @@ class AdminJobsListScreen extends StatelessWidget {
           // Jobs List
           Expanded(
             child: Obx(() {
-              if (controller.filteredJobs.isEmpty) {
+              if (_controller.filteredJobs.isEmpty) {
                 return AppEmptyState(
-                  message: controller.jobs.isEmpty
+                  message: _controller.jobs.isEmpty
                       ? AppTexts.noJobsAvailable
                       : AppTexts.noJobsFound,
                   icon: Iconsax.briefcase,
@@ -62,10 +91,10 @@ class AdminJobsListScreen extends StatelessWidget {
 
               return ListView.builder(
                 padding: AppSpacing.padding(context),
-                itemCount: controller.filteredJobs.length,
+                itemCount: _controller.filteredJobs.length,
                 itemBuilder: (context, index) {
-                  final job = controller.filteredJobs[index];
-                  final applicationCount = controller.getApplicationCount(
+                  final job = _controller.filteredJobs[index];
+                  final applicationCount = _controller.getApplicationCount(
                     job.jobId,
                   );
 
@@ -73,16 +102,16 @@ class AdminJobsListScreen extends StatelessWidget {
                     job: job,
                     applicationCount: applicationCount,
                     onTap: () {
-                      controller.selectJob(job);
+                      _controller.selectJob(job);
                       Get.toNamed(AppConstants.routeAdminJobDetails);
                     },
                     onEdit: () {
-                      controller.selectJob(job);
+                      _controller.selectJob(job);
                       Get.toNamed(AppConstants.routeAdminJobEdit);
                     },
                     onDelete: () => _showDeleteConfirmation(
                       context,
-                      controller,
+                      _controller,
                       job.jobId,
                       job.title,
                     ),
@@ -90,7 +119,7 @@ class AdminJobsListScreen extends StatelessWidget {
                       final newStatus = job.status == AppConstants.jobStatusOpen
                           ? AppConstants.jobStatusClosed
                           : AppConstants.jobStatusOpen;
-                      controller.changeJobStatus(job.jobId, newStatus);
+                      _controller.changeJobStatus(job.jobId, newStatus);
                     },
                   );
                 },
@@ -99,6 +128,11 @@ class AdminJobsListScreen extends StatelessWidget {
           ),
         ],
       ),
+    );
+
+    return AppAdminLayout(
+      title: AppTexts.jobs,
+      child: _cachedContent!,
     );
   }
 

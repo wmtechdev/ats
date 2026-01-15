@@ -40,7 +40,7 @@ class AppDropDownField<T> extends StatelessWidget {
         : defaultPadding;
 
     final dropdown = DropdownButtonFormField<T>(
-      initialValue: value,
+      value: value,
       decoration: InputDecoration(
         labelText: showLabelAbove ? null : labelText,
         hintText: hintText,
@@ -89,11 +89,14 @@ class AppDropDownField<T> extends StatelessWidget {
         ),
         contentPadding: contentPadding,
         errorText: errorText,
+        isDense: true,
       ),
       items: items,
       onChanged: onChanged,
       validator: validator,
       style: AppTextStyles.bodyText(context),
+      isExpanded: true,
+      menuMaxHeight: AppResponsive.screenHeight(context) * 0.4,
     );
 
     if (showLabelAbove && labelText != null && labelText!.isNotEmpty) {

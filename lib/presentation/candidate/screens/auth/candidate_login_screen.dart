@@ -8,18 +8,70 @@ import 'package:ats/core/utils/app_texts/app_texts.dart';
 import 'package:ats/core/utils/app_spacing/app_spacing.dart';
 import 'package:ats/core/widgets/app_widgets.dart';
 
-class CandidateLoginScreen extends StatelessWidget {
+class CandidateLoginScreen extends StatefulWidget {
   const CandidateLoginScreen({super.key});
 
   @override
+  State<CandidateLoginScreen> createState() => _CandidateLoginScreenState();
+}
+
+class _CandidateLoginScreenState extends State<CandidateLoginScreen> {
+  // Local controllers that we manage - these won't be disposed unexpectedly
+  late final TextEditingController _emailController;
+  late final TextEditingController _passwordController;
+  CandidateAuthController? _authController;
+  
+  @override
+  void initState() {
+    super.initState();
+    // Create local controllers that we control
+    _emailController = TextEditingController();
+    _passwordController = TextEditingController();
+    _syncWithAuthController();
+  }
+  
+  void _syncWithAuthController() {
+    try {
+      final controller = Get.find<CandidateAuthController>();
+      _authController = controller;
+      
+      // Sync local controllers with auth controller's values initially
+      // After this, onChanged callbacks will keep them in sync
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted && _authController != null) {
+          if (_emailController.text != _authController!.emailValue.value) {
+            _emailController.text = _authController!.emailValue.value;
+          }
+          if (_passwordController.text != _authController!.passwordValue.value) {
+            _passwordController.text = _authController!.passwordValue.value;
+          }
+        }
+      });
+    } catch (e) {
+      // Controller not found yet, will be created by GetX
+      _authController = null;
+    }
+  }
+  
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    // Ensure controller is fresh - this simulates app restart behavior after sign-out
-    // The controller is deleted on sign-out, so Get.find() will create a fresh instance via lazyPut
-    final controller = Get.find<CandidateAuthController>();
-
-    // Use controller instance as key to force widget recreation when controller is recreated
-    final controllerKey = controller.hashCode;
-
+    // Get or create auth controller
+    try {
+      _authController ??= Get.find<CandidateAuthController>();
+    } catch (e) {
+      // Controller not found, return empty
+      return const SizedBox.shrink();
+    }
+    
+    final controller = _authController!;
+    
     return AppAuthLayout(
       title: AppTexts.candidateLogin,
       isLoginSelected: true,
@@ -27,19 +79,18 @@ class CandidateLoginScreen extends StatelessWidget {
         // Already on login screen
       },
       onSignUpTap: () {
-        Get.offNamed(AppConstants.routeSignUp);
+        Get.toNamed(AppConstants.routeSignUp);
       },
       formFields: [
         AppTextField(
-          key: ValueKey('candidate_login_email_$controllerKey'),
-          // Force recreation when controller changes
-          controller: controller.emailController,
+          key: const ValueKey('candidate-login-email'),
+          controller: _emailController,
           labelText: AppTexts.email,
           prefixIcon: Iconsax.sms,
           keyboardType: TextInputType.emailAddress,
           onChanged: (value) {
-            // Always validate on change to clear errors when user types
-            // Use the value parameter directly instead of reading from controller
+            // Update auth controller's value and validate
+            controller.emailValue.value = value;
             controller.validateEmail(value);
           },
         ),
@@ -54,15 +105,14 @@ class CandidateLoginScreen extends StatelessWidget {
         ),
         AppSpacing.vertical(context, 0.02),
         AppTextField(
-          key: ValueKey('candidate_login_password_$controllerKey'),
-          // Force recreation when controller changes
-          controller: controller.passwordController,
+          key: const ValueKey('candidate-login-password'),
+          controller: _passwordController,
           labelText: AppTexts.password,
           prefixIcon: Iconsax.lock,
           obscureText: true,
           onChanged: (value) {
-            // Always validate on change to clear errors when user types
-            // Use the value parameter directly instead of reading from controller
+            // Update auth controller's value and validate
+            controller.passwordValue.value = value;
             controller.validatePassword(value);
           },
         ),
