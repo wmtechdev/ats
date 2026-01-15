@@ -18,213 +18,221 @@ class AppUserProfileSection extends StatelessWidget {
 
   const AppUserProfileSection({super.key, required this.onLogout});
 
-  /// Get user name based on role
-  String _getUserName() {
-    // Try admin/recruiter first
-    if (Get.isRegistered<AdminAuthController>()) {
-      try {
-        final adminController = Get.find<AdminAuthController>();
-        final adminProfile = adminController.currentAdminProfile.value;
-        if (adminProfile != null && adminProfile.name.isNotEmpty) {
-          return adminProfile.name;
-        }
-      } catch (e) {
-        // Controller not found or not initialized, continue to candidate check
-      }
-    }
-
-    // Try candidate
-    if (Get.isRegistered<ProfileController>()) {
-      try {
-        final profileController = Get.find<ProfileController>();
-        final candidateProfile = profileController.profile.value;
-        if (candidateProfile != null) {
-          final firstName = candidateProfile.firstName.trim();
-          final lastName = candidateProfile.lastName.trim();
-          if (firstName.isNotEmpty || lastName.isNotEmpty) {
-            return '$firstName $lastName'.trim();
-          }
-        }
-      } catch (e) {
-        // Controller not found, continue to fallback
-      }
-    }
-
-    // Fallback: try to get from auth repository
-    UserEntity? currentUser;
-    if (Get.isRegistered<CandidateAuthRepository>()) {
-      try {
-        final authRepo = Get.find<CandidateAuthRepository>();
-        currentUser = authRepo.getCurrentUser();
-      } catch (e) {
-        // Repository not found
-      }
-    } else if (Get.isRegistered<AdminAuthRepository>()) {
-      try {
-        final authRepo = Get.find<AdminAuthRepository>();
-        currentUser = authRepo.getCurrentUser();
-      } catch (e) {
-        // Repository not found
-      }
-    }
-
-    if (currentUser != null && currentUser.email.isNotEmpty) {
-      return currentUser.email.split('@').first;
-    }
-
-    return AppTexts.admin; // Final fallback
-  }
-
-  /// Get user role display text
-  String _getUserRole() {
-    // Check if admin/recruiter
-    if (Get.isRegistered<AdminAuthController>()) {
-      try {
-        final adminController = Get.find<AdminAuthController>();
-        final adminProfile = adminController.currentAdminProfile.value;
-        if (adminProfile != null) {
-          // Map access level to display role
-          if (adminProfile.accessLevel == AppConstants.accessLevelSuperAdmin) {
-            return AppTexts.admin;
-          } else if (adminProfile.accessLevel ==
-              AppConstants.accessLevelRecruiter) {
-            return AppTexts.recruiter;
-          }
-        }
-      } catch (e) {
-        // Controller not found, continue to candidate check
-      }
-    }
-
-    // Check if candidate
-    if (Get.isRegistered<CandidateAuthRepository>()) {
-      try {
-        final authRepo = Get.find<CandidateAuthRepository>();
-        final currentUser = authRepo.getCurrentUser();
-        if (currentUser != null &&
-            currentUser.role == AppConstants.roleCandidate) {
-          return AppTexts.candidate;
-        }
-      } catch (e) {
-        // Repository not found
-      }
-    }
-
-    // Fallback
-    return AppTexts.admin;
-  }
-
   @override
   Widget build(BuildContext context) {
     final isMobile = AppResponsive.isMobile(context);
 
-    // Use Obx to make it reactive to profile changes
-    return Obx(() {
-      final userName = _getUserName();
-      final userRole = _getUserRole();
+    // Check if we have reactive controllers available
+    final hasAdminController = Get.isRegistered<AdminAuthController>();
+    final hasProfileController = Get.isRegistered<ProfileController>();
+    
+    // Only use Obx if we have controllers with observables to track
+    if (hasAdminController || hasProfileController) {
+      return Obx(() {
+        String userName = AppTexts.admin;
+        String userRole = AppTexts.admin;
+        
+        // Try admin/recruiter first - access observable directly
+        if (hasAdminController) {
+          try {
+            final adminController = Get.find<AdminAuthController>();
+            // Access observable directly - GetX will track this
+            final adminProfile = adminController.currentAdminProfile.value;
+            if (adminProfile != null && adminProfile.name.isNotEmpty) {
+              userName = adminProfile.name;
+              // Map access level to display role
+              if (adminProfile.accessLevel == AppConstants.accessLevelSuperAdmin) {
+                userRole = AppTexts.admin;
+              } else if (adminProfile.accessLevel == AppConstants.accessLevelRecruiter) {
+                userRole = AppTexts.recruiter;
+              } else {
+                userRole = AppTexts.admin;
+              }
+              
+              return _buildProfileWidget(context, isMobile, userName, userRole);
+            }
+          } catch (e) {
+            // Controller not found or being recreated, continue to candidate check
+          }
+        }
 
-      if (isMobile) {
-        // Mobile: Profile section at bottom of drawer
-        return Container(
-          padding: AppSpacing.all(context, factor: 1),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // Profile Info Row
-              Row(
-                children: [
-                  // Name and Role
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          userName,
-                          style: AppTextStyles.bodyText(context).copyWith(
-                            color: AppColors.white,
-                            fontWeight: FontWeight.w600,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        Text(
-                          userRole,
-                          style: AppTextStyles.hintText(context).copyWith(
-                            color: AppColors.white.withValues(alpha: 0.8),
-                            fontSize:
-                                AppResponsive.screenWidth(context) * 0.025,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ],
-                    ),
-                  ),
-                  // Logout Button
-                  IconButton(
-                    icon: Icon(
-                      Iconsax.logout,
-                      size: AppResponsive.iconSize(context),
-                      color: AppColors.white,
-                    ),
-                    onPressed: onLogout,
-                    tooltip: AppTexts.logout,
-                  ),
-                ],
-              ),
-            ],
-          ),
-        );
-      } else {
-        // Desktop: Profile section at top right
-        return Row(
+        // Try candidate - access observable directly
+        if (hasProfileController) {
+          try {
+            final profileController = Get.find<ProfileController>();
+            // Access observable directly - GetX will track this
+            final candidateProfile = profileController.profile.value;
+            if (candidateProfile != null) {
+              final firstName = candidateProfile.firstName.trim();
+              final lastName = candidateProfile.lastName.trim();
+              if (firstName.isNotEmpty || lastName.isNotEmpty) {
+                userName = '$firstName $lastName'.trim();
+                userRole = AppTexts.candidate;
+                
+                return _buildProfileWidget(context, isMobile, userName, userRole);
+              }
+            }
+          } catch (e) {
+            // Controller not found or being recreated, continue to fallback
+          }
+        }
+
+        // Fallback: try to get from auth repository (non-reactive)
+        userName = _getFallbackUserName();
+        userRole = _getFallbackUserRole();
+        
+        return _buildProfileWidget(context, isMobile, userName, userRole);
+      });
+    } else {
+      // No reactive controllers available, use non-reactive fallback
+      final userName = _getFallbackUserName();
+      final userRole = _getFallbackUserRole();
+      return _buildProfileWidget(context, isMobile, userName, userRole);
+    }
+  }
+  
+  String _getFallbackUserName() {
+    // Try to get from auth repository (non-reactive)
+    try {
+      UserEntity? currentUser;
+      if (Get.isRegistered<CandidateAuthRepository>()) {
+        final authRepo = Get.find<CandidateAuthRepository>();
+        currentUser = authRepo.getCurrentUser();
+      } else if (Get.isRegistered<AdminAuthRepository>()) {
+        final authRepo = Get.find<AdminAuthRepository>();
+        currentUser = authRepo.getCurrentUser();
+      }
+
+      if (currentUser != null && currentUser.email.isNotEmpty) {
+        return currentUser.email.split('@').first;
+      }
+    } catch (e) {
+      // Repositories not found
+    }
+    return AppTexts.admin;
+  }
+  
+  String _getFallbackUserRole() {
+    // Try to get from auth repository (non-reactive)
+    try {
+      UserEntity? currentUser;
+      if (Get.isRegistered<CandidateAuthRepository>()) {
+        final authRepo = Get.find<CandidateAuthRepository>();
+        currentUser = authRepo.getCurrentUser();
+        if (currentUser != null && currentUser.role == AppConstants.roleCandidate) {
+          return AppTexts.candidate;
+        }
+      } else if (Get.isRegistered<AdminAuthRepository>()) {
+        final authRepo = Get.find<AdminAuthRepository>();
+        currentUser = authRepo.getCurrentUser();
+      }
+    } catch (e) {
+      // Repositories not found
+    }
+    return AppTexts.admin;
+  }
+  
+  Widget _buildProfileWidget(BuildContext context, bool isMobile, String userName, String userRole) {
+    if (isMobile) {
+      // Mobile: Profile section at bottom of drawer
+      return Container(
+        padding: AppSpacing.all(context, factor: 1),
+        child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Name and Role
-            Flexible(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Text(
-                    userName,
-                    style: AppTextStyles.bodyText(context).copyWith(
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.white,
-                      height: 1.0,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
+            // Profile Info Row
+            Row(
+              children: [
+                // Name and Role
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        userName,
+                        style: AppTextStyles.bodyText(context).copyWith(
+                          color: AppColors.white,
+                          fontWeight: FontWeight.w600,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      Text(
+                        userRole,
+                        style: AppTextStyles.hintText(context).copyWith(
+                          color: AppColors.white.withValues(alpha: 0.8),
+                          fontSize: AppResponsive.screenWidth(context) * 0.025,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
                   ),
-                  Text(
-                    userRole,
-                    style: AppTextStyles.hintText(context).copyWith(
-                      fontSize: AppResponsive.screenWidth(context) * 0.01,
-                      color: AppColors.white.withValues(alpha: 0.8),
-                      height: 1.0,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
+                ),
+                // Logout Button
+                IconButton(
+                  icon: Icon(
+                    Iconsax.logout,
+                    size: AppResponsive.iconSize(context),
+                    color: AppColors.white,
                   ),
-                ],
-              ),
-            ),
-            AppSpacing.horizontal(context, 0.01),
-            // Logout Button
-            IconButton(
-              icon: Icon(
-                Iconsax.logout,
-                size: AppResponsive.iconSize(context),
-                color: AppColors.white,
-              ),
-              onPressed: onLogout,
-              tooltip: AppTexts.logout,
+                  onPressed: onLogout,
+                  tooltip: AppTexts.logout,
+                ),
+              ],
             ),
           ],
-        );
-      }
-    });
+        ),
+      );
+    } else {
+      // Desktop: Profile section at top right
+      return Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // Name and Role
+          Flexible(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Text(
+                  userName,
+                  style: AppTextStyles.bodyText(context).copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.white,
+                    height: 1.0,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                Text(
+                  userRole,
+                  style: AppTextStyles.hintText(context).copyWith(
+                    fontSize: AppResponsive.screenWidth(context) * 0.01,
+                    color: AppColors.white.withValues(alpha: 0.8),
+                    height: 1.0,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
+          ),
+          AppSpacing.horizontal(context, 0.01),
+          // Logout Button
+          IconButton(
+            icon: Icon(
+              Iconsax.logout,
+              size: AppResponsive.iconSize(context),
+              color: AppColors.white,
+            ),
+            onPressed: onLogout,
+            tooltip: AppTexts.logout,
+          ),
+        ],
+      );
+    }
   }
 }

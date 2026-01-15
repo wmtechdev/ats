@@ -10,23 +10,52 @@ import 'package:ats/core/widgets/app_widgets.dart';
 import 'package:ats/domain/entities/admin_profile_entity.dart';
 import 'package:ats/presentation/admin/controllers/admin_manage_admins_controller.dart';
 
-class AdminManageAdminsScreen extends StatelessWidget {
+class AdminManageAdminsScreen extends StatefulWidget {
   const AdminManageAdminsScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final controller = Get.find<AdminManageAdminsController>();
+  State<AdminManageAdminsScreen> createState() => _AdminManageAdminsScreenState();
+}
 
-    return AppAdminLayout(
-      title: AppTexts.manageAdmins,
-      child: Column(
+class _AdminManageAdminsScreenState extends State<AdminManageAdminsScreen> {
+  late final TextEditingController _searchController;
+  late final AdminManageAdminsController _controller;
+  Widget? _cachedContent;
+  final _searchBarKey = GlobalKey(debugLabel: 'admin-manage-admins-search-bar');
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = Get.find<AdminManageAdminsController>();
+    _searchController = TextEditingController(text: _controller.searchQuery.value);
+    
+    ever(_controller.searchQuery, (query) {
+      if (_searchController.text != query) {
+        _searchController.text = query;
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    _cachedContent ??= Builder(
+      builder: (context) => Column(
+        key: const ValueKey('admin-manage-admins-content-column'),
         children: [
-          // Search and Create Section
+          // Search and Create Section - Use GlobalKey to preserve state
           AppSearchCreateBar(
+            key: _searchBarKey,
+            searchController: _searchController,
             searchHint: AppTexts.searchAdmins,
             createButtonText: AppTexts.createUser,
             createButtonIcon: Iconsax.add,
-            onSearchChanged: (value) => controller.setSearchQuery(value),
+            onSearchChanged: (value) => _controller.setSearchQuery(value),
             onCreatePressed: () {
               Get.toNamed(AppConstants.routeAdminCreateNewUser);
             },
@@ -34,11 +63,11 @@ class AdminManageAdminsScreen extends StatelessWidget {
           // Admins and Recruiters List
           Expanded(
             child: Obx(() {
-              final filteredProfiles = controller.filteredAdminProfiles
+              final filteredProfiles = _controller.filteredAdminProfiles
                   .toList();
-              final allProfiles = controller.adminProfiles.toList();
+              final allProfiles = _controller.adminProfiles.toList();
 
-              if (controller.isLoadingList.value) {
+              if (_controller.isLoadingList.value) {
                 return const Center(child: AppLoadingIndicator());
               }
 
@@ -58,9 +87,9 @@ class AdminManageAdminsScreen extends StatelessWidget {
                   final profile = filteredProfiles[index];
                   final isAdmin =
                       profile.accessLevel == AppConstants.accessLevelSuperAdmin;
-                  final isCurrentUser = controller.isCurrentUser(profile);
+                  final isCurrentUser = _controller.isCurrentUser(profile);
                   final isChanging =
-                      controller.isChangingRole[profile.profileId] ?? false;
+                      _controller.isChangingRole[profile.profileId] ?? false;
 
                   return AppListCard(
                     title: profile.name,
@@ -86,7 +115,7 @@ class AdminManageAdminsScreen extends StatelessWidget {
                                 ? null
                                 : () => _showChangeRoleConfirmation(
                                     context,
-                                    controller,
+                                    _controller,
                                     profile,
                                   ),
                             backgroundColor: AppColors.success,
@@ -95,12 +124,12 @@ class AdminManageAdminsScreen extends StatelessWidget {
                           AppActionButton(
                             text: AppTexts.deleteUser,
                             onPressed:
-                                (controller.isDeletingUser[profile.profileId] ??
+                                (_controller.isDeletingUser[profile.profileId] ??
                                     false)
                                 ? null
                                 : () => _showDeleteUserConfirmation(
                                     context,
-                                    controller,
+                                    _controller,
                                     profile,
                                   ),
                             backgroundColor: AppColors.error,
@@ -117,6 +146,11 @@ class AdminManageAdminsScreen extends StatelessWidget {
           ),
         ],
       ),
+    );
+
+    return AppAdminLayout(
+      title: AppTexts.manageAdmins,
+      child: _cachedContent!,
     );
   }
 

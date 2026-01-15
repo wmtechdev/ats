@@ -62,11 +62,13 @@ class AppCountryCodePicker extends StatelessWidget {
                 theme: ImageTheme(width: flagWidth, height: flagHeight),
               ),
               const SizedBox(width: 8),
-              // Country code and name
-              Text(
-                '$countryCode $countryName',
-                overflow: TextOverflow.ellipsis,
-                maxLines: 1,
+              // Country code and name - use Flexible to prevent overflow
+              Flexible(
+                child: Text(
+                  '$countryCode $countryName',
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
+                ),
               ),
             ],
           ),

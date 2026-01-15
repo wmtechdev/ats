@@ -9,6 +9,7 @@ class AppSearchCreateBar extends StatelessWidget {
   final IconData createButtonIcon;
   final void Function(String)? onSearchChanged;
   final VoidCallback? onCreatePressed;
+  final TextEditingController? searchController; // Optional controller for search field
 
   const AppSearchCreateBar({
     super.key,
@@ -17,6 +18,7 @@ class AppSearchCreateBar extends StatelessWidget {
     required this.createButtonIcon,
     this.onSearchChanged,
     this.onCreatePressed,
+    this.searchController, // Add controller parameter
   });
 
   @override
@@ -27,6 +29,8 @@ class AppSearchCreateBar extends StatelessWidget {
         children: [
           Expanded(
             child: AppTextField(
+              key: const ValueKey('search-field'), // Stable key to preserve state
+              controller: searchController, // Use provided controller
               hintText: searchHint,
               prefixIcon: Iconsax.search_normal,
               onChanged: onSearchChanged,

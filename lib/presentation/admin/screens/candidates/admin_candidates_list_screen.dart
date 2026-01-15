@@ -9,8 +9,37 @@ import 'package:ats/core/utils/app_colors/app_colors.dart';
 import 'package:ats/core/utils/app_spacing/app_spacing.dart';
 import 'package:ats/core/widgets/app_widgets.dart';
 
-class AdminCandidatesListScreen extends StatelessWidget {
+class AdminCandidatesListScreen extends StatefulWidget {
   const AdminCandidatesListScreen({super.key});
+
+  @override
+  State<AdminCandidatesListScreen> createState() => _AdminCandidatesListScreenState();
+}
+
+class _AdminCandidatesListScreenState extends State<AdminCandidatesListScreen> {
+  late final TextEditingController _searchController;
+  late final AdminCandidatesController _controller;
+  Widget? _cachedContent;
+  final _searchBarKey = GlobalKey(debugLabel: 'admin-candidates-search-bar');
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = Get.find<AdminCandidatesController>();
+    _searchController = TextEditingController(text: _controller.searchQuery.value);
+    
+    ever(_controller.searchQuery, (query) {
+      if (_searchController.text != query) {
+        _searchController.text = query;
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
 
   void _showDeleteConfirmation(
     BuildContext context,
@@ -36,49 +65,47 @@ class AdminCandidatesListScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.find<AdminCandidatesController>();
-
-    return AppAdminLayout(
-      title: AppTexts.candidates,
-      child: Column(
+    _cachedContent ??= Builder(
+      builder: (context) => Column(
+        key: const ValueKey('admin-candidates-content-column'),
         children: [
-          // Search Section
-          Obx(
-            () => AppSearchCreateBar(
-              searchHint: AppTexts.searchCandidates,
-              createButtonText: AppTexts.createCandidate,
-              createButtonIcon: Iconsax.add,
-              onSearchChanged: (value) => controller.setSearchQuery(value),
-              onCreatePressed: controller.isSuperAdmin
-                  ? () {
-                      Get.toNamed(AppConstants.routeAdminCreateCandidate);
-                    }
-                  : null, // Recruiters can't create candidates
-            ),
+          // Search Section - Use GlobalKey to preserve state
+          AppSearchCreateBar(
+            key: _searchBarKey,
+            searchController: _searchController,
+            searchHint: AppTexts.searchCandidates,
+            createButtonText: AppTexts.createCandidate,
+            createButtonIcon: Iconsax.add,
+            onSearchChanged: (value) => _controller.setSearchQuery(value),
+            onCreatePressed: _controller.isSuperAdmin
+                ? () {
+                    Get.toNamed(AppConstants.routeAdminCreateCandidate);
+                  }
+                : null, // Recruiters can't create candidates
           ),
           // Filters Section
           Container(
             padding: AppSpacing.padding(context).copyWith(top: 0),
             child: LayoutBuilder(
               builder: (context, constraints) {
-                // Access reactive variables at the top level so GetX can track them
+                  // Access reactive variables at the top level so GetX can track them
                 return Obx(() {
-                  final selectedAgent = controller.selectedAgentFilter.value;
-                  final selectedStatus = controller.selectedStatusFilter.value;
+                  final selectedAgent = _controller.selectedAgentFilter.value;
+                  final selectedStatus = _controller.selectedStatusFilter.value;
                   final selectedProfession =
-                      controller.selectedProfessionFilter.value;
-                  final availableAgents = controller.availableAgents.toList();
-                  final availableProfessions = controller
+                      _controller.selectedProfessionFilter.value;
+                  final availableAgents = _controller.availableAgents.toList();
+                  final availableProfessions = _controller
                       .getAvailableProfessions();
 
                   // Get status counts
-                  final pendingCount = controller.getStatusCount(
+                  final pendingCount = _controller.getStatusCount(
                     AppConstants.documentStatusPending,
                   );
-                  final approvedCount = controller.getStatusCount(
+                  final approvedCount = _controller.getStatusCount(
                     AppConstants.documentStatusApproved,
                   );
-                  final deniedCount = controller.getStatusCount(
+                  final deniedCount = _controller.getStatusCount(
                     AppConstants.documentStatusDenied,
                   );
 
@@ -118,7 +145,7 @@ class AdminCandidatesListScreen extends StatelessWidget {
                                   }),
                                 ],
                                 onChanged: (value) =>
-                                    controller.setAgentFilter(value),
+                                    _controller.setAgentFilter(value),
                               ),
                             ),
                             // Profession Filter
@@ -144,7 +171,7 @@ class AdminCandidatesListScreen extends StatelessWidget {
                                   }),
                                 ],
                                 onChanged: (value) =>
-                                    controller.setProfessionFilter(value),
+                                    _controller.setProfessionFilter(value),
                               ),
                             ),
                           ],
@@ -170,9 +197,9 @@ class AdminCandidatesListScreen extends StatelessWidget {
                                 onTap: () {
                                   if (selectedStatus ==
                                       AppConstants.documentStatusPending) {
-                                    controller.setStatusFilter(null);
+                                    _controller.setStatusFilter(null);
                                   } else {
-                                    controller.setStatusFilter(
+                                    _controller.setStatusFilter(
                                       AppConstants.documentStatusPending,
                                     );
                                   }
@@ -190,9 +217,9 @@ class AdminCandidatesListScreen extends StatelessWidget {
                                 onTap: () {
                                   if (selectedStatus ==
                                       AppConstants.documentStatusApproved) {
-                                    controller.setStatusFilter(null);
+                                    _controller.setStatusFilter(null);
                                   } else {
-                                    controller.setStatusFilter(
+                                    _controller.setStatusFilter(
                                       AppConstants.documentStatusApproved,
                                     );
                                   }
@@ -210,9 +237,9 @@ class AdminCandidatesListScreen extends StatelessWidget {
                                 onTap: () {
                                   if (selectedStatus ==
                                       AppConstants.documentStatusDenied) {
-                                    controller.setStatusFilter(null);
+                                    _controller.setStatusFilter(null);
                                   } else {
-                                    controller.setStatusFilter(
+                                    _controller.setStatusFilter(
                                       AppConstants.documentStatusDenied,
                                     );
                                   }
@@ -253,7 +280,7 @@ class AdminCandidatesListScreen extends StatelessWidget {
                                   }),
                                 ],
                                 onChanged: (value) =>
-                                    controller.setAgentFilter(value),
+                                    _controller.setAgentFilter(value),
                               ),
                             ),
                             AppSpacing.horizontal(context, 0.02),
@@ -279,7 +306,7 @@ class AdminCandidatesListScreen extends StatelessWidget {
                                   }),
                                 ],
                                 onChanged: (value) =>
-                                    controller.setProfessionFilter(value),
+                                    _controller.setProfessionFilter(value),
                               ),
                             ),
                           ],
@@ -305,9 +332,9 @@ class AdminCandidatesListScreen extends StatelessWidget {
                                 onTap: () {
                                   if (selectedStatus ==
                                       AppConstants.documentStatusPending) {
-                                    controller.setStatusFilter(null);
+                                    _controller.setStatusFilter(null);
                                   } else {
-                                    controller.setStatusFilter(
+                                    _controller.setStatusFilter(
                                       AppConstants.documentStatusPending,
                                     );
                                   }
@@ -325,9 +352,9 @@ class AdminCandidatesListScreen extends StatelessWidget {
                                 onTap: () {
                                   if (selectedStatus ==
                                       AppConstants.documentStatusApproved) {
-                                    controller.setStatusFilter(null);
+                                    _controller.setStatusFilter(null);
                                   } else {
-                                    controller.setStatusFilter(
+                                    _controller.setStatusFilter(
                                       AppConstants.documentStatusApproved,
                                     );
                                   }
@@ -345,9 +372,9 @@ class AdminCandidatesListScreen extends StatelessWidget {
                                 onTap: () {
                                   if (selectedStatus ==
                                       AppConstants.documentStatusDenied) {
-                                    controller.setStatusFilter(null);
+                                    _controller.setStatusFilter(null);
                                   } else {
-                                    controller.setStatusFilter(
+                                    _controller.setStatusFilter(
                                       AppConstants.documentStatusDenied,
                                     );
                                   }
@@ -374,14 +401,14 @@ class AdminCandidatesListScreen extends StatelessWidget {
                 // AdminAuthController not found, continue
               }
 
-              if (controller.candidates.isEmpty) {
+              if (_controller.candidates.isEmpty) {
                 return AppEmptyState(
                   message: AppTexts.noCandidatesAvailable,
                   icon: Iconsax.profile_circle,
                 );
               }
 
-              if (controller.filteredCandidates.isEmpty) {
+              if (_controller.filteredCandidates.isEmpty) {
                 return AppEmptyState(
                   message: AppTexts.noCandidatesFound,
                   icon: Iconsax.profile_circle,
@@ -390,51 +417,51 @@ class AdminCandidatesListScreen extends StatelessWidget {
 
               // Observe candidateProfiles and candidateDocumentsMap to rebuild when data loads
               // Access the maps to ensure GetX tracks changes
-              for (var candidate in controller.filteredCandidates) {
-                controller.candidateProfiles[candidate.userId];
-                controller.candidateDocumentsMap[candidate.userId];
+              for (var candidate in _controller.filteredCandidates) {
+                _controller.candidateProfiles[candidate.userId];
+                _controller.candidateDocumentsMap[candidate.userId];
               }
 
               // Observe availableAgents to rebuild when agents load
-              final agents = controller.availableAgents.toList();
+              final agents = _controller.availableAgents.toList();
 
               return AppCandidatesTable(
-                candidates: controller.filteredCandidates,
-                getName: (userId) => controller.getCandidateName(userId),
-                getCompany: (userId) => controller.getCandidateCompany(userId),
+                candidates: _controller.filteredCandidates,
+                getName: (userId) => _controller.getCandidateName(userId),
+                getCompany: (userId) => _controller.getCandidateCompany(userId),
                 getPosition: (userId) =>
-                    controller.getCandidatePosition(userId),
-                getStatus: (userId) => controller.getCandidateStatus(userId),
+                    _controller.getCandidatePosition(userId),
+                getStatus: (userId) => _controller.getCandidateStatus(userId),
                 getAgentName: (userId) =>
-                    controller.getCandidateAgentName(userId),
+                    _controller.getCandidateAgentName(userId),
                 getAssignedAgentProfileId: (userId) =>
-                    controller.getAssignedAgentProfileId(userId),
+                    _controller.getAssignedAgentProfileId(userId),
                 getProfession: (userId) =>
-                    controller.getCandidateProfession(userId),
+                    _controller.getCandidateProfession(userId),
                 getSpecialties: (userId) =>
-                    controller.getCandidateSpecialties(userId),
-                isSuperAdmin: controller.isSuperAdmin,
+                    _controller.getCandidateSpecialties(userId),
+                isSuperAdmin: _controller.isSuperAdmin,
                 availableAgents: agents,
-                onAgentChanged: (userId, agentId) => controller
+                onAgentChanged: (userId, agentId) => _controller
                     .updateCandidateAgent(userId: userId, agentId: agentId),
                 onCandidateTap: (candidate) {
-                  controller.selectCandidate(candidate);
+                  _controller.selectCandidate(candidate);
                   Get.toNamed(AppConstants.routeAdminCandidateDetails);
                 },
-                onCandidateEdit: controller.isSuperAdmin
+                onCandidateEdit: _controller.isSuperAdmin
                     ? (candidate) {
-                        controller.selectCandidate(candidate);
+                        _controller.selectCandidate(candidate);
                         Get.toNamed(AppConstants.routeAdminEditCandidate);
                       }
                     : null,
-                onCandidateDelete: controller.isSuperAdmin
+                onCandidateDelete: _controller.isSuperAdmin
                     ? (candidate) {
                         // Get candidate name and profile info
-                        final candidateName = controller.getCandidateName(
+                        final candidateName = _controller.getCandidateName(
                           candidate.userId,
                         );
                         final profile =
-                            controller.candidateProfiles[candidate.userId];
+                            _controller.candidateProfiles[candidate.userId];
                         final profileId = profile?.profileId ?? '';
 
                         if (profileId.isEmpty) {
@@ -446,7 +473,7 @@ class AdminCandidatesListScreen extends StatelessWidget {
 
                         _showDeleteConfirmation(
                           context,
-                          controller,
+                          _controller,
                           candidateName,
                           candidate.userId,
                           profileId,
@@ -458,6 +485,11 @@ class AdminCandidatesListScreen extends StatelessWidget {
           ),
         ],
       ),
+    );
+
+    return AppAdminLayout(
+      title: AppTexts.candidates,
+      child: _cachedContent!,
     );
   }
 }

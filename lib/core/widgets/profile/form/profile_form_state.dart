@@ -75,45 +75,31 @@ class ProfileFormState {
   void loadFromProfile(dynamic profile) {
     if (profile == null) return;
 
-    // Candidate Profile
-    if (firstNameController.text.isEmpty) {
-      firstNameController.text = profile.firstName ?? '';
-    }
-    if (middleNameController.text.isEmpty) {
-      middleNameController.text = profile.middleName ?? '';
-    }
-    if (lastNameController.text.isEmpty) {
-      lastNameController.text = profile.lastName ?? '';
-    }
+    // Candidate Profile - Always load from profile (don't check if empty)
+    // This ensures updated profile data is displayed
+    firstNameController.text = profile.firstName ?? '';
+    middleNameController.text = profile.middleName ?? '';
+    lastNameController.text = profile.lastName ?? '';
+    
     // Email is always from user account, don't override it
     // Only set if empty (shouldn't happen, but just in case)
     if (emailController.text.isEmpty) {
       final currentUser = controller.authRepository.getCurrentUser();
       emailController.text = currentUser?.email ?? '';
     }
+    
     // Password field should show masked placeholder (read-only for candidate)
     // Keep it as masked placeholder, not the email value
-    if (passwordController.text.isEmpty) {
+    if (passwordController.text.isEmpty || passwordController.text == '••••••••') {
       passwordController.text = '••••••••';
     }
-    if (address1Controller.text.isEmpty) {
-      address1Controller.text = profile.address1 ?? '';
-    }
-    if (address2Controller.text.isEmpty) {
-      address2Controller.text = profile.address2 ?? '';
-    }
-    if (cityController.text.isEmpty) {
-      cityController.text = profile.city ?? '';
-    }
-    if (stateController.text.isEmpty) {
-      stateController.text = profile.state ?? '';
-    }
-    if (zipController.text.isEmpty) {
-      zipController.text = profile.zip ?? '';
-    }
-    if (ssnController.text.isEmpty) {
-      ssnController.text = profile.ssn ?? '';
-    }
+    
+    address1Controller.text = profile.address1 ?? '';
+    address2Controller.text = profile.address2 ?? '';
+    cityController.text = profile.city ?? '';
+    stateController.text = profile.state ?? '';
+    zipController.text = profile.zip ?? '';
+    ssnController.text = profile.ssn ?? '';
 
     // Phones - Clear existing and reload from profile
     for (var phone in phoneEntries) {
@@ -136,7 +122,7 @@ class ProfileFormState {
       }
     }
 
-    // Specialty
+    // Specialty - Always load from profile
     selectedProfession = profile.profession;
     // Load specialties from profile (comma-separated string to list)
     selectedSpecialties.clear();
@@ -149,13 +135,13 @@ class ProfileFormState {
       selectedSpecialties.addAll(specialtiesList);
     }
 
-    // Background History
-    liabilityAction ??= profile.liabilityAction;
-    licenseAction ??= profile.licenseAction;
-    previouslyTraveled ??= profile.previouslyTraveled;
-    terminatedFromAssignment ??= profile.terminatedFromAssignment;
+    // Background History - Always load from profile
+    liabilityAction = profile.liabilityAction;
+    licenseAction = profile.licenseAction;
+    previouslyTraveled = profile.previouslyTraveled;
+    terminatedFromAssignment = profile.terminatedFromAssignment;
 
-    // Licensure
+    // Licensure - Always load from profile
     licensureState = profile.licensureState;
     npiController.text = profile.npi ?? '';
 

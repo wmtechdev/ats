@@ -7,7 +7,7 @@ class AppTexts {
   // Auth
   static const String login = "Login";
   static const String signUp = "Sign Up";
-  static const String candidateLogin = "Candidate Login";
+  static const String candidateLogin = "Candidate Login1";
   static const String candidateSignUp = "Candidate Sign Up";
   static const String adminLogin = "Admin Login";
   static const String adminSignUp = "Admin Sign Up";
