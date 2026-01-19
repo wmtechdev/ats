@@ -10,6 +10,7 @@ import 'package:ats/core/utils/app_file_validator/app_file_validator.dart';
 import 'package:ats/core/widgets/app_widgets.dart';
 import 'package:ats/core/widgets/candidates/profile/app_candidate_profile_formatters.dart';
 import 'package:ats/core/constants/app_constants.dart';
+import 'package:ats/core/widgets/admin/admin_document_actions_button.dart';
 
 class AdminCandidateDetailsScreen extends StatelessWidget {
   const AdminCandidateDetailsScreen({super.key});
@@ -273,15 +274,7 @@ class AdminCandidateDetailsScreen extends StatelessWidget {
                         Positioned(
                           bottom: 16,
                           right: 16,
-                          child: AppFloatingActionButton(
-                            icon: Iconsax.document_upload,
-                            tooltip: AppTexts.requestDocument,
-                            onPressed: () {
-                              Get.toNamed(
-                                AppConstants.routeAdminRequestDocument,
-                              );
-                            },
-                          ),
+                          child: AdminDocumentActionsButton(),
                         ),
                       ],
                     ),

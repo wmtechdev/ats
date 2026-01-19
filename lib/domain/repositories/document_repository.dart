@@ -2,6 +2,7 @@ import 'package:ats/core/errors/failures.dart';
 import 'package:ats/domain/entities/document_type_entity.dart';
 import 'package:ats/domain/entities/candidate_document_entity.dart';
 import 'package:dartz/dartz.dart';
+import 'package:file_picker/file_picker.dart';
 
 abstract class DocumentRepository {
   // Document Types
@@ -72,4 +73,17 @@ abstract class DocumentRepository {
   Stream<List<DocumentTypeEntity>> streamDocumentTypesForCandidate(
     String candidateId,
   );
+
+  /// Creates a document for a candidate on behalf of admin
+  /// Document is created with approved status by default
+  Future<Either<Failure, CandidateDocumentEntity>> createDocumentForAdmin({
+    required String candidateId,
+    required String docTypeId,
+    required String documentName,
+    required PlatformFile platformFile,
+    required String title,
+    void Function(double progress)? onProgress,
+    DateTime? expiryDate,
+    bool hasNoExpiry = false,
+  });
 }

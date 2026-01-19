@@ -6,11 +6,19 @@ service firebase.storage {
       return request.auth != null;
     }
     
+    // Helper function to get user role from users collection
+    // Note: Storage rules access Firestore using (default) as the database name
+    // Use firestore.get() and firestore.exists() for cross-service access
+    function getUserRole() {
+      return isAuthenticated() && 
+        firestore.exists(/databases/(default)/documents/users/$(request.auth.uid))
+        ? firestore.get(/databases/(default)/documents/users/$(request.auth.uid)).data.role
+        : null;
+    }
+    
     // Helper function to check if user is admin
     function isAdmin() {
-      return isAuthenticated() && 
-        exists(/databases/$(database)/documents/admins/$(request.auth.uid)) &&
-        get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.isAdmin == true;
+      return isAuthenticated() && getUserRole() == 'admin';
     }
     
     // Helper function to check if user is the candidate
@@ -25,6 +33,9 @@ service firebase.storage {
       
       // Admins can read all documents
       allow read: if isAuthenticated() && isAdmin();
+      
+      // Admins can write (upload) documents on behalf of candidates
+      allow write: if isAuthenticated() && isAdmin();
       
       // Admins can delete documents (for moderation)
       allow delete: if isAuthenticated() && isAdmin();

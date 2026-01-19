@@ -782,3 +782,125 @@ exports.sendDocumentRequestRevocationEmail = onCall(
     );
   }
 });
+
+/**
+ * Sends an email notification to a candidate when admin uploads a document on their behalf
+ * This function uses nodemailer with SMTP configuration from environment variables
+ * 
+ * Environment variables required (set via Firebase Console or gcloud):
+ * - SMTP_HOST: SMTP server host (e.g., mail.wmsols.com)
+ * - SMTP_PORT: SMTP server port (e.g., 465)
+ * - SMTP_USER: SMTP username/email
+ * - SMTP_PASSWORD: SMTP password
+ * - EMAIL_FROM: From email address (e.g., test@wmsols.com)
+ * - EMAIL_FROMNAME: From display name (e.g., ATS-Maximum)
+ */
+exports.sendAdminDocumentUploadEmail = onCall(
+  {
+    // Set environment variables here or via Firebase Console
+  },
+  async (request) => {
+  const {data, auth} = request;
+  
+  // Verify that the caller is authenticated and is an admin
+  if (!auth) {
+    throw new HttpsError(
+      'unauthenticated',
+      'User must be authenticated to send emails'
+    );
+  }
+
+  // Verify the caller is an admin
+  const callerUserDoc = await admin.firestore()
+    .collection('users')
+    .doc(auth.uid)
+    .get();
+
+  if (!callerUserDoc.exists) {
+    throw new HttpsError(
+      'permission-denied',
+      'User document not found'
+    );
+  }
+
+  const callerRole = callerUserDoc.data().role;
+  if (callerRole !== 'admin') {
+    throw new HttpsError(
+      'permission-denied',
+      'Only admins can send emails'
+    );
+  }
+
+  // Extract data from request
+  const { candidateEmail, candidateName, documentName } = data;
+
+  if (!candidateEmail || !candidateName || !documentName) {
+    throw new HttpsError(
+      'invalid-argument',
+      'Missing required fields: candidateEmail, candidateName, documentName'
+    );
+  }
+
+  try {
+    // Get SMTP configuration from environment variables
+    const host = process.env.SMTP_HOST;
+    const port = process.env.SMTP_PORT || '587';
+    const user = process.env.SMTP_USER;
+    const password = process.env.SMTP_PASSWORD;
+    const fromEmail = process.env.EMAIL_FROM;
+    const fromName = process.env.EMAIL_FROMNAME;
+
+    if (!host || !user || !password) {
+      throw new Error('SMTP configuration is missing. Please set environment variables: SMTP_HOST, SMTP_USER, SMTP_PASSWORD');
+    }
+
+    if (!fromEmail || !fromName) {
+      throw new Error('Email configuration is missing. Please set environment variables: EMAIL_FROM, EMAIL_FROMNAME');
+    }
+
+    // Create nodemailer transporter
+    const transporter = nodemailer.createTransport({
+      host: host,
+      port: parseInt(port, 10),
+      secure: port === '465', // true for 465, false for other ports
+      auth: {
+        user: user,
+        pass: password,
+      },
+    });
+
+    // Build email subject
+    const subject = `Document Uploaded on Your Behalf - ${documentName}`;
+
+    // Build email body (plain text)
+    let emailBody = `Dear ${candidateName},\n\n`;
+    emailBody += `We are informing you that a document has been uploaded on your behalf:\n\n`;
+    emailBody += `Document Name: ${documentName}\n\n`;
+    emailBody += `This document has been uploaded by an administrator and is already approved. You can view it in your "My Documents" section.\n\n`;
+    emailBody += `If you have any questions or concerns, please don't hesitate to contact us.\n\n`;
+    emailBody += `Best regards,\n${fromName}`;
+
+    // Send email
+    const mailOptions = {
+      from: `"${fromName}" <${fromEmail}>`,
+      to: candidateEmail,
+      subject: subject,
+      text: emailBody,
+    };
+
+    const info = await transporter.sendMail(mailOptions);
+    
+    console.log('Email sent successfully:', info.messageId);
+    
+    return {
+      success: true,
+      messageId: info.messageId,
+    };
+  } catch (error) {
+    console.error('Error sending email:', error);
+    throw new HttpsError(
+      'internal',
+      `Failed to send email: ${error.message}`
+    );
+  }
+});

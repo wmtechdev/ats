@@ -142,6 +142,7 @@ class AppTexts {
   static const String documentTypes = "Document Types";
   static const String createDocumentType = "Create Document Type";
   static const String requestDocument = "Request Document";
+  static const String uploadDocument = "Upload Document";
   static const String requestedDocuments = "Requested Documents";
   static const String revoke = "Revoke";
   static const String documentTypeCreated =

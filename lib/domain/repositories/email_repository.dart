@@ -24,4 +24,11 @@ abstract class EmailRepository {
     required String candidateName,
     required String documentName,
   });
+
+  /// Sends an email notification to a candidate when admin uploads a document on their behalf
+  Future<Either<Failure, void>> sendAdminDocumentUploadEmail({
+    required String candidateEmail,
+    required String candidateName,
+    required String documentName,
+  });
 }

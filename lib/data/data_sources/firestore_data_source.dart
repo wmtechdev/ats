@@ -143,6 +143,7 @@ abstract class FirestoreDataSource {
     String? description,
     DateTime? expiryDate,
     bool hasNoExpiry = false,
+    String? status,
   });
 
   Future<List<Map<String, dynamic>>> getCandidateDocuments(String candidateId);
@@ -744,6 +745,7 @@ class FirestoreDataSourceImpl implements FirestoreDataSource {
     String? description,
     DateTime? expiryDate,
     bool hasNoExpiry = false,
+    String? status,
   }) async {
     try {
       final docRef = await firestore
@@ -753,7 +755,7 @@ class FirestoreDataSourceImpl implements FirestoreDataSource {
             'docTypeId': docTypeId,
             'documentName': documentName,
             'storageUrl': storageUrl,
-            'status': AppConstants.documentStatusPending,
+            'status': status ?? AppConstants.documentStatusPending,
             'uploadedAt': FieldValue.serverTimestamp(),
             if (title != null) 'title': title,
             if (description != null) 'description': description,

@@ -54,6 +54,13 @@ abstract class FirebaseFunctionsDataSource {
     required String candidateName,
     required String documentName,
   });
+
+  /// Sends an email notification to a candidate when admin uploads a document on their behalf
+  Future<void> sendAdminDocumentUploadEmail({
+    required String candidateEmail,
+    required String candidateName,
+    required String documentName,
+  });
 }
 
 class FirebaseFunctionsDataSourceImpl implements FirebaseFunctionsDataSource {
@@ -202,6 +209,28 @@ class FirebaseFunctionsDataSourceImpl implements FirebaseFunctionsDataSource {
     try {
       final callable = firebaseFunctions.httpsCallable(
         'sendDocumentRequestRevocationEmail',
+      );
+      await callable.call({
+        'candidateEmail': candidateEmail,
+        'candidateName': candidateName,
+        'documentName': documentName,
+      });
+    } on FirebaseFunctionsException catch (e) {
+      throw ServerException('Failed to send email: ${e.message}');
+    } catch (e) {
+      throw ServerException('An unexpected error occurred: $e');
+    }
+  }
+
+  @override
+  Future<void> sendAdminDocumentUploadEmail({
+    required String candidateEmail,
+    required String candidateName,
+    required String documentName,
+  }) async {
+    try {
+      final callable = firebaseFunctions.httpsCallable(
+        'sendAdminDocumentUploadEmail',
       );
       await callable.call({
         'candidateEmail': candidateEmail,

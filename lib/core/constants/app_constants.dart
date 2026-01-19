@@ -72,6 +72,8 @@ class AppConstants {
       '/admin/document-types/create';
   static const String routeAdminRequestDocument =
       '/admin/candidates/request-document';
+  static const String routeAdminUploadDocument =
+      '/admin/candidates/upload-document';
   static const String routeAdminManageAdmins = '/admin/manage-admins';
   static const String routeAdminCreateNewUser = '/admin/manage-admins/create';
 }

@@ -72,4 +72,24 @@ class EmailRepositoryImpl implements EmailRepository {
       return Left(ServerFailure('An unexpected error occurred: $e'));
     }
   }
+
+  @override
+  Future<Either<Failure, void>> sendAdminDocumentUploadEmail({
+    required String candidateEmail,
+    required String candidateName,
+    required String documentName,
+  }) async {
+    try {
+      await functionsDataSource.sendAdminDocumentUploadEmail(
+        candidateEmail: candidateEmail,
+        candidateName: candidateName,
+        documentName: documentName,
+      );
+      return const Right(null);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message));
+    } catch (e) {
+      return Left(ServerFailure('An unexpected error occurred: $e'));
+    }
+  }
 }

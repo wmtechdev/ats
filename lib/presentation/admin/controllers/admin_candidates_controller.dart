@@ -21,9 +21,12 @@ import 'package:ats/domain/usecases/document/update_document_status_usecase.dart
 import 'package:ats/domain/usecases/email/send_document_denial_email_usecase.dart';
 import 'package:ats/domain/usecases/email/send_document_request_email_usecase.dart';
 import 'package:ats/domain/usecases/email/send_document_request_revocation_email_usecase.dart';
+import 'package:ats/domain/usecases/email/send_admin_document_upload_email_usecase.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:ats/domain/usecases/admin/delete_candidate_usecase.dart';
 import 'package:ats/core/constants/app_constants.dart';
 import 'package:ats/core/utils/app_file_validator/app_file_validator.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:ats/core/widgets/app_widgets.dart';
 import 'package:ats/core/utils/app_texts/app_texts.dart';
 import 'package:ats/core/widgets/candidates/profile/app_candidate_profile_formatters.dart';
@@ -61,6 +64,13 @@ class AdminCandidatesController extends GetxController {
   final candidateProfileStreams =
       <String, StreamSubscription<CandidateProfileEntity?>>{};
 
+  // File selection for admin document upload
+  final selectedFile = Rxn<PlatformFile>();
+  final selectedFileName = ''.obs;
+  final selectedFileSize = ''.obs;
+  final uploadProgress = 0.0.obs;
+  final isUploading = false.obs;
+
   // Filter state
   final selectedAgentFilter = Rxn<String>(); // profileId
   final selectedStatusFilter = Rxn<String>();
@@ -72,6 +82,8 @@ class AdminCandidatesController extends GetxController {
   late final SendDocumentRequestEmailUseCase sendDocumentRequestEmailUseCase;
   late final SendDocumentRequestRevocationEmailUseCase
       sendDocumentRequestRevocationEmailUseCase;
+  late final SendAdminDocumentUploadEmailUseCase
+      sendAdminDocumentUploadEmailUseCase;
   late final DeleteCandidateUseCase deleteCandidateUseCase;
 
   // Stream subscriptions
@@ -99,6 +111,9 @@ class AdminCandidatesController extends GetxController {
     );
     sendDocumentRequestRevocationEmailUseCase =
         SendDocumentRequestRevocationEmailUseCase(
+      Get.find<EmailRepository>(),
+    );
+    sendAdminDocumentUploadEmailUseCase = SendAdminDocumentUploadEmailUseCase(
       Get.find<EmailRepository>(),
     );
     deleteCandidateUseCase = DeleteCandidateUseCase(adminRepository);
@@ -131,6 +146,8 @@ class AdminCandidatesController extends GetxController {
     }
     _candidateDocumentsSubscriptions.clear();
     candidateProfileStreams.clear();
+    // Clear file selection
+    clearSelectedFile();
     super.onClose();
   }
 
@@ -1251,5 +1268,165 @@ class AdminCandidatesController extends GetxController {
         }
       },
     );
+  }
+
+  /// Uploads a document on behalf of the selected candidate
+  /// Document is created with approved status by default
+  /// Sends email notification to candidate
+  Future<void> uploadDocumentForCandidate({
+    required String docTypeId,
+    required String title,
+    required String documentName,
+    required PlatformFile platformFile,
+    DateTime? expiryDate,
+    bool hasNoExpiry = false,
+  }) async {
+    isLoading.value = true;
+    errorMessage.value = '';
+
+    final candidate = selectedCandidate.value;
+    final profile = selectedCandidateProfile.value;
+
+    if (candidate == null) {
+      errorMessage.value = 'Candidate not selected';
+      isLoading.value = false;
+      AppSnackbar.error('Candidate not selected');
+      return;
+    }
+
+    final candidateId = candidate.userId;
+    final candidateEmail = candidate.email;
+    final candidateName = profile != null
+        ? AppCandidateProfileFormatters.getFullName(profile)
+        : candidateEmail;
+
+    // Check if document type already exists for this candidate
+    final existingDocs = candidateDocuments.where(
+      (doc) => doc.docTypeId == docTypeId,
+    ).toList();
+
+    if (existingDocs.isNotEmpty) {
+      errorMessage.value = 'This document type has already been uploaded for this candidate';
+      isLoading.value = false;
+      AppSnackbar.error('This document type has already been uploaded for this candidate');
+      return;
+    }
+
+    // Get document type name for email
+    final repositoryImpl = documentRepository as DocumentRepositoryImpl;
+    String documentTypeName = title;
+    try {
+      final allDocTypes = await documentRepository.getDocumentTypes();
+      allDocTypes.fold(
+        (failure) => null,
+        (docTypes) {
+          DocumentTypeEntity? docType;
+          try {
+            docType = docTypes.firstWhere(
+              (dt) => dt.docTypeId == docTypeId,
+            );
+          } catch (e) {
+            docType = null;
+          }
+          if (docType != null) {
+            documentTypeName = docType.name;
+          }
+        },
+      );
+    } catch (e) {
+      // Use title if document type not found
+    }
+
+    // Upload document with approved status
+    final uploadResult = await repositoryImpl.createDocumentForAdmin(
+      candidateId: candidateId,
+      docTypeId: docTypeId,
+      documentName: documentName,
+      platformFile: platformFile,
+      title: title,
+      onProgress: (progress) {
+        // Progress tracking if needed
+      },
+      expiryDate: expiryDate,
+      hasNoExpiry: hasNoExpiry,
+    );
+
+    uploadResult.fold(
+      (failure) {
+        errorMessage.value = failure.message;
+        isLoading.value = false;
+        AppSnackbar.error('Failed to upload document: ${failure.message}');
+      },
+      (document) async {
+        // Send email notification to candidate
+        final emailResult = await sendAdminDocumentUploadEmailUseCase(
+          candidateEmail: candidateEmail,
+          candidateName: candidateName,
+          documentName: documentTypeName,
+        );
+
+        emailResult.fold(
+          (failure) {
+            // Email failed but document is uploaded - show warning
+            isLoading.value = false;
+            AppSnackbar.warning(
+              'Document uploaded successfully, but failed to send email: ${failure.message}',
+            );
+          },
+          (_) {
+            isLoading.value = false;
+            AppSnackbar.success('Document uploaded successfully');
+            AppSnackbar.success('Email notification sent to candidate');
+            // Reload documents to show the new upload
+            loadCandidateDocuments(candidateId);
+            // Navigate back to candidate details screen
+            Get.offNamedUntil(
+              AppConstants.routeAdminCandidateDetails,
+              (route) =>
+                  route.settings.name == AppConstants.routeAdminCandidateDetails,
+            );
+          },
+        );
+      },
+    );
+  }
+
+  /// Pick file for admin document upload
+  Future<void> pickFileForAdminUpload() async {
+    try {
+      final result = await FilePicker.platform.pickFiles(
+        type: FileType.any,
+        allowMultiple: false,
+      );
+
+      if (result == null || result.files.isEmpty) {
+        return;
+      }
+
+      final file = result.files.first;
+
+      // Validate file
+      final validationError = AppFileValidator.validateFile(file);
+      if (validationError != null) {
+        errorMessage.value = validationError;
+        AppSnackbar.error(validationError);
+        return;
+      }
+
+      selectedFile.value = file;
+      selectedFileName.value = file.name;
+      selectedFileSize.value = AppFileValidator.formatFileSize(file.size);
+      errorMessage.value = '';
+    } catch (e) {
+      errorMessage.value = 'Failed to pick file: $e';
+      AppSnackbar.error('Failed to pick file: $e');
+    }
+  }
+
+  /// Clear selected file for admin document upload
+  void clearSelectedFile() {
+    selectedFile.value = null;
+    selectedFileName.value = '';
+    selectedFileSize.value = '';
   }
 }

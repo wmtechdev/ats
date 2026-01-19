@@ -743,4 +743,100 @@ class DocumentRepositoryImpl implements DocumentRepository {
     // The file might still exist in storage, but the document record is gone
     return const Right(null);
   }
+
+  @override
+  Future<Either<Failure, CandidateDocumentEntity>> createDocumentForAdmin({
+    required String candidateId,
+    required String docTypeId,
+    required String documentName,
+    required PlatformFile platformFile,
+    required String title,
+    void Function(double progress)? onProgress,
+    DateTime? expiryDate,
+    bool hasNoExpiry = false,
+  }) async {
+    try {
+      // Validate file
+      final validationError = AppFileValidator.validateFile(platformFile);
+      if (validationError != null) {
+        return Left(StorageFailure(validationError));
+      }
+
+      File? file;
+      Uint8List? bytes;
+      String? mimeType;
+
+      if (kIsWeb) {
+        // Web: use bytes
+        if (platformFile.bytes == null) {
+          return const Left(
+            StorageFailure('File bytes are required for web platform'),
+          );
+        }
+        bytes = platformFile.bytes;
+      } else {
+        // Mobile: use File
+        if (platformFile.path == null) {
+          return const Left(
+            StorageFailure('File path is required for mobile platform'),
+          );
+        }
+        file = File(platformFile.path!);
+        if (!await file.exists()) {
+          return const Left(StorageFailure('File does not exist'));
+        }
+      }
+
+      // Get MIME type from extension
+      if (platformFile.extension != null) {
+        mimeType = _getMimeTypeFromExtension(platformFile.extension!);
+      }
+
+      // Sanitize file name
+      final sanitizedFileName = AppFileValidator.sanitizeFileName(documentName);
+
+      // Upload to Firebase Storage
+      final downloadUrl = await storageDataSource.uploadFile(
+        path: '${AppConstants.documentsStoragePath}/$candidateId',
+        fileName: sanitizedFileName,
+        file: file,
+        bytes: bytes,
+        mimeType: mimeType,
+        onProgress: onProgress,
+      );
+
+      // Create document record in Firestore with approved status
+      final candidateDocId = await firestoreDataSource.createCandidateDocument(
+        candidateId: candidateId,
+        docTypeId: docTypeId,
+        documentName: sanitizedFileName,
+        storageUrl: downloadUrl,
+        title: title,
+        expiryDate: expiryDate,
+        hasNoExpiry: hasNoExpiry,
+        status: AppConstants.documentStatusApproved, // Admin uploads are approved by default
+      );
+
+      final doc = CandidateDocumentModel(
+        candidateDocId: candidateDocId,
+        candidateId: candidateId,
+        docTypeId: docTypeId,
+        documentName: sanitizedFileName,
+        storageUrl: downloadUrl,
+        status: AppConstants.documentStatusApproved,
+        uploadedAt: DateTime.now(),
+        title: title,
+        expiryDate: expiryDate,
+        hasNoExpiry: hasNoExpiry,
+      );
+
+      return Right(doc.toEntity());
+    } on StorageException catch (e) {
+      return Left(StorageFailure(e.message));
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message));
+    } catch (e) {
+      return Left(StorageFailure('An unexpected error occurred: $e'));
+    }
+  }
 }

@@ -9,8 +9,10 @@ import 'package:ats/core/utils/app_responsive/app_responsive.dart';
 import 'package:ats/core/utils/app_styles/app_text_styles.dart';
 import 'package:ats/core/widgets/app_widgets.dart';
 
+/// Reusable document upload widget that works with any controller
+/// that implements the required reactive properties and methods
 class AppDocumentUploadWidget extends StatelessWidget {
-  final DocumentsController controller;
+  final dynamic controller;
 
   const AppDocumentUploadWidget({super.key, required this.controller});
 
@@ -143,7 +145,15 @@ class AppDocumentUploadWidget extends StatelessWidget {
                     : Iconsax.folder,
                 onPressed: isUploading
                     ? null
-                    : () => controller.pickFileForUserDocument(),
+                    : () {
+                        // Support both DocumentsController and AdminCandidatesController
+                        if (controller is DocumentsController) {
+                          controller.pickFileForUserDocument();
+                        } else {
+                          // AdminCandidatesController
+                          controller.pickFileForAdminUpload();
+                        }
+                      },
                 isFullWidth: true,
               ),
             ],

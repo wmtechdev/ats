@@ -162,8 +162,8 @@ service cloud.firestore {
       allow delete: if isAuthenticated() && 
                        resource.data.candidateId == getUserId();
       
-      // Admins can read, update, and delete all candidate documents
-      allow read, update, delete: if isAdmin();
+      // Admins can read, create, update, and delete all candidate documents
+      allow read, create, update, delete: if isAdmin();
     }
   }
 }
