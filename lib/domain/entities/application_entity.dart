@@ -4,6 +4,8 @@ class ApplicationEntity {
   final String jobId;
   final String status;
   final DateTime appliedAt;
+  final List<String> requiredDocumentIds;
+  final List<String> uploadedDocumentIds;
 
   ApplicationEntity({
     required this.applicationId,
@@ -11,5 +13,7 @@ class ApplicationEntity {
     required this.jobId,
     required this.status,
     required this.appliedAt,
+    required this.requiredDocumentIds,
+    required this.uploadedDocumentIds,
   });
 }

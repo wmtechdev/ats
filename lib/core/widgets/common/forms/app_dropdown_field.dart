@@ -89,7 +89,7 @@ class AppDropDownField<T> extends StatelessWidget {
         ),
         contentPadding: contentPadding,
         errorText: errorText,
-        isDense: true,
+        isDense: false,
       ),
       items: items,
       onChanged: onChanged,

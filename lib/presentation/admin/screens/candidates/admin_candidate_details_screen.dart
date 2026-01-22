@@ -8,9 +8,9 @@ import 'package:ats/presentation/admin/controllers/admin_candidates_controller.d
 import 'package:ats/core/utils/app_texts/app_texts.dart';
 import 'package:ats/core/utils/app_file_validator/app_file_validator.dart';
 import 'package:ats/core/widgets/app_widgets.dart';
-import 'package:ats/core/widgets/candidates/profile/app_candidate_profile_formatters.dart';
 import 'package:ats/core/constants/app_constants.dart';
 import 'package:ats/core/widgets/admin/admin_document_actions_button.dart';
+import 'package:ats/core/widgets/candidates/lists/app_missing_documents_list.dart';
 
 class AdminCandidateDetailsScreen extends StatelessWidget {
   const AdminCandidateDetailsScreen({super.key});
@@ -163,6 +163,7 @@ class AdminCandidateDetailsScreen extends StatelessWidget {
                               controller.candidateRequestedDocumentTypes.toList();
                           final allCandidateDocs =
                               controller.candidateDocuments.toList();
+                          final selectedFilter = controller.selectedDocumentFilter.value ?? 'all';
                           
                           // Filter out documents that are from requested document types
                           // to avoid showing them twice (once in requested section, once in regular section)
@@ -173,11 +174,60 @@ class AdminCandidateDetailsScreen extends StatelessWidget {
                               .where((doc) => !requestedDocTypeIds.contains(doc.docTypeId))
                               .toList();
 
-                          return CustomScrollView(
-                            slivers: [
-                              // Requested Documents Section
-                              if (requestedDocs.isNotEmpty)
-                                SliverToBoxAdapter(
+                          return FutureBuilder<Map<String, Map<String, dynamic>>>(
+                            future: controller.getMissingDocumentsForApplications(),
+                            builder: (context, snapshot) {
+                              final missingDocs = snapshot.data ?? {};
+                              
+                              // Determine what to show based on filter
+                              final showMissing = selectedFilter == 'all' || selectedFilter == 'missing';
+                              final showRequested = selectedFilter == 'all' || selectedFilter == 'requested';
+                              final showRegular = selectedFilter == 'all';
+                              
+                              return CustomScrollView(
+                                slivers: [
+                                  // Filter Dropdown
+                                  SliverToBoxAdapter(
+                                    child: Padding(
+                                      padding: AppSpacing.padding(context).copyWith(bottom: 0),
+                                      child: AppDropDownField<String>(
+                                        value: selectedFilter,
+                                        labelText: 'Filter Documents',
+                                        hintText: 'All Documents',
+                                        items: [
+                                          DropdownMenuItem<String>(
+                                            value: 'all',
+                                            child: Text('All Documents'),
+                                          ),
+                                          DropdownMenuItem<String>(
+                                            value: 'requested',
+                                            child: Text('Requested Documents'),
+                                          ),
+                                          DropdownMenuItem<String>(
+                                            value: 'missing',
+                                            child: Text('Missing Documents'),
+                                          ),
+                                        ],
+                                        onChanged: (value) =>
+                                            controller.setDocumentFilter(value),
+                                      ),
+                                    ),
+                                  ),
+                                  // Missing Documents Section (for applications)
+                                  if (showMissing && missingDocs.isNotEmpty)
+                                    SliverToBoxAdapter(
+                                      child: AppMissingDocumentsList(
+                                        missingDocuments: missingDocs,
+                                        onRequest: (docTypeId) {
+                                          controller.requestMissingDocument(
+                                            docTypeId: docTypeId,
+                                          );
+                                        },
+                                      ),
+                                    ),
+                                  // Requested Documents Section
+                                  if (showRequested && requestedDocs.isNotEmpty)
+                                    SliverToBoxAdapter(
                                   child: AppRequestedDocumentsList(
                                     requestedDocuments: requestedDocs,
                                     candidateDocuments: allCandidateDocs,
@@ -221,54 +271,64 @@ class AdminCandidateDetailsScreen extends StatelessWidget {
                                   ),
                                 ),
                               // Regular Documents List (excluding requested documents)
-                              if (regularDocs.isEmpty && requestedDocs.isEmpty)
+                              if (showRegular) ...[
+                                if (regularDocs.isEmpty && requestedDocs.isEmpty && missingDocs.isEmpty)
+                                  SliverFillRemaining(
+                                    child: AppEmptyState(
+                                      message: AppTexts.noDocumentsFound,
+                                      icon: Iconsax.document_text,
+                                    ),
+                                  )
+                                else if (regularDocs.isNotEmpty)
+                                  SliverToBoxAdapter(
+                                    child: AppCandidateDocumentsList(
+                                      documents: regularDocs,
+                                      onStatusUpdate: (candidateDocId, status) {
+                                        controller.updateDocumentStatus(
+                                          candidateDocId: candidateDocId,
+                                          status: status,
+                                        );
+                                      },
+                                      onDeny: (candidateDocId, status, denialReason) {
+                                        controller.denyDocumentWithEmail(
+                                          candidateDocId: candidateDocId,
+                                          status: status,
+                                          denialReason: denialReason,
+                                        );
+                                      },
+                                      onView: (storageUrl) {
+                                        // Find the document name for display
+                                        String? documentName;
+                                        try {
+                                          final document = allCandidateDocs.firstWhere(
+                                            (doc) => doc.storageUrl == storageUrl,
+                                          );
+                                          documentName =
+                                              document.title ??
+                                              AppFileValidator.extractOriginalFileName(
+                                                document.documentName,
+                                              );
+                                        } catch (e) {
+                                          // Document not found, use default name
+                                          documentName = null;
+                                        }
+                                        AppDocumentViewer.show(
+                                          documentUrl: storageUrl,
+                                          documentName: documentName,
+                                        );
+                                      },
+                                    ),
+                                  ),
+                              ] else if (!showMissing && !showRequested && regularDocs.isEmpty)
                                 SliverFillRemaining(
                                   child: AppEmptyState(
                                     message: AppTexts.noDocumentsFound,
                                     icon: Iconsax.document_text,
                                   ),
-                                )
-                              else if (regularDocs.isNotEmpty)
-                                SliverToBoxAdapter(
-                                  child: AppCandidateDocumentsList(
-                                    documents: regularDocs,
-                                    onStatusUpdate: (candidateDocId, status) {
-                                      controller.updateDocumentStatus(
-                                        candidateDocId: candidateDocId,
-                                        status: status,
-                                      );
-                                    },
-                                    onDeny: (candidateDocId, status, denialReason) {
-                                      controller.denyDocumentWithEmail(
-                                        candidateDocId: candidateDocId,
-                                        status: status,
-                                        denialReason: denialReason,
-                                      );
-                                    },
-                                    onView: (storageUrl) {
-                                      // Find the document name for display
-                                      String? documentName;
-                                      try {
-                                        final document = allCandidateDocs.firstWhere(
-                                          (doc) => doc.storageUrl == storageUrl,
-                                        );
-                                        documentName =
-                                            document.title ??
-                                            AppFileValidator.extractOriginalFileName(
-                                              document.documentName,
-                                            );
-                                      } catch (e) {
-                                        // Document not found, use default name
-                                        documentName = null;
-                                      }
-                                      AppDocumentViewer.show(
-                                        documentUrl: storageUrl,
-                                        documentName: documentName,
-                                      );
-                                    },
-                                  ),
                                 ),
                             ],
+                          );
+                            },
                           );
                         }),
                         Positioned(

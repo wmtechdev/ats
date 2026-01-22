@@ -2,20 +2,29 @@ import 'dart:async';
 import 'package:get/get.dart';
 import 'package:ats/domain/repositories/candidate_auth_repository.dart';
 import 'package:ats/domain/repositories/document_repository.dart';
+import 'package:ats/domain/repositories/application_repository.dart';
 import 'package:ats/domain/entities/document_type_entity.dart';
 import 'package:ats/domain/entities/candidate_document_entity.dart';
+import 'package:ats/domain/entities/application_entity.dart';
 import 'package:ats/domain/usecases/document/upload_document_usecase.dart';
 import 'package:ats/core/utils/app_file_validator/app_file_validator.dart';
 import 'package:ats/core/constants/app_constants.dart';
 import 'package:ats/data/repositories/document_repository_impl.dart';
+import 'package:ats/presentation/candidate/controllers/jobs_controller.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:ats/core/widgets/app_widgets.dart';
 
 class DocumentsController extends GetxController {
   final DocumentRepository documentRepository;
   final CandidateAuthRepository authRepository;
+  final ApplicationRepository applicationRepository;
+  JobsController? _jobsController;
 
-  DocumentsController(this.documentRepository, this.authRepository);
+  DocumentsController(
+    this.documentRepository,
+    this.authRepository,
+    this.applicationRepository,
+  );
 
   final isLoading = false.obs;
   final uploadProgress = 0.0.obs;
@@ -46,8 +55,18 @@ class DocumentsController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    // Try to get JobsController if available (may not be initialized yet)
+    try {
+      _jobsController = Get.find<JobsController>();
+    } catch (e) {
+      // JobsController not available yet, will be set later if needed
+    }
     loadDocumentTypes();
     loadCandidateDocuments();
+  }
+
+  void setJobsController(JobsController jobsController) {
+    _jobsController = jobsController;
   }
 
   @override
@@ -171,6 +190,83 @@ class DocumentsController extends GetxController {
     }
   }
 
+  // Missing document detection methods
+  List<ApplicationEntity> getApplications() {
+    if (_jobsController == null) {
+      try {
+        _jobsController = Get.find<JobsController>();
+      } catch (e) {
+        return [];
+      }
+    }
+    return _jobsController?.applications.toList() ?? [];
+  }
+
+  /// Check if a document type is missing for any application
+  bool isDocumentMissingForAnyApplication(String docTypeId) {
+    final applications = getApplications();
+    if (applications.isEmpty) return false;
+
+    // Check if document is required by any application and not uploaded
+    for (final app in applications) {
+      if (app.requiredDocumentIds.contains(docTypeId) &&
+          !app.uploadedDocumentIds.contains(docTypeId)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /// Get list of job IDs that require this document and it's missing
+  List<String> getJobsRequiringDocument(String docTypeId) {
+    final applications = getApplications();
+    if (applications.isEmpty) return [];
+
+    final jobIds = <String>[];
+    for (final app in applications) {
+      if (app.requiredDocumentIds.contains(docTypeId) &&
+          !app.uploadedDocumentIds.contains(docTypeId)) {
+        jobIds.add(app.jobId);
+      }
+    }
+    return jobIds;
+  }
+
+  /// Get job titles for jobs requiring this document
+  List<String> getJobTitlesRequiringDocument(String docTypeId) {
+    final jobIds = getJobsRequiringDocument(docTypeId);
+    if (jobIds.isEmpty || _jobsController == null) return [];
+
+    final jobTitles = <String>[];
+    for (final jobId in jobIds) {
+      try {
+        final job = _jobsController!.jobs.firstWhere(
+          (j) => j.jobId == jobId,
+        );
+        jobTitles.add(job.title);
+      } catch (e) {
+        // Job not found, skip
+      }
+    }
+    return jobTitles;
+  }
+
+  /// Get all missing document IDs across all applications
+  List<String> getMissingDocumentsForAllApplications() {
+    final applications = getApplications();
+    if (applications.isEmpty) return [];
+
+    final missingDocIds = <String>{};
+    for (final app in applications) {
+      for (final docId in app.requiredDocumentIds) {
+        if (!app.uploadedDocumentIds.contains(docId)) {
+          missingDocIds.add(docId);
+        }
+      }
+    }
+    return missingDocIds.toList();
+  }
+
   Future<void> uploadDocument(
     String docTypeId,
     String docTypeName, {
@@ -244,7 +340,7 @@ class DocumentsController extends GetxController {
           uploadingDocTypeId.value = '';
           AppSnackbar.error(failure.message);
         },
-        (document) {
+        (document) async {
           isLoading.value = false;
           isUploading.value = false;
           uploadProgress.value = 1.0;
@@ -253,6 +349,19 @@ class DocumentsController extends GetxController {
             uploadingDocTypeId.value = '';
             uploadProgress.value = 0.0;
           });
+          
+          // Update applications to mark this document as uploaded
+          if (docTypeId.isNotEmpty) {
+            final currentUser = authRepository.getCurrentUser();
+            if (currentUser != null) {
+              await applicationRepository.updateApplicationsForDocument(
+                candidateId: currentUser.userId,
+                docTypeId: docTypeId,
+                isUploaded: true,
+              );
+            }
+          }
+          
           AppSnackbar.success('Document uploaded successfully');
           // Navigate back if we're on upload screen
           if (Get.currentRoute.contains('upload')) {
@@ -341,11 +450,24 @@ class DocumentsController extends GetxController {
         uploadingDocTypeId.value = '';
         AppSnackbar.error(failure.message);
       },
-      (document) {
+      (document) async {
         isLoading.value = false;
         isUploading.value = false;
         uploadProgress.value = 1.0;
         clearSelectedFile();
+        
+        // Update applications to mark this document as uploaded
+        if (docTypeId.isNotEmpty) {
+          final currentUser = authRepository.getCurrentUser();
+          if (currentUser != null) {
+            await applicationRepository.updateApplicationsForDocument(
+              candidateId: currentUser.userId,
+              docTypeId: docTypeId,
+              isUploaded: true,
+            );
+          }
+        }
+        
         AppSnackbar.success('Document uploaded successfully');
         // Reset progress after a short delay
         Future.delayed(const Duration(seconds: 2), () {
@@ -399,6 +521,17 @@ class DocumentsController extends GetxController {
     errorMessage.value = '';
 
     try {
+      // Get docTypeId before deletion
+      String docTypeId = '';
+      try {
+        final document = candidateDocuments.firstWhere(
+          (doc) => doc.candidateDocId == candidateDocId,
+        );
+        docTypeId = document.docTypeId;
+      } catch (e) {
+        // Document not found in local list, will skip application update
+      }
+      
       final result = await documentRepository.deleteDocument(
         candidateDocId: candidateDocId,
         storageUrl: storageUrl,
@@ -410,8 +543,21 @@ class DocumentsController extends GetxController {
           isLoading.value = false;
           AppSnackbar.error(failure.message);
         },
-        (_) {
+        (_) async {
           isLoading.value = false;
+          
+          // Update applications to mark this document as deleted
+          if (docTypeId.isNotEmpty) {
+            final currentUser = authRepository.getCurrentUser();
+            if (currentUser != null) {
+              await applicationRepository.updateApplicationsForDocument(
+                candidateId: currentUser.userId,
+                docTypeId: docTypeId,
+                isUploaded: false,
+              );
+            }
+          }
+          
           AppSnackbar.success('Document deleted successfully');
         },
       );

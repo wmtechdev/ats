@@ -8,7 +8,6 @@ import 'package:ats/domain/entities/document_type_entity.dart';
 import 'package:ats/core/utils/app_texts/app_texts.dart';
 import 'package:ats/core/utils/app_spacing/app_spacing.dart';
 import 'package:ats/core/widgets/app_widgets.dart';
-import 'package:ats/core/widgets/documents/documents.dart';
 import 'package:ats/core/widgets/common/forms/app_dropdown_field.dart' as dropdown;
 
 class AdminUploadDocumentScreen extends StatefulWidget {

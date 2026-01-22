@@ -6,6 +6,7 @@ abstract class ApplicationRepository {
   Future<Either<Failure, ApplicationEntity>> createApplication({
     required String candidateId,
     required String jobId,
+    required List<String> requiredDocumentIds,
   });
 
   Future<Either<Failure, List<ApplicationEntity>>> getApplications({
@@ -27,5 +28,13 @@ abstract class ApplicationRepository {
 
   Future<Either<Failure, void>> deleteApplication({
     required String applicationId,
+  });
+
+  /// Update uploadedDocumentIds for all applications of a candidate
+  /// when a document is uploaded or deleted
+  Future<Either<Failure, void>> updateApplicationsForDocument({
+    required String candidateId,
+    required String docTypeId,
+    required bool isUploaded,
   });
 }

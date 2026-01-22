@@ -61,6 +61,14 @@ abstract class FirebaseFunctionsDataSource {
     required String candidateName,
     required String documentName,
   });
+
+  /// Sends a missing documents email to a candidate when they apply for a job
+  Future<void> sendMissingDocumentsEmail({
+    required String candidateEmail,
+    required String candidateName,
+    required String jobTitle,
+    required List<Map<String, String>> missingDocuments,
+  });
 }
 
 class FirebaseFunctionsDataSourceImpl implements FirebaseFunctionsDataSource {
@@ -236,6 +244,30 @@ class FirebaseFunctionsDataSourceImpl implements FirebaseFunctionsDataSource {
         'candidateEmail': candidateEmail,
         'candidateName': candidateName,
         'documentName': documentName,
+      });
+    } on FirebaseFunctionsException catch (e) {
+      throw ServerException('Failed to send email: ${e.message}');
+    } catch (e) {
+      throw ServerException('An unexpected error occurred: $e');
+    }
+  }
+
+  @override
+  Future<void> sendMissingDocumentsEmail({
+    required String candidateEmail,
+    required String candidateName,
+    required String jobTitle,
+    required List<Map<String, String>> missingDocuments,
+  }) async {
+    try {
+      final callable = firebaseFunctions.httpsCallable(
+        'sendMissingDocumentsEmail',
+      );
+      await callable.call({
+        'candidateEmail': candidateEmail,
+        'candidateName': candidateName,
+        'jobTitle': jobTitle,
+        'missingDocuments': missingDocuments,
       });
     } on FirebaseFunctionsException catch (e) {
       throw ServerException('Failed to send email: ${e.message}');

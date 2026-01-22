@@ -54,7 +54,7 @@ class AppRequestedDocumentsList extends StatelessWidget {
         ListView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
-          padding: AppSpacing.padding(context).copyWith(bottom: 0),
+          padding: AppSpacing.padding(context).copyWith(bottom: 0, top: 0),
           itemCount: requestedDocuments.length,
           itemBuilder: (context, index) {
             final docType = requestedDocuments[index];

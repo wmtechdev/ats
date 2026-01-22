@@ -904,3 +904,116 @@ exports.sendAdminDocumentUploadEmail = onCall(
     );
   }
 });
+
+/**
+ * Sends a missing documents email to a candidate when they apply for a job
+ * This function uses nodemailer with SMTP configuration from environment variables
+ * 
+ * Environment variables required (set via Firebase Console or gcloud):
+ * - SMTP_HOST: SMTP server host (e.g., mail.wmsols.com)
+ * - SMTP_PORT: SMTP server port (e.g., 465)
+ * - SMTP_USER: SMTP username/email
+ * - SMTP_PASSWORD: SMTP password
+ * - EMAIL_FROM: From email address (e.g., test@wmsols.com)
+ * - EMAIL_FROMNAME: From display name (e.g., ATS-Maximum)
+ */
+exports.sendMissingDocumentsEmail = onCall(
+  {
+    // Set environment variables here or via Firebase Console
+  },
+  async (request) => {
+  const {data, auth} = request;
+  
+  // Verify that the caller is authenticated
+  if (!auth) {
+    throw new HttpsError(
+      'unauthenticated',
+      'User must be authenticated to send emails'
+    );
+  }
+
+  // Extract data from request
+  const { candidateEmail, candidateName, jobTitle, missingDocuments } = data;
+
+  if (!candidateEmail || !candidateName || !jobTitle || !missingDocuments || !Array.isArray(missingDocuments) || missingDocuments.length === 0) {
+    throw new HttpsError(
+      'invalid-argument',
+      'Missing required fields: candidateEmail, candidateName, jobTitle, missingDocuments (non-empty array)'
+    );
+  }
+
+  try {
+    // Get SMTP configuration from environment variables
+    const host = process.env.SMTP_HOST;
+    const port = process.env.SMTP_PORT || '587';
+    const user = process.env.SMTP_USER;
+    const password = process.env.SMTP_PASSWORD;
+    const fromEmail = process.env.EMAIL_FROM;
+    const fromName = process.env.EMAIL_FROMNAME;
+
+    if (!host || !user || !password) {
+      throw new Error('SMTP configuration is missing. Please set environment variables: SMTP_HOST, SMTP_USER, SMTP_PASSWORD');
+    }
+
+    if (!fromEmail || !fromName) {
+      throw new Error('Email configuration is missing. Please set environment variables: EMAIL_FROM, EMAIL_FROMNAME');
+    }
+
+    // Create nodemailer transporter
+    const transporter = nodemailer.createTransport({
+      host: host,
+      port: parseInt(port, 10),
+      secure: port === '465', // true for 465, false for other ports
+      auth: {
+        user: user,
+        pass: password,
+      },
+    });
+
+    // Build email subject
+    const subject = `Missing Documents Required for Job Application - ${jobTitle}`;
+
+    // Build email body (plain text)
+    let emailBody = `Dear ${candidateName},\n\n`;
+    emailBody += `Thank you for applying to the position: ${jobTitle}\n\n`;
+    emailBody += `We noticed that the following required documents are missing from your application:\n\n`;
+    
+    // List missing documents
+    missingDocuments.forEach((doc, index) => {
+      emailBody += `${index + 1}. ${doc.name}`;
+      if (doc.description) {
+        emailBody += ` - ${doc.description}`;
+      }
+      emailBody += `\n`;
+    });
+    
+    emailBody += `\nPlease log in to your account and upload these documents through the "My Documents" section. `;
+    emailBody += `These documents are required to complete your application for this position.\n\n`;
+    emailBody += `You can see which documents are missing by checking the "Missing" status in your My Documents screen.\n\n`;
+    emailBody += `If you have any questions or need further clarification, please don't hesitate to contact us.\n\n`;
+    emailBody += `Best regards,\n${fromName}`;
+
+    // Send email
+    const mailOptions = {
+      from: `"${fromName}" <${fromEmail}>`,
+      to: candidateEmail,
+      subject: subject,
+      text: emailBody,
+    };
+
+    const info = await transporter.sendMail(mailOptions);
+    
+    console.log('Email sent successfully:', info.messageId);
+    
+    return {
+      success: true,
+      messageId: info.messageId,
+    };
+  } catch (error) {
+    console.error('Error sending email:', error);
+    throw new HttpsError(
+      'internal',
+      `Failed to send email: ${error.message}`
+    );
+  }
+});

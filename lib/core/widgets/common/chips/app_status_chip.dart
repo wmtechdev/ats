@@ -123,7 +123,8 @@ class AppStatusChip extends StatelessWidget {
       return AppColors.success;
     } else if (lowerStatus == AppConstants.jobStatusClosed ||
         lowerStatus == AppConstants.applicationStatusDenied ||
-        lowerStatus == AppConstants.documentStatusDenied) {
+        lowerStatus == AppConstants.documentStatusDenied ||
+        lowerStatus == 'missing') {
       return AppColors.error;
     } else if (lowerStatus == AppConstants.applicationStatusPending ||
         lowerStatus == AppConstants.documentStatusPending) {
@@ -155,6 +156,8 @@ class AppStatusChip extends StatelessWidget {
         lowerStatus == AppConstants.applicationStatusDenied ||
         lowerStatus == AppConstants.documentStatusDenied) {
       return Iconsax.close_circle;
+    } else if (lowerStatus == 'missing') {
+      return Iconsax.warning_2;
     } else if (lowerStatus == AppConstants.applicationStatusPending ||
         lowerStatus == AppConstants.documentStatusPending) {
       return Iconsax.clock;

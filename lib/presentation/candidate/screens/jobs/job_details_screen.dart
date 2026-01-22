@@ -96,7 +96,7 @@ class JobDetailsScreen extends StatelessWidget {
                 if (!hasAllDocuments)
                   AppInfoMessage(
                     message: AppTexts.uploadRequiredDocuments,
-                    type: AppInfoMessageType.error,
+                    type: AppInfoMessageType.warning,
                     action: TextButton.icon(
                       onPressed: () {
                         Get.toNamed(AppConstants.routeCandidateDocuments);
@@ -123,21 +123,70 @@ class JobDetailsScreen extends StatelessWidget {
               ],
               AppSpacing.vertical(context, 0.04),
               Obx(
-                () => jobsController.hasApplied(job.jobId)
-                    ? AppInfoMessage(
-                        message: AppTexts.alreadyApplied,
-                        type: AppInfoMessageType.success,
-                      )
-                    : AppButton(
+                () {
+                  final hasApplied = jobsController.hasApplied(job.jobId);
+                  if (hasApplied) {
+                    // Get the application to check missing documents
+                    final application = jobsController.applications.firstWhereOrNull(
+                      (app) => app.jobId == job.jobId,
+                    );
+                    
+                    if (application != null) {
+                      final missingDocIds = application.requiredDocumentIds
+                          .where((docId) => !application.uploadedDocumentIds.contains(docId))
+                          .toList();
+                      
+                      if (missingDocIds.isNotEmpty) {
+                        return AppInfoMessage(
+                          message: 'Please upload missing documents in My Documents screen to complete your application.',
+                          type: AppInfoMessageType.warning,
+                          action: TextButton.icon(
+                            onPressed: () {
+                              Get.toNamed(AppConstants.routeCandidateDocuments);
+                            },
+                            icon: Icon(
+                              Iconsax.document_text,
+                              size: AppResponsive.iconSize(context),
+                              color: AppColors.primary,
+                            ),
+                            label: Text(
+                              AppTexts.goToDocuments,
+                              style: AppTextStyles.bodyText(context).copyWith(
+                                color: AppColors.primary,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                        );
+                      }
+                    }
+                    
+                    return AppInfoMessage(
+                      message: AppTexts.alreadyApplied,
+                      type: AppInfoMessageType.success,
+                    );
+                  }
+                  
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      if (!hasAllDocuments && requiredDocIds.isNotEmpty)
+                        AppInfoMessage(
+                          message: 'You can apply now, but please upload required documents later in My Documents.',
+                          type: AppInfoMessageType.warning,
+                        ),
+                      if (!hasAllDocuments && requiredDocIds.isNotEmpty)
+                        AppSpacing.vertical(context, 0.02),
+                      AppButton(
                         text: AppTexts.applyNow,
-                        icon: Iconsax.send_2,
-                        onPressed: hasAllDocuments
-                            ? () => jobsController.applyToJob(job.jobId)
-                            : null,
-                        backgroundColor: hasAllDocuments
-                            ? null
-                            : AppColors.grey,
+                        icon: !hasAllDocuments && requiredDocIds.isNotEmpty
+                            ? Iconsax.warning_2
+                            : Iconsax.send_2,
+                        onPressed: () => jobsController.applyToJob(job.jobId),
                       ),
+                    ],
+                  );
+                },
               ),
             ],
           ),

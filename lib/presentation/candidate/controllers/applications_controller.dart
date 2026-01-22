@@ -17,6 +17,7 @@ class ApplicationsController extends GetxController {
 
   final createApplicationUseCase = CreateApplicationUseCase(
     Get.find<ApplicationRepository>(),
+    Get.find<JobRepository>(),
   );
 
   final isLoading = false.obs;

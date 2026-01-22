@@ -26,10 +26,8 @@ import 'package:file_picker/file_picker.dart';
 import 'package:ats/domain/usecases/admin/delete_candidate_usecase.dart';
 import 'package:ats/core/constants/app_constants.dart';
 import 'package:ats/core/utils/app_file_validator/app_file_validator.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:ats/core/widgets/app_widgets.dart';
 import 'package:ats/core/utils/app_texts/app_texts.dart';
-import 'package:ats/core/widgets/candidates/profile/app_candidate_profile_formatters.dart';
 import 'package:ats/presentation/admin/controllers/admin_auth_controller.dart';
 
 class AdminCandidatesController extends GetxController {
@@ -63,6 +61,8 @@ class AdminCandidatesController extends GetxController {
   final availableAgents = <AdminProfileEntity>[].obs;
   final candidateProfileStreams =
       <String, StreamSubscription<CandidateProfileEntity?>>{};
+  
+  final isRequestingDocument = <String, bool>{}.obs;
 
   // File selection for admin document upload
   final selectedFile = Rxn<PlatformFile>();
@@ -75,6 +75,7 @@ class AdminCandidatesController extends GetxController {
   final selectedAgentFilter = Rxn<String>(); // profileId
   final selectedStatusFilter = Rxn<String>();
   final selectedProfessionFilter = Rxn<String>();
+  final selectedDocumentFilter = Rxn<String>(); // 'all', 'requested', 'missing'
 
   late final UpdateApplicationStatusUseCase updateApplicationStatusUseCase;
   late final UpdateDocumentStatusUseCase updateDocumentStatusUseCase;
@@ -731,6 +732,166 @@ class AdminCandidatesController extends GetxController {
     return candidateApplications.length;
   }
 
+  /// Get missing documents for all applications
+  /// Returns a map of docTypeId -> {docType, jobIds that require it, jobTitles}
+  Future<Map<String, Map<String, dynamic>>> getMissingDocumentsForApplications() async {
+    final missingDocsMap = <String, Map<String, dynamic>>{};
+    
+    // Get all document types (both regular and candidate-specific)
+    final allDocTypes = <String, DocumentTypeEntity>{};
+    
+    // Get regular document types
+    final regularDocTypesResult = await documentRepository.getDocumentTypes();
+    regularDocTypesResult.fold(
+      (_) {},
+      (docTypes) {
+        for (final docType in docTypes) {
+          allDocTypes[docType.docTypeId] = docType;
+        }
+      },
+    );
+    
+    // Add candidate-specific document types
+    for (final docType in candidateRequestedDocumentTypes) {
+      allDocTypes[docType.docTypeId] = docType;
+    }
+    
+    // Check each application for missing documents
+    for (final app in candidateApplications) {
+      final job = applicationJobs[app.jobId];
+      if (job == null) continue;
+      
+      for (final requiredDocId in app.requiredDocumentIds) {
+        // Check if document is missing (not in uploadedDocumentIds)
+        if (!app.uploadedDocumentIds.contains(requiredDocId)) {
+          if (!missingDocsMap.containsKey(requiredDocId)) {
+            // Get document type
+            final docType = allDocTypes[requiredDocId];
+            
+            missingDocsMap[requiredDocId] = {
+              'docType': docType,
+              'docTypeId': requiredDocId,
+              'jobIds': <String>[app.jobId],
+              'jobTitles': <String>[job.title],
+            };
+          } else {
+            // Add this job to the existing entry
+            final entry = missingDocsMap[requiredDocId]!;
+            final jobIds = entry['jobIds'] as List<String>;
+            final jobTitles = entry['jobTitles'] as List<String>;
+            if (!jobIds.contains(app.jobId)) {
+              jobIds.add(app.jobId);
+              jobTitles.add(job.title);
+            }
+          }
+        }
+      }
+    }
+    
+    return missingDocsMap;
+  }
+
+  /// Request a missing document (for all jobs that require it)
+  Future<void> requestMissingDocument({
+    required String docTypeId,
+  }) async {
+    final candidate = selectedCandidate.value;
+    final profile = selectedCandidateProfile.value;
+    
+    if (candidate == null || profile == null) {
+      AppSnackbar.error('Candidate not selected');
+      return;
+    }
+    
+    // Set loading state for this specific document
+    isRequestingDocument[docTypeId] = true;
+    
+    // Get document type details - try regular document types first
+    DocumentTypeEntity? docType;
+    
+    final regularDocTypesResult = await documentRepository.getDocumentTypes();
+    await regularDocTypesResult.fold(
+      (failure) async {
+        // Try candidate-specific document types
+        try {
+          docType = candidateRequestedDocumentTypes.firstWhere(
+            (dt) => dt.docTypeId == docTypeId,
+          );
+        } catch (e) {
+          isRequestingDocument[docTypeId] = false;
+          AppSnackbar.error('Document type not found');
+          return;
+        }
+      },
+      (docTypes) async {
+        try {
+          docType = docTypes.firstWhere((dt) => dt.docTypeId == docTypeId);
+        } catch (e) {
+          // Try candidate-specific document types
+          try {
+            docType = candidateRequestedDocumentTypes.firstWhere(
+              (dt) => dt.docTypeId == docTypeId,
+            );
+          } catch (e) {
+            isRequestingDocument[docTypeId] = false;
+            AppSnackbar.error('Document type not found');
+            return;
+          }
+        }
+      },
+    );
+    
+    if (docType == null) {
+      isRequestingDocument[docTypeId] = false;
+      AppSnackbar.error('Document type not found');
+      return;
+    }
+    
+    // Get all jobs that require this document
+    final missingDocs = await getMissingDocumentsForApplications();
+    final docEntry = missingDocs[docTypeId];
+    
+    if (docEntry == null) {
+      isRequestingDocument[docTypeId] = false;
+      AppSnackbar.error('Document not found in missing documents');
+      return;
+    }
+    
+    final jobTitles = docEntry['jobTitles'] as List<String>;
+    if (jobTitles.isEmpty) {
+      isRequestingDocument[docTypeId] = false;
+      AppSnackbar.error('No jobs found for this document');
+      return;
+    }
+    
+    final candidateName = AppCandidateProfileFormatters.getFullName(profile);
+    final candidateEmail = candidate.email;
+    
+    // Build description with all job names
+    final jobNamesText = jobTitles.length == 1
+        ? jobTitles.first
+        : jobTitles.join(', ');
+    
+    // Send email - docType is guaranteed to be non-null here due to null check above
+    final emailResult = await sendDocumentRequestEmailUseCase(
+      candidateEmail: candidateEmail,
+      candidateName: candidateName,
+      documentName: docType!.name,
+      documentDescription: '${docType!.description}\n\nThis document is required for your application to: $jobNamesText',
+    );
+    
+    isRequestingDocument[docTypeId] = false;
+    
+    emailResult.fold(
+      (failure) {
+        AppSnackbar.error('Failed to send email: ${failure.message}');
+      },
+      (_) {
+        AppSnackbar.success('Document request email sent successfully');
+      },
+    );
+  }
+
   String getWorkHistoryText() {
     final profile = selectedCandidateProfile.value;
     if (profile?.workHistory == null || profile!.workHistory!.isEmpty) {
@@ -762,6 +923,10 @@ class AdminCandidatesController extends GetxController {
   void setProfessionFilter(String? profession) {
     selectedProfessionFilter.value = profession;
     _applyFilters();
+  }
+
+  void setDocumentFilter(String? filter) {
+    selectedDocumentFilter.value = filter;
   }
 
   // Get unique professions from all candidate profiles

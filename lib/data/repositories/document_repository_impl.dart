@@ -82,6 +82,7 @@ class DocumentRepositoryImpl implements DocumentRepository {
   }
 
   /// Stream document types for a specific candidate (includes candidate-specific ones)
+  @override
   Stream<List<DocumentTypeEntity>> streamDocumentTypesForCandidate(
     String candidateId,
   ) {
@@ -145,6 +146,7 @@ class DocumentRepositoryImpl implements DocumentRepository {
   }
 
   /// Create a candidate-specific document type
+  @override
   Future<Either<Failure, DocumentTypeEntity>> createCandidateSpecificDocumentType({
     required String name,
     required String description,

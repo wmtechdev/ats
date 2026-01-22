@@ -52,26 +52,44 @@ class AppCandidateApplicationsList extends StatelessWidget {
               // Show only status chip when application is approved
               if (isApproved) AppStatusChip(status: app.status),
               // Show approve/deny buttons only when application is pending
-              if (isPending) ...[
-                AppActionButton(
-                  text: AppTexts.approve,
-                  onPressed: () => onStatusUpdate(
-                    app.applicationId,
-                    AppConstants.applicationStatusApproved,
-                  ),
-                  backgroundColor: AppColors.success,
-                  foregroundColor: AppColors.white,
+              if (isPending)
+                Builder(
+                  builder: (context) {
+                    // Check if all required documents are uploaded
+                    final totalRequired = app.requiredDocumentIds.length;
+                    final uploadedCount = app.uploadedDocumentIds.length;
+                    final allDocsUploaded = totalRequired == 0 || uploadedCount >= totalRequired;
+                    
+                    return Wrap(
+                      spacing: AppResponsive.screenWidth(context) * 0.01,
+                      runSpacing: AppResponsive.screenHeight(context) * 0.005,
+                      children: [
+                        AppActionButton(
+                          text: AppTexts.approve,
+                          onPressed: allDocsUploaded
+                              ? () => onStatusUpdate(
+                                  app.applicationId,
+                                  AppConstants.applicationStatusApproved,
+                                )
+                              : null,
+                          backgroundColor: allDocsUploaded
+                              ? AppColors.success
+                              : AppColors.grey,
+                          foregroundColor: AppColors.white,
+                        ),
+                        AppActionButton(
+                          text: AppTexts.deny,
+                          onPressed: () => onStatusUpdate(
+                            app.applicationId,
+                            AppConstants.applicationStatusDenied,
+                          ),
+                          backgroundColor: AppColors.error,
+                          foregroundColor: AppColors.white,
+                        ),
+                      ],
+                    );
+                  },
                 ),
-                AppActionButton(
-                  text: AppTexts.deny,
-                  onPressed: () => onStatusUpdate(
-                    app.applicationId,
-                    AppConstants.applicationStatusDenied,
-                  ),
-                  backgroundColor: AppColors.error,
-                  foregroundColor: AppColors.white,
-                ),
-              ],
               // Show status chip when application is denied (no buttons for admin)
               if (isDenied) AppStatusChip(status: app.status),
             ],

@@ -31,4 +31,12 @@ abstract class EmailRepository {
     required String candidateName,
     required String documentName,
   });
+
+  /// Sends a missing documents email to a candidate when they apply for a job
+  Future<Either<Failure, void>> sendMissingDocumentsEmail({
+    required String candidateEmail,
+    required String candidateName,
+    required String jobTitle,
+    required List<Map<String, String>> missingDocuments,
+  });
 }

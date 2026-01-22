@@ -8,6 +8,8 @@ class ApplicationModel extends ApplicationEntity {
     required super.jobId,
     required super.status,
     required super.appliedAt,
+    required super.requiredDocumentIds,
+    required super.uploadedDocumentIds,
   });
 
   factory ApplicationModel.fromFirestore(DocumentSnapshot doc) {
@@ -18,6 +20,8 @@ class ApplicationModel extends ApplicationEntity {
       jobId: data['jobId'] ?? '',
       status: data['status'] ?? 'pending',
       appliedAt: (data['appliedAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
+      requiredDocumentIds: List<String>.from(data['requiredDocumentIds'] ?? []),
+      uploadedDocumentIds: List<String>.from(data['uploadedDocumentIds'] ?? []),
     );
   }
 
@@ -27,6 +31,8 @@ class ApplicationModel extends ApplicationEntity {
       'jobId': jobId,
       'status': status,
       'appliedAt': Timestamp.fromDate(appliedAt),
+      'requiredDocumentIds': requiredDocumentIds,
+      'uploadedDocumentIds': uploadedDocumentIds,
     };
   }
 
@@ -37,6 +43,8 @@ class ApplicationModel extends ApplicationEntity {
       jobId: jobId,
       status: status,
       appliedAt: appliedAt,
+      requiredDocumentIds: requiredDocumentIds,
+      uploadedDocumentIds: uploadedDocumentIds,
     );
   }
 }

@@ -167,6 +167,14 @@ class _MyDocumentsScreenState extends State<MyDocumentsScreen> {
                           documentStatus == AppConstants.documentStatusDenied;
                       final hasStorageUrl =
                           currentDocument?.storageUrl.isNotEmpty ?? false;
+                      final isMissing = !currentHasDoc &&
+                          _controller.isDocumentMissingForAnyApplication(
+                            currentDocType.docTypeId,
+                          );
+                      final jobTitlesRequiringDoc =
+                          _controller.getJobTitlesRequiringDocument(
+                        currentDocType.docTypeId,
+                      );
 
                       return Column(
                         children: [
@@ -239,6 +247,37 @@ class _MyDocumentsScreenState extends State<MyDocumentsScreen> {
                                     status:
                                         AppConstants.documentStatusRequested,
                                     showIcon: false,
+                                  ),
+                                // Show "Missing" status if required by applications but not uploaded
+                                if (isMissing)
+                                  Tooltip(
+                                    message: jobTitlesRequiringDoc.isNotEmpty
+                                        ? 'Required for: ${jobTitlesRequiringDoc.join(', ')}'
+                                        : 'Required for applied jobs',
+                                    child: InkWell(
+                                      onTap: () {
+                                        Get.toNamed(
+                                          AppConstants.routeCandidateUploadDocument,
+                                          arguments: {
+                                            'docTypeId': currentDocType.docTypeId,
+                                            'docTypeName': currentDocType.name,
+                                          },
+                                        );
+                                      },
+                                      child: AppStatusChip(
+                                        status: 'missing',
+                                        customText: 'Missing',
+                                        onTap: () {
+                                          Get.toNamed(
+                                            AppConstants.routeCandidateUploadDocument,
+                                            arguments: {
+                                              'docTypeId': currentDocType.docTypeId,
+                                              'docTypeName': currentDocType.name,
+                                            },
+                                          );
+                                        },
+                                      ),
+                                    ),
                                   ),
                                 if (currentHasDoc) ...[
                                   // Show "Uploaded" chip for requested documents
