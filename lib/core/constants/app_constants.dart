@@ -76,4 +76,7 @@ class AppConstants {
       '/admin/candidates/upload-document';
   static const String routeAdminManageAdmins = '/admin/manage-admins';
   static const String routeAdminCreateNewUser = '/admin/manage-admins/create';
+
+  // External URLs
+  static const String wmsolsWebsiteUrl = 'https://wmsols.com/';
 }

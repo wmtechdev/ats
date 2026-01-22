@@ -8,6 +8,7 @@ import 'package:ats/core/utils/app_images/app_images.dart';
 import 'package:ats/core/widgets/common/navigation/app_navigation_item.dart';
 import 'package:ats/core/widgets/common/navigation/app_navigation_item_model.dart';
 import 'package:ats/core/widgets/common/layout/app_user_profile_section.dart';
+import 'package:ats/core/widgets/common/layout/app_wmsols_footer.dart';
 
 class AppSideLayout extends StatefulWidget {
   final Widget child;
@@ -109,12 +110,19 @@ class _AppSideLayoutState extends State<AppSideLayout> {
               : null,
           actions: widget.actions,
         ),
-        body: RepaintBoundary(
-          key: const ValueKey('app-side-layout-child-repaint'),
-          child: KeyedSubtree(
-            key: const ValueKey('app-side-layout-child'),
-            child: _cachedChild ?? widget.child, // Use cached child to prevent recreation
-          ),
+        body: Column(
+          children: [
+            Expanded(
+              child: RepaintBoundary(
+                key: const ValueKey('app-side-layout-child-repaint'),
+                child: KeyedSubtree(
+                  key: const ValueKey('app-side-layout-child'),
+                  child: _cachedChild ?? widget.child, // Use cached child to prevent recreation
+                ),
+              ),
+            ),
+            const AppWMSolsFooter(),
+          ],
         ),
       );
     } else {
@@ -140,6 +148,8 @@ class _AppSideLayoutState extends State<AppSideLayout> {
                       ),
                     ),
                   ),
+                  // Footer
+                  const AppWMSolsFooter(),
                 ],
               ),
             ),

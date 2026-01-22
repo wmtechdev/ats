@@ -8,6 +8,7 @@ import 'package:ats/core/widgets/auth/components/app_auth_logo.dart';
 import 'package:ats/core/widgets/auth/components/app_auth_title.dart';
 import 'package:ats/core/widgets/auth/forms/app_auth_form_content.dart';
 import 'package:ats/core/widgets/auth/layout/app_auth_container.dart';
+import 'package:ats/core/widgets/common/layout/app_wmsols_footer.dart';
 
 class AppAuthLayout extends StatelessWidget {
   final String title;
@@ -36,41 +37,48 @@ class AppAuthLayout extends StatelessWidget {
     return Scaffold(
       backgroundColor: AppColors.lightBackground,
       body: SafeArea(
-        child: AppAuthContainer(
-          child: Container(
-            padding: AppSpacing.all(context),
-            decoration: BoxDecoration(
-              color: AppColors.secondary,
-              borderRadius: BorderRadius.circular(
-                AppResponsive.radius(context, factor: 2),
+        child: Column(
+          children: [
+            Expanded(
+              child: AppAuthContainer(
+                child: Container(
+                  padding: AppSpacing.all(context),
+                  decoration: BoxDecoration(
+                    color: AppColors.secondary,
+                    borderRadius: BorderRadius.circular(
+                      AppResponsive.radius(context, factor: 2),
+                    ),
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      const AppAuthLogo(),
+                      AppSpacing.vertical(context, 0.02),
+                      if (showNavigationChip)
+                        AppNavigationChip(
+                          firstLabel: AppTexts.login,
+                          secondLabel: AppTexts.signUp,
+                          isFirstSelected: isLoginSelected,
+                          onFirstTap: onLoginTap,
+                          onSecondTap: onSignUpTap,
+                        ),
+                      if (showNavigationChip) AppSpacing.vertical(context, 0.02),
+                      AppAuthTitle(title: title),
+                      AppSpacing.vertical(context, 0.04),
+                      AppAuthFormContent(
+                        isLoginSelected: isLoginSelected,
+                        formFields: formFields,
+                        actionButton: actionButton,
+                        errorMessage: errorMessage,
+                      ),
+                    ],
+                  ),
+                ),
               ),
             ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                const AppAuthLogo(),
-                AppSpacing.vertical(context, 0.02),
-                if (showNavigationChip)
-                  AppNavigationChip(
-                    firstLabel: AppTexts.login,
-                    secondLabel: AppTexts.signUp,
-                    isFirstSelected: isLoginSelected,
-                    onFirstTap: onLoginTap,
-                    onSecondTap: onSignUpTap,
-                  ),
-                if (showNavigationChip) AppSpacing.vertical(context, 0.02),
-                AppAuthTitle(title: title),
-                AppSpacing.vertical(context, 0.04),
-                AppAuthFormContent(
-                  isLoginSelected: isLoginSelected,
-                  formFields: formFields,
-                  actionButton: actionButton,
-                  errorMessage: errorMessage,
-                ),
-              ],
-            ),
-          ),
+            const AppWMSolsFooter(),
+          ],
         ),
       ),
     );

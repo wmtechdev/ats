@@ -367,4 +367,7 @@ class AppTexts {
       "Failed to change password. Please verify your current password and try again.";
   static const String currentPasswordIncorrect =
       "Current password is incorrect. Please try again.";
+
+  // Footer
+  static const String managedByWMSols = "Managed by WMSols";
 }
